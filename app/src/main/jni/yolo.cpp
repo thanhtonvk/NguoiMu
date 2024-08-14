@@ -246,8 +246,8 @@ int Yolo::load(AAssetManager* mgr, const char* modeltype, int _target_size, cons
 
     char parampath[256];
     char modelpath[256];
-    sprintf(parampath, "yolov8s.param", modeltype);
-    sprintf(modelpath, "yolov8s.bin", modeltype);
+    sprintf(parampath, "yolov8n.param", modeltype);
+    sprintf(modelpath, "yolov8n.bin", modeltype);
 
     yolo.load_param(mgr, parampath);
     yolo.load_model(mgr, modelpath);

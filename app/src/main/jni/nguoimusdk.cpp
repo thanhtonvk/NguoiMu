@@ -35,6 +35,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
+#include <android/bitmap.h>
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
 
 #if __ARM_NEON
 #include <arm_neon.h>
@@ -112,12 +116,14 @@ static int draw_fps(cv::Mat &rgb) {
 static Yolo *g_yolo = 0;
 static SCRFD *g_scrfd = 0;
 static FaceEmb *g_faceEmb = 0;
+
 static ncnn::Mutex lock;
 
 
 static std::vector<Object> objects;
 static std::vector<FaceObject> faceObjects;
 static std::vector<float> embedding;
+static cv::Mat faceAligned;
 
 class MyNdkCamera : public NdkCameraWindow {
 public:
@@ -130,16 +136,17 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
         ncnn::MutexLockGuard g(lock);
 
         if (g_yolo) {
+            g_scrfd->detect(rgb, faceObjects);
+
+            if (faceObjects.size() > 0) {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "pass1");
+                g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding, faceAligned);
+            }
             g_yolo->detect(rgb, objects);
 
             g_yolo->draw(rgb, objects);
-
-            g_scrfd->detect(rgb, faceObjects);
             g_scrfd->draw(rgb, faceObjects);
-//            if (faceObjects.size() > 0) {
-//                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "pass1");
-//                g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding);
-//            }
+
 
         } else {
             draw_unsupported(rgb);
@@ -173,6 +180,9 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 
         delete g_scrfd;
         g_scrfd = 0;
+
+        delete g_faceEmb;
+        g_faceEmb = 0;
     }
 
     delete g_camera;
@@ -228,6 +238,8 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             g_yolo = 0;
             delete g_scrfd;
             g_scrfd = 0;
+            delete g_faceEmb;
+            g_faceEmb = 0;
         } else {
             if (!g_yolo)
                 g_yolo = new Yolo;
@@ -237,6 +249,10 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             if (!g_scrfd)
                 g_scrfd = new SCRFD;
             g_scrfd->load(mgr, modeltype, false);
+
+            if (!g_faceEmb)
+                g_faceEmb = new FaceEmb;
+            g_faceEmb->load(mgr);
         }
     }
 
@@ -296,4 +312,98 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getListResult(JNIEnv *env, jobject thiz) {
         env->DeleteLocalRef(javaString);  // Clean up local reference
     }
     return arrayList;
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getEmbedding(JNIEnv *env, jobject thiz) {
+    if (embedding.size() > 0) {
+        std::ostringstream oss;
+
+        // Convert each element to string and add it to the stream
+        for (size_t i = 0; i < embedding.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << embedding[i];
+        }
+
+        // Convert the stream to a string
+        std::string embeddingStr = oss.str();
+        embedding.clear();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
+
+}
+
+
+jobject mat_to_bitmap(JNIEnv *env, Mat &src, bool needPremultiplyAlpha) {
+    jclass java_bitmap_class = env->FindClass("android/graphics/Bitmap");
+    jclass bmpCfgCls = env->FindClass("android/graphics/Bitmap$Config");
+    jmethodID bmpClsValueOfMid = env->GetStaticMethodID(bmpCfgCls, "valueOf",
+                                                        "(Ljava/lang/String;)Landroid/graphics/Bitmap$Config;");
+    jobject jBmpCfg = env->CallStaticObjectMethod(bmpCfgCls, bmpClsValueOfMid,
+                                                  env->NewStringUTF("ARGB_8888"));
+
+    jmethodID mid = env->GetStaticMethodID(java_bitmap_class,
+                                           "createBitmap",
+                                           "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
+
+    jobject bitmap = env->CallStaticObjectMethod(java_bitmap_class,
+                                                 mid, src.cols, src.rows,
+                                                 jBmpCfg);
+
+    AndroidBitmapInfo info;
+    void *pixels = nullptr;
+
+
+    // Validate
+    if (AndroidBitmap_getInfo(env, bitmap, &info) < 0) {
+        std::runtime_error("Failed to get Bitmap info.");
+    }
+    if (src.type() != CV_8UC1 && src.type() != CV_8UC3 && src.type() != CV_8UC4) {
+        std::runtime_error("Unsupported cv::Mat type.");
+    }
+    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) < 0) {
+        std::runtime_error("Failed to lock Bitmap pixels.");
+    }
+    if (!pixels) {
+        std::runtime_error("Bitmap pixels are null.");
+    }
+
+    // Convert cv::Mat to the Bitmap format
+    if (info.format == ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        Mat tmp(info.height, info.width, CV_8UC4, pixels);
+        if (src.type() == CV_8UC1) {
+            cvtColor(src, tmp, COLOR_GRAY2RGBA);
+        } else if (src.type() == CV_8UC3) {
+            cvtColor(src, tmp, COLOR_RGB2RGBA);
+        } else if (src.type() == CV_8UC4) {
+            if (needPremultiplyAlpha) {
+                cvtColor(src, tmp, COLOR_RGBA2mRGBA);
+            } else {
+                src.copyTo(tmp);
+            }
+        }
+    } else if (info.format == ANDROID_BITMAP_FORMAT_RGB_565) {
+        Mat tmp(info.height, info.width, CV_8UC2, pixels);
+        if (src.type() == CV_8UC1) {
+            cvtColor(src, tmp, COLOR_GRAY2BGR565);
+        } else if (src.type() == CV_8UC3) {
+            cvtColor(src, tmp, COLOR_RGB2BGR565);
+        } else if (src.type() == CV_8UC4) {
+            cvtColor(src, tmp, COLOR_RGBA2BGR565);
+        }
+    }
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return bitmap;
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getFaceAlign(JNIEnv *env, jobject thiz) {
+    jobject bitmap = mat_to_bitmap(env, faceAligned, false);
+    return bitmap;
 }

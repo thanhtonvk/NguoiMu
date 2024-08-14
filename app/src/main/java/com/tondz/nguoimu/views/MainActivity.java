@@ -1,16 +1,28 @@
-package com.tondz.nguoimu;
+package com.tondz.nguoimu.views;
 
+import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.tondz.nguoimu.NguoiMuSDK;
+import com.tondz.nguoimu.R;
+import com.tondz.nguoimu.database.DBContext;
+import com.tondz.nguoimu.models.NguoiThan;
+import com.tondz.nguoimu.utils.Common;
 
 import java.util.List;
 import java.util.Locale;
@@ -20,7 +32,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private SurfaceView cameraView;
     private static final int REQUEST_CAMERA = 510;
     TextToSpeech textToSpeech;
-
+    ImageView imgView;
+    DBContext dbContext;
+    TextView tvName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,23 +48,49 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     }
 
+    NguoiThan nguoiThan = null;
+
     private void getObject() {
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(1000);
+
+                        nguoiThan = null;
                         List<String> stringList = yolov8Ncnn.getListResult();
-                        if (stringList.isEmpty()) {
-                            Log.e("RESULT_DETECTOR", "EMPTY LIST");
-                        } else {
-                            for (String result : stringList
-                            ) {
-                                speakObject(result);
+                        String stringEmb = yolov8Ncnn.getEmbedding();
+                        if (!stringEmb.isEmpty()) {
+                            nguoiThan = timNguoi(stringEmb);
+                            if (nguoiThan != null) {
+                                speakNguoiThan(nguoiThan);
+                                tvName.setText(nguoiThan.getTen());
                                 Thread.sleep(2000);
                             }
+                            Bitmap bitmap = yolov8Ncnn.getFaceAlign();
+                            if(bitmap!=null){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        imgView.setImageBitmap(bitmap);
+
+                                    }
+                                });
+                            }
+
+
+                        } else {
+                            if (!stringList.isEmpty()) {
+                                for (String result : stringList
+                                ) {
+                                    speakObject(result);
+                                    Thread.sleep(2000);
+                                }
+                            }
                         }
+                        Thread.sleep(1000);
+
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -63,7 +103,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void init() {
         cameraView = findViewById(R.id.cameraview);
+        imgView = findViewById(R.id.imgView);
         cameraView.getHolder().addCallback(this);
+        dbContext = new DBContext(MainActivity.this);
+        tvName = findViewById(R.id.tvName);
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -72,10 +115,22 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 }
             }
         });
+        findViewById(R.id.btnThem).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ThemNguoiThanActivity.class));
+            }
+        });
+
+    }
+
+    private void speakNguoiThan(NguoiThan nguoiThan) {
+        textToSpeech.speak(nguoiThan.getTen(), TextToSpeech.QUEUE_FLUSH, null);
     }
 
     private void speakObject(String text) {
         String[] arr = text.split(" ");
+
         int label = Integer.parseInt(arr[0]);
         double x = Double.parseDouble(arr[1]);
         double y = Double.parseDouble(arr[2]);
@@ -118,7 +173,37 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (0 < centerX && centerX < 100 && 0 < centerY && centerY < 200) {
             speaking = name + " " + "đang ở trên bên trái";
         }
+        Log.e("TAG", "speakObject: " + speaking);
         textToSpeech.speak(speaking, TextToSpeech.QUEUE_FLUSH, null);
+
+
+    }
+
+    private NguoiThan timNguoi(String embedding) {
+        NguoiThan result = null;
+        double maxScore = 0;
+        for (NguoiThan nguoiThan : dbContext.getNguoiThans()
+        ) {
+            String[] str_target = embedding.split(",");
+            double[] target = new double[512];
+            for (int i = 0; i < 512; i++) {
+                target[i] = Double.parseDouble(str_target[i]);
+            }
+            String[] str_source = nguoiThan.getEmbedding().split(",");
+            double[] source = new double[512];
+            for (int i = 0; i < 512; i++) {
+                source[i] = Double.parseDouble(str_source[i]);
+            }
+            double score = Common.cosineSimilarity(target, source);
+
+            if (score > 0.5 && score > maxScore) {
+                maxScore = score;
+                result = nguoiThan;
+            }
+
+        }
+        Log.e("SEARCH EMB", "timNguoi: " + maxScore);
+        return result;
     }
 
     private void reload() {
@@ -147,11 +232,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public void onResume() {
         super.onResume();
 
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
         }
 
-        yolov8Ncnn.openCamera(0);
+        yolov8Ncnn.openCamera(1);
     }
 
     @Override
