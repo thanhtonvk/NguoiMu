@@ -37,7 +37,7 @@ public class DBContext extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery("select * from NguoiThan", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            NguoiThan nguoiThan = new NguoiThan(cursor.getString(0), cursor.getBlob(1),cursor.getString(2));
+            NguoiThan nguoiThan = new NguoiThan(cursor.getString(0), cursor.getBlob(1), cursor.getString(2));
             nguoiThans.add(nguoiThan);
             cursor.moveToNext();
         }
@@ -53,5 +53,10 @@ public class DBContext extends SQLiteOpenHelper {
         values.put("Embedding", nguoiThan.getEmbedding());
         database.insert("NguoiThan", null, values);
         database.close();
+    }
+
+    public void xoa(String embedding) {
+        SQLiteDatabase database = getWritableDatabase();
+        database.delete("NguoiThan", "Embedding = "+embedding, null);
     }
 }
