@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -24,6 +26,9 @@ import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.Common;
 
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     ImageView imgView;
     DBContext dbContext;
     TextView tvName;
+    Handler handler;
+    Runnable runnable;
+    private boolean canPlaySound = true;
+    AppCompatButton btnDoiCamera;
+    private int facing = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,65 +53,125 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         init();
         reload();
+        onClick();
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                canPlaySound = true;
+            }
+        };
         getObject();
 
+    }
+
+    private void onClick() {
+        btnDoiCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int new_facing = 1 - facing;
+                yolov8Ncnn.closeCamera();
+                yolov8Ncnn.openCamera(new_facing);
+                facing = new_facing;
+            }
+        });
 
     }
 
     NguoiThan nguoiThan = null;
 
     private void getObject() {
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-
-                        nguoiThan = null;
-                        List<String> stringList = yolov8Ncnn.getListResult();
-                        String stringEmb = yolov8Ncnn.getEmbedding();
-                        if (!stringEmb.isEmpty()) {
-                            nguoiThan = timNguoi(stringEmb);
-                            if (nguoiThan != null) {
-                                speakNguoiThan(nguoiThan);
-                                tvName.setText(nguoiThan.getTen());
-                                Thread.sleep(2000);
+        new Thread(() -> {
+            while (true) {
+                nguoiThan = null;
+                String stringEmb = yolov8Ncnn.getEmbedding();
+                if (!stringEmb.isEmpty()) {
+                    nguoiThan = timNguoi(stringEmb);
+                    Bitmap bitmap = yolov8Ncnn.getFaceAlign();
+                    if (bitmap != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                imgView.setImageBitmap(bitmap);
                             }
-                            Bitmap bitmap = yolov8Ncnn.getFaceAlign();
-                            if(bitmap!=null){
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        imgView.setImageBitmap(bitmap);
-
-                                    }
-                                });
-                            }
-
-
-                        } else {
-                            if (!stringList.isEmpty()) {
-                                for (String result : stringList
-                                ) {
-                                    speakObject(result);
-                                    Thread.sleep(2000);
-                                }
-                            }
+                        });
+                    }
+                    if (nguoiThan != null) {
+                        if (canPlaySound) {
+                            speakNguoiThan(nguoiThan);
+                            tvName.setText(nguoiThan.getTen());
+                            canPlaySound = false;
+                            handler.postDelayed(runnable, 5000);
                         }
-                        Thread.sleep(1000);
-
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                    }
+                } else {
+                    List<String> stringList = yolov8Ncnn.getListResult();
+                    if (!stringList.isEmpty()) {
+                        if (canPlaySound) {
+                            countObject(stringList);
+                            for (String result : stringList
+                            ) {
+                                speakObject(result);
+                            }
+                            handler.postDelayed(runnable, 10000);
+                        }
                     }
                 }
-
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
-        });
-        thread.start();
+        }).start();
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    try {
+//                        nguoiThan = null;
+//                        List<String> stringList = yolov8Ncnn.getListResult();
+//                        String stringEmb = yolov8Ncnn.getEmbedding();
+//                        if (!stringEmb.isEmpty()) {
+//                            nguoiThan = timNguoi(stringEmb);
+//                            if (nguoiThan != null) {
+//                                speakNguoiThan(nguoiThan);
+//                                tvName.setText(nguoiThan.getTen());
+//                                Thread.sleep(2000);
+//                            }
+//                            Bitmap bitmap = yolov8Ncnn.getFaceAlign();
+//                            if (bitmap != null) {
+//                                runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        imgView.setImageBitmap(bitmap);
+//                                    }
+//                                });
+//                            }
+//                        } else {
+//                            if (!stringList.isEmpty()) {
+//                                countObject(stringList);
+//                                for (String result : stringList
+//                                ) {
+//                                    speakObject(result);
+//                                    Thread.sleep(2000);
+//                                }
+//                            }
+//                        }
+//                        Thread.sleep(1000);
+//
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//
+//            }
+//        });
+//        thread.start();
     }
 
     private void init() {
+        btnDoiCamera = findViewById(R.id.btnChangeCamera);
         cameraView = findViewById(R.id.cameraview);
         imgView = findViewById(R.id.imgView);
         cameraView.getHolder().addCallback(this);
@@ -128,9 +198,40 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         textToSpeech.speak(nguoiThan.getTen(), TextToSpeech.QUEUE_FLUSH, null);
     }
 
+    private void countObject(List<String> stringObject) {
+        List<String> labels = new ArrayList<>();
+        for (String result : stringObject
+        ) {
+            String[] arr = result.split(" ");
+            labels.add(Common.listObject[Integer.parseInt(arr[0])]);
+        }
+        HashMap<String, Integer> elementCountMap = new HashMap<>();
+
+        // Duyệt qua mảng và đếm số lần xuất hiện của từng phần tử
+        for (String str : labels) {
+            if (elementCountMap.containsKey(str)) {
+                elementCountMap.put(str, elementCountMap.get(str) + 1);
+            } else {
+                elementCountMap.put(str, 1);
+            }
+        }
+        for (String key : elementCountMap.keySet()) {
+            int num_of_value = elementCountMap.get(key);
+            if (num_of_value > 1) {
+                String speak = "Có " + num_of_value + " " + key;
+                textToSpeech.speak(speak, TextToSpeech.QUEUE_FLUSH, null);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        }
+    }
+
     private void speakObject(String text) {
         String[] arr = text.split(" ");
-
         int label = Integer.parseInt(arr[0]);
         double x = Double.parseDouble(arr[1]);
         double y = Double.parseDouble(arr[2]);
@@ -173,9 +274,17 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (0 < centerX && centerX < 100 && 0 < centerY && centerY < 200) {
             speaking = name + " " + "đang ở trên bên trái";
         }
+
+        if (100 < centerX && centerX < 200 && 200 < centerY && centerY < 400) {
+            speaking = name + " " + "đang ở giữa ";
+        }
         Log.e("TAG", "speakObject: " + speaking);
         textToSpeech.speak(speaking, TextToSpeech.QUEUE_FLUSH, null);
-
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -236,13 +345,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
         }
 
-        yolov8Ncnn.openCamera(1);
+        yolov8Ncnn.openCamera(facing);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
         yolov8Ncnn.closeCamera();
     }
 }

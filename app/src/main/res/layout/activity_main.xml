@@ -13,6 +13,13 @@
         android:layout_height="wrap_content"
         android:text="Thêm người thân" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnChangeCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnThem"
+        android:text="Đổi camera" />
+
     <SurfaceView
         android:id="@+id/cameraview"
         android:layout_width="fill_parent"
