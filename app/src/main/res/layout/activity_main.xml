@@ -5,42 +5,29 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".views.MainActivity">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnThem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Thêm người thân" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnChangeCamera"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnThem"
-        android:text="Đổi camera" />
-
-    <SurfaceView
-        android:id="@+id/cameraview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@id/btnThem" />
-
-    <ImageView
-        android:id="@+id/imgView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:scaleType="fitCenter" />
-
     <TextView
-        android:id="@+id/tvName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/imgView"
+        android:layout_marginTop="50dp"
         android:gravity="center"
-        android:textColor="#FF0000"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:text="Phần mềm hỗ trợ người khiếm thị"
+        android:textColor="#D84315"
+        android:textSize="50sp" />
+
+    <Button
+        android:id="@+id/btnDoDuong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Dò đường" />
+
+    <Button
+        android:id="@+id/btnNhanDienNguoi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnDoDuong"
+        android:text="Nhận diện người thân" />
 </RelativeLayout>

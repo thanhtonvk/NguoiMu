@@ -41,6 +41,12 @@
         android:src="@drawable/user" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/openGallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=" Mở thư viện " />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnThem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

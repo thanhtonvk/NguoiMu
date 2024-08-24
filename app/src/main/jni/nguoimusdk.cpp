@@ -31,12 +31,14 @@
 #include "ndkcamera.h"
 #include "scrfd.h"
 #include "face_emb.h"
+#include "light_traffic.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <android/bitmap.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace cv;
 
@@ -44,77 +46,10 @@ using namespace cv;
 #include <arm_neon.h>
 #endif // __ARM_NEON
 
-static int draw_unsupported(cv::Mat &rgb) {
-    const char text[] = "unsupported";
-
-    int baseLine = 0;
-    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 1.0, 1, &baseLine);
-
-    int y = (rgb.rows - label_size.height) / 2;
-    int x = (rgb.cols - label_size.width) / 2;
-
-    cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-                                cv::Size(label_size.width, label_size.height + baseLine)),
-                  cv::Scalar(255, 255, 255), -1);
-
-    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
-                cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0));
-
-    return 0;
-}
-
-static int draw_fps(cv::Mat &rgb) {
-    // resolve moving average
-    float avg_fps = 0.f;
-    {
-        static double t0 = 0.f;
-        static float fps_history[10] = {0.f};
-
-        double t1 = ncnn::get_current_time();
-        if (t0 == 0.f) {
-            t0 = t1;
-            return 0;
-        }
-
-        float fps = 1000.f / (t1 - t0);
-        t0 = t1;
-
-        for (int i = 9; i >= 1; i--) {
-            fps_history[i] = fps_history[i - 1];
-        }
-        fps_history[0] = fps;
-
-        if (fps_history[9] == 0.f) {
-            return 0;
-        }
-
-        for (int i = 0; i < 10; i++) {
-            avg_fps += fps_history[i];
-        }
-        avg_fps /= 10.f;
-    }
-
-    char text[32];
-    sprintf(text, "FPS=%.2f", avg_fps);
-
-    int baseLine = 0;
-    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-
-    int y = 0;
-    int x = rgb.cols - label_size.width;
-
-    cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-                                cv::Size(label_size.width, label_size.height + baseLine)),
-                  cv::Scalar(255, 255, 255), -1);
-
-    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
-                cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
-
-    return 0;
-}
-
 static Yolo *g_yolo = 0;
 static SCRFD *g_scrfd = 0;
+static LightTraffic *g_lightTraffic = 0;
+
 static FaceEmb *g_faceEmb = 0;
 
 static ncnn::Mutex lock;
@@ -124,6 +59,7 @@ static std::vector<Object> objects;
 static std::vector<FaceObject> faceObjects;
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
+static std::vector<float> resultLightTraffic;
 
 class MyNdkCamera : public NdkCameraWindow {
 public:
@@ -131,143 +67,124 @@ public:
 };
 
 void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
-    // nanodet
     {
         ncnn::MutexLockGuard g(lock);
-
         if (g_yolo) {
+            g_yolo->detect(rgb, objects);
+            g_yolo->draw(rgb, objects);
+            for (Object obj: objects) {
+                if (obj.label == 9) {
+                    cv::Mat roi = rgb(obj.rect);
+                    g_lightTraffic->predict(roi, resultLightTraffic);
+                    break;
+                }
+            }
+        }
+        if (g_scrfd) {
             g_scrfd->detect(rgb, faceObjects);
-
             if (faceObjects.size() > 0) {
-                __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "pass1");
                 g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding, faceAligned);
             }
-            g_yolo->detect(rgb, objects);
-
-            g_yolo->draw(rgb, objects);
             g_scrfd->draw(rgb, faceObjects);
-
-
-        } else {
-            draw_unsupported(rgb);
         }
     }
-
-    draw_fps(rgb);
 }
 
 static MyNdkCamera *g_camera = 0;
 
 extern "C" {
-
 JNIEXPORT jint
 JNI_OnLoad(JavaVM *vm, void *reserved) {
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "JNI_OnLoad");
-
     g_camera = new MyNdkCamera;
 
     return JNI_VERSION_1_4;
 }
 
 JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "JNI_OnUnload");
-
     {
         ncnn::MutexLockGuard g(lock);
-
         delete g_yolo;
         g_yolo = 0;
-
         delete g_scrfd;
         g_scrfd = 0;
-
         delete g_faceEmb;
         g_faceEmb = 0;
+        delete g_lightTraffic;
+        g_lightTraffic = 0;
     }
 
     delete g_camera;
     g_camera = 0;
 }
 
+
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
-                                            jint modelid, jint cpugpu) {
-    if (modelid < 0 || modelid > 6 || cpugpu < 0 || cpugpu > 1) {
-        return JNI_FALSE;
-    }
-
+                                            jint yoloDetect, jint faceDectector,
+                                            jint trafficLight) {
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
-
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "loadModel %p", mgr);
-
-    const char *modeltypes[] =
-            {
-                    "n",
-                    "s",
-            };
-
-    const int target_sizes[] =
-            {
-                    320,
-                    320,
-            };
-
-    const float mean_vals[][3] =
-            {
-                    {103.53f, 116.28f, 123.675f},
-                    {103.53f, 116.28f, 123.675f},
-            };
-
-    const float norm_vals[][3] =
-            {
-                    {1 / 255.f, 1 / 255.f, 1 / 255.f},
-                    {1 / 255.f, 1 / 255.f, 1 / 255.f},
-            };
-
-    const char *modeltype = modeltypes[(int) modelid];
-    int target_size = target_sizes[(int) modelid];
-    bool use_gpu = (int) cpugpu == 1;
-
-    // reload
-    {
-        ncnn::MutexLockGuard g(lock);
-
-        if (use_gpu && ncnn::get_gpu_count() == 0) {
-            // no gpu
-            delete g_yolo;
-            g_yolo = 0;
-            delete g_scrfd;
-            g_scrfd = 0;
-            delete g_faceEmb;
-            g_faceEmb = 0;
-        } else {
-            if (!g_yolo)
-                g_yolo = new Yolo;
-            g_yolo->load(mgr, modeltype, target_size, mean_vals[(int) modelid],
-                         norm_vals[(int) modelid], false);
-
-            if (!g_scrfd)
-                g_scrfd = new SCRFD;
-            g_scrfd->load(mgr, modeltype, false);
-
-            if (!g_faceEmb)
-                g_faceEmb = new FaceEmb;
-            g_faceEmb->load(mgr);
+    ncnn::MutexLockGuard g(lock);
+    const char *modeltype = "n";
+    if (trafficLight == 1) {
+        if (!g_lightTraffic) {
+            g_lightTraffic = new LightTraffic;
+        }
+        g_lightTraffic->load(mgr);
+    } else {
+        if (g_lightTraffic) {
+            delete g_lightTraffic;
+            g_lightTraffic = 0;
         }
     }
+    if (yoloDetect == 1) {
+        const float mean_vals[][3] =
+                {
+                        {103.53f, 116.28f, 123.675f},
+                        {103.53f, 116.28f, 123.675f},
+                };
 
+        const float norm_vals[][3] =
+                {
+                        {1 / 255.f, 1 / 255.f, 1 / 255.f},
+                        {1 / 255.f, 1 / 255.f, 1 / 255.f},
+                };
+
+        int target_size = 640;
+        if (!g_yolo) {
+            g_yolo = new Yolo;
+        }
+        g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
+                     norm_vals[0], false);
+    } else {
+        if (g_yolo) {
+            delete g_yolo;
+            g_yolo = 0;
+        }
+
+    }
+    if (faceDectector == 1) {
+        if (!g_scrfd)
+            g_scrfd = new SCRFD;
+        g_scrfd->load(mgr, modeltype, false);
+        if (!g_faceEmb)
+            g_faceEmb = new FaceEmb;
+        g_faceEmb->load(mgr);
+    } else {
+        if (g_scrfd) {
+            delete g_scrfd;
+            delete g_faceEmb;
+            g_scrfd = 0;
+            g_faceEmb = 0;
+        }
+
+
+    }
     return JNI_TRUE;
 }
-
-// public native boolean openCamera(int facing);
-
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_openCamera(JNIEnv *env, jobject thiz, jint facing) {
     if (facing < 0 || facing > 1)
         return JNI_FALSE;
-
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "openCamera %d", facing);
-
     g_camera->open((int) facing);
 
     return JNI_TRUE;
@@ -275,8 +192,6 @@ Java_com_tondz_nguoimu_NguoiMuSDK_openCamera(JNIEnv *env, jobject thiz, jint fac
 
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_closeCamera(JNIEnv *env, jobject thiz) {
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "closeCamera");
-
     g_camera->close();
 
     return JNI_TRUE;
@@ -285,11 +200,7 @@ Java_com_tondz_nguoimu_NguoiMuSDK_closeCamera(JNIEnv *env, jobject thiz) {
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_setOutputWindow(JNIEnv *env, jobject thiz, jobject surface) {
     ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
-
-    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "setOutputWindow %p", win);
-
     g_camera->set_window(win);
-
     return JNI_TRUE;
 }
 
@@ -305,12 +216,13 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getListResult(JNIEnv *env, jobject thiz) {
     for (const Object &obj: objects) {
         std::ostringstream oss;
         oss << obj.label << " " << obj.rect.x << " " << obj.rect.y << " "
-            << obj.rect.width << " " << obj.rect.height;
+            << obj.rect.width << " " << obj.rect.height << " " << obj.distance;
         std::string objName = oss.str();
         jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
         env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
         env->DeleteLocalRef(javaString);  // Clean up local reference
     }
+    objects.clear();
     return arrayList;
 }
 
@@ -406,4 +318,88 @@ JNIEXPORT jobject JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getFaceAlign(JNIEnv *env, jobject thiz) {
     jobject bitmap = mat_to_bitmap(env, faceAligned, false);
     return bitmap;
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getEmbeddingFromPath(JNIEnv *env, jobject thiz, jstring path) {
+    std::vector<float> result;
+    jboolean isCopy;
+    const char *convertedValue = (env)->GetStringUTFChars(path, &isCopy);
+    std::string strPath = convertedValue;
+    static std::vector<FaceObject> faceObjects1;
+    static std::vector<float> embedding1;
+    static cv::Mat faceAligned1;
+
+
+    cv::Mat bgr = imread(strPath, IMREAD_COLOR);
+    cv::Mat rgb;
+    cv::cvtColor(bgr, rgb, cv::COLOR_BGR2RGB);
+    g_scrfd->detect(rgb, faceObjects1);
+    __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len face %f", faceObjects1[0].rect.width);
+    if (faceObjects1.size() > 0) {
+        g_faceEmb->getEmbeding(bgr, faceObjects1[0].landmark, embedding1, faceAligned1);
+        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %zu", embedding1.size());
+        std::ostringstream oss;
+
+        // Convert each element to string and add it to the stream
+        for (size_t i = 0; i < embedding1.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << embedding1[i];
+        }
+
+        // Convert the stream to a string
+        std::string embeddingStr = oss.str();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getFaceAlignFromPath(JNIEnv *env, jobject thiz, jstring path) {
+    std::vector<float> result;
+    jboolean isCopy;
+    const char *convertedValue = (env)->GetStringUTFChars(path, &isCopy);
+    std::string strPath = convertedValue;
+    static std::vector<FaceObject> faceObjects1;
+    static std::vector<float> embedding1;
+    static cv::Mat faceAligned1;
+
+
+    cv::Mat bgr = imread(strPath, IMREAD_COLOR);
+    cv::Mat rgb;
+    cv::cvtColor(bgr, rgb, cv::COLOR_BGR2RGB);
+
+
+    g_scrfd->detect(rgb, faceObjects1);
+    __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len face %f", faceObjects1[0].rect.width);
+    if (faceObjects1.size() > 0) {
+        g_faceEmb->getEmbeding(rgb, faceObjects1[0].landmark, embedding1, faceAligned1);
+        jobject bitmap = mat_to_bitmap(env, faceAligned1, false);
+        return bitmap;
+    }
+    jobject bitmap = mat_to_bitmap(env, faceAligned1, false);
+    return bitmap;
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getLightTraffic(JNIEnv *env, jobject thiz) {
+    if (resultLightTraffic.size() > 0) {
+        std::ostringstream oss;
+        // Convert each element to string and add it to the stream
+        for (size_t i = 0; i < resultLightTraffic.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << resultLightTraffic[i];
+        }
+
+        // Convert the stream to a string
+        std::string embeddingStr = oss.str();
+        resultLightTraffic.clear();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
 }

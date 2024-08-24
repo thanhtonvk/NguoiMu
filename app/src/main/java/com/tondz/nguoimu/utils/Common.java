@@ -1,5 +1,14 @@
 package com.tondz.nguoimu.utils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.List;
+
 public class Common {
     public static String[] listObject = {
             "người", "xe đạp", "ô tô", "xe máy", "máy bay", "xe buýt", "tàu hỏa", "xe tải", "thuyền", "đèn giao thông",
@@ -12,6 +21,30 @@ public class Common {
             "lò vi sóng", "lò nướng", "máy nướng bánh mì", "bồn rửa", "tủ lạnh", "sách", "đồng hồ", "bình hoa", "kéo", "gấu bông",
             "máy sấy tóc", "bàn chải đánh răng"
     };
+    public static String[] lightTraffic = {"Xanh", "Đỏ", "Vàng"};
+    public static double[] knownWidths = {
+            0.5, 1.7, 1.8, 2.0, 35.0, 2.5, 3.0, 2.5, 3.0, 0.3,
+            0.4, 0.75, 0.25, 1.5, 0.3, 0.25, 0.4, 1.8, 1.2, 2.0,
+            4.0, 1.5, 1.5, 2.5, 0.3, 0.5, 0.4, 0.2, 0.4, 0.2,
+            1.5, 1.5, 0.3, 0.5, 0.7, 0.3, 0.8, 1.5,
+            0.4, 0.3, 0.1, 0.1, 0.2, 0.3, 0.3, 0.3, 0.2, 0.2,
+            0.4, 0.4, 0.4, 0.4, 0.6, 0.4, 0.4, 0.4, 0.5, 1.5,
+            0.4, 2.0, 1.0, 0.5, 1.5, 0.3, 0.1, 0.2, 0.2, 0.1,
+            0.5, 0.6, 0.6, 0.4, 0.5, 0.2, 0.2, 0.3, 0.2, 0.2,
+            0.4, 0.2
+    };
+
+    public static double[] knownDistances = {
+            2.0, 5.0, 10.0, 5.0, 100.0, 10.0, 15.0, 10.0, 20.0, 10.0,
+            2.0, 10.0, 2.0, 5.0, 2.0, 1.5, 2.0, 5.0, 2.0, 5.0,
+            15.0, 5.0, 5.0, 10.0, 2.0, 2.0, 1.5, 1.0, 1.5, 1.5,
+            5.0, 5.0, 2.0, 5.0, 5.0, 2.0, 5.0, 5.0,
+            2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0,
+            2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 5.0,
+            2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.5, 1.5, 1.5, 1.5,
+            2.0, 2.0, 2.0, 2.0, 2.0, 1.5, 1.5, 1.5, 1.5, 1.5,
+            2.0, 1.5
+    };
     public static String[] side = {"bên trái", "bên phải", "phía trên", "phía dưới", "ở giữa"};
 
     public static double[] xywhToCenter(double x, double y, double w, double h) {
@@ -19,6 +52,7 @@ public class Common {
         double centerY = y + h / 2;
         return new double[]{centerX, centerY};
     }
+
     public static double cosineSimilarity(double[] vectorA, double[] vectorB) {
         double dotProduct = 0.0;
         double normA = 0.0;
@@ -30,4 +64,45 @@ public class Common {
         }
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
+
+    public static double focal_length_finder(double measured_distance, double real_width, double width_in_rf) {
+        double focal_length = (width_in_rf * measured_distance) / real_width;
+
+        return focal_length;
+    }
+
+
+    public static double distance_finder(double focal_length, double real_object_width, double width_in_frmae) {
+        double distance = (real_object_width * focal_length) / width_in_frmae;
+        return distance;
+    }
+
+    public static Bitmap decodeUri(Uri selectedImage, Context context) throws FileNotFoundException {
+        // Decode image size
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(context.getContentResolver().openInputStream(selectedImage), null, o);
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 400;
+
+        // Find the correct scale value. It should be the power of 2.
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        int scale = 1;
+        while (true) {
+            if (width_tmp / 2 < REQUIRED_SIZE
+                    || height_tmp / 2 < REQUIRED_SIZE) {
+                break;
+            }
+            width_tmp /= 2;
+            height_tmp /= 2;
+            scale *= 2;
+        }
+
+        // Decode with inSampleSize
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        return BitmapFactory.decodeStream(context.getContentResolver().openInputStream(selectedImage), null, o2);
+    }
+
 }
