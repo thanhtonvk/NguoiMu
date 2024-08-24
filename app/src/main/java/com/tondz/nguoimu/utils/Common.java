@@ -22,29 +22,15 @@ public class Common {
             "máy sấy tóc", "bàn chải đánh răng"
     };
     public static String[] lightTraffic = {"Xanh", "Đỏ", "Vàng"};
-    public static double[] knownWidths = {
-            0.5, 1.7, 1.8, 2.0, 35.0, 2.5, 3.0, 2.5, 3.0, 0.3,
-            0.4, 0.75, 0.25, 1.5, 0.3, 0.25, 0.4, 1.8, 1.2, 2.0,
-            4.0, 1.5, 1.5, 2.5, 0.3, 0.5, 0.4, 0.2, 0.4, 0.2,
-            1.5, 1.5, 0.3, 0.5, 0.7, 0.3, 0.8, 1.5,
-            0.4, 0.3, 0.1, 0.1, 0.2, 0.3, 0.3, 0.3, 0.2, 0.2,
-            0.4, 0.4, 0.4, 0.4, 0.6, 0.4, 0.4, 0.4, 0.5, 1.5,
-            0.4, 2.0, 1.0, 0.5, 1.5, 0.3, 0.1, 0.2, 0.2, 0.1,
-            0.5, 0.6, 0.6, 0.4, 0.5, 0.2, 0.2, 0.3, 0.2, 0.2,
-            0.4, 0.2
-    };
 
-    public static double[] knownDistances = {
-            2.0, 5.0, 10.0, 5.0, 100.0, 10.0, 15.0, 10.0, 20.0, 10.0,
-            2.0, 10.0, 2.0, 5.0, 2.0, 1.5, 2.0, 5.0, 2.0, 5.0,
-            15.0, 5.0, 5.0, 10.0, 2.0, 2.0, 1.5, 1.0, 1.5, 1.5,
-            5.0, 5.0, 2.0, 5.0, 5.0, 2.0, 5.0, 5.0,
-            2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0,
-            2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 5.0,
-            2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.5, 1.5, 1.5, 1.5,
-            2.0, 2.0, 2.0, 2.0, 2.0, 1.5, 1.5, 1.5, 1.5, 1.5,
-            2.0, 1.5
-    };
+    public static String convertArrayToString(double[] list) {
+        String result = "";
+        for (int i = 0; i < list.length; i++) {
+            result += CalDistance.widthInImages[i] + ",";
+        }
+        return result;
+    }
+
     public static String[] side = {"bên trái", "bên phải", "phía trên", "phía dưới", "ở giữa"};
 
     public static double[] xywhToCenter(double x, double y, double w, double h) {

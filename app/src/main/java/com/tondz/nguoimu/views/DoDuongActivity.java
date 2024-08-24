@@ -30,6 +30,7 @@ import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
 import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.models.NguoiThan;
+import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.utils.Common;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     private boolean canPlaySound = true;
     Button btnDoiCamera;
     private int facing = 1;
+    TextView tvKhoangCach;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,13 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
                 yolov8Ncnn.closeCamera();
                 yolov8Ncnn.openCamera(new_facing);
                 facing = new_facing;
+            }
+        });
+        findViewById(R.id.btnCanChinh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), CanChinhKhoangCachActivity.class));
+                finish();
             }
         });
 
@@ -113,7 +122,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
 
         cameraView.getHolder().addCallback(this);
-
+        tvKhoangCach = findViewById(R.id.tvKc);
 
         dbContext = new DBContext(DoDuongActivity.this);
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -160,6 +169,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
 
+    @SuppressLint("DefaultLocale")
     private void speakObject(String text) {
         String[] arr = text.split(" ");
         int label = Integer.parseInt(arr[0]);
@@ -167,7 +177,10 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
         double y = Double.parseDouble(arr[2]);
         double w = Double.parseDouble(arr[3]);
         double h = Double.parseDouble(arr[4]);
-        double distance = Double.parseDouble(arr[5]);
+        double focalLength = CalDistance.calculateFocalLength(CalDistance.knownDistances[label], CalDistance.knownWidths[label],
+                CalDistance.widthInImages[label]);
+        double distance = CalDistance.calculateDistance(CalDistance.knownWidths[label], focalLength, w);
+        tvKhoangCach.setText(String.format("Khoảng cách %,.2fm", distance));
         String name = Common.listObject[label];
         double[] position = Common.xywhToCenter(x, y, w, h);
         double centerX = position[0];

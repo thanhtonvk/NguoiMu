@@ -1,17 +1,3 @@
-// Tencent is pleased to support the open source community by making ncnn available.
-//
-// Copyright (C) 2021 THL A29 Limited, a Tencent company. All rights reserved.
-//
-// Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
-// in compliance with the License. You may obtain a copy of the License at
-//
-// https://opensource.org/licenses/BSD-3-Clause
-//
-// Unless required by applicable law or agreed to in writing, software distributed
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the
-// specific language governing permissions and limitations under the License.
-
 #include "yolo.h"
 
 #include <opencv2/core/core.hpp>
@@ -122,7 +108,7 @@ double distanceObject(int label, int width) {
         widthInImage = 170;
     }
     if (alpha == 2.0) {
-        widthInImage = 200;
+        widthInImage = 100;
     }
     if (alpha == 2.5) {
         widthInImage = 220;
@@ -446,8 +432,8 @@ int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_th
         objects[i].rect.y = y0;
         objects[i].rect.width = x1 - x0;
         objects[i].rect.height = y1 - y0;
-        double distance = distanceObject(objects[i].label, objects[i].rect.width);
-        objects[i].distance = distance;
+//        double distance = distanceObject(objects[i].label, objects[i].rect.width);
+//        objects[i].distance = distance;
     }
 
     // sort objects by area
@@ -497,7 +483,7 @@ int Yolo::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
         cv::rectangle(rgb, obj.rect, cc, 2);
 
         char text[256];
-        sprintf(text, "%.1fm %s %.1f%%", obj.distance, class_names[obj.label], obj.prob * 100);
+        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
 
         int baseLine = 0;
         cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);

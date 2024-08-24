@@ -24,7 +24,6 @@ struct Object
     cv::Rect_<float> rect;
     int label;
     float prob;
-    float distance;
 };
 struct GridAndStride
 {

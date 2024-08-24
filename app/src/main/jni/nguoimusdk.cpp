@@ -216,7 +216,7 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getListResult(JNIEnv *env, jobject thiz) {
     for (const Object &obj: objects) {
         std::ostringstream oss;
         oss << obj.label << " " << obj.rect.x << " " << obj.rect.y << " "
-            << obj.rect.width << " " << obj.rect.height << " " << obj.distance;
+            << obj.rect.width << " " << obj.rect.height;
         std::string objName = oss.str();
         jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
         env->CallBooleanMethod(arrayList, arrayListAdd, javaString);

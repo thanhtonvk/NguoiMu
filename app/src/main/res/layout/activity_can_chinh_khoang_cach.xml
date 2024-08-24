@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.DoDuongActivity">
+    tools:context=".views.CanChinhKhoangCachActivity">
 
 
     <SurfaceView
@@ -17,7 +17,15 @@
         android:id="@+id/tvKc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tvKichthuoc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvKc"
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="24sp" />
@@ -25,22 +33,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btnChangeCamera"
+            android:id="@+id/btnCong"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:layout_weight="1"
-            android:text="Đổi camera" />
+            android:text="+" />
 
         <Button
-            android:id="@+id/btnCanChinh"
+            android:id="@+id/btnTru"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:layout_weight="1"
-            android:text="Căn chỉnh khoảng cách" />
+            android:text="-" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:text="Lưu" />
     </LinearLayout>
-
-
 </RelativeLayout>
