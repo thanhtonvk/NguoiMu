@@ -18,11 +18,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
 import com.tondz.nguoimu.database.DBContext;
@@ -37,21 +43,48 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    boolean isPass = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        String PASSWORD = "12345";
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        reference.child("pass").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue().toString().equals(PASSWORD)) {
+                    isPass = true;
+                } else {
+                    Toast.makeText(getApplicationContext(), "Đã hết thời gian dùng thử", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                finish();
+            }
+        });
         findViewById(R.id.btnDoDuong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
+                if (isPass) {
+                    startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
+                }
+
             }
         });
         findViewById(R.id.btnNhanDienNguoi).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
+                if (isPass) {
+                    startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
+                }
+
             }
         });
         checkPermissions();
