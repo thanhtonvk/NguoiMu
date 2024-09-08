@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
+    android:orientation="vertical"
     tools:context=".views.MainActivity">
 
     <TextView
@@ -30,4 +31,20 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btnDoDuong"
         android:text="Nhận diện người thân" />
+
+    <Button
+        android:id="@+id/btnGoiDien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnNhanDienNguoi"
+        android:text="Quay số" />
+
+    <Button
+        android:id="@+id/btnGoiDanhBa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnGoiDien"
+        android:text="Gọi trong danh bạ" />
+
+
 </RelativeLayout>
