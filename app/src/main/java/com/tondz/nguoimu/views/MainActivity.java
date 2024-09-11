@@ -119,11 +119,45 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        findViewById(R.id.btnMic).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent
+                        = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                        Locale.getDefault());
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
+
+                try {
+                    startActivityForResult(intent, REQUEST_MIC);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
+    private static final int REQUEST_MIC = 1345;
     private static final int REQUEST_QUAY_SO = 1000;
     private static final int REQUEST_DANH_BA = 1001;
     private static final int REQUEST_CODE_PERMISSION = 12000;
+
+    private void actionMic(String text) {
+        if (text.toLowerCase().contains("do duong")) {
+            startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
+        }
+        if (text.toLowerCase().contains("nhan dien nguoi")) {
+            startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
+        }
+        if (text.toLowerCase().contains("goi dien")) {
+            speechQuaySo();
+        }
+        if (text.toLowerCase().contains("danh ba")) {
+            speechDanhBa();
+        }
+    }
 
     private void speechDanhBa() {
         Intent intent
@@ -178,6 +212,14 @@ public class MainActivity extends AppCompatActivity {
                 String text = result.get(0);
                 findContacts(text);
 
+            }
+        }
+        if (requestCode == REQUEST_MIC && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (result != null && !result.isEmpty()) {
+                String text = result.get(0);
+                text = removeAccent(text);
+                actionMic(text);
             }
         }
     }
