@@ -62,7 +62,16 @@ public class MainActivity extends AppCompatActivity {
         String PASSWORD = "12345";
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference();
-
+        checkPermissions();
+        loadWidthInImages();
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(Locale.forLanguageTag("vi-VN"));
+                }
+            }
+        });
         reference.child("pass").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -83,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isPass) {
+                    textToSpeech.speak("dò đường", TextToSpeech.QUEUE_FLUSH, null);
                     startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
                 }
 
@@ -92,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isPass) {
+                    textToSpeech.speak("nhận diện người thân", TextToSpeech.QUEUE_FLUSH, null);
                     startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
                 }
 
@@ -100,25 +111,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnGoiDien).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                textToSpeech.speak("Quay số", TextToSpeech.QUEUE_FLUSH, null);
                 speechQuaySo();
             }
         });
         findViewById(R.id.btnGoiDanhBa).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                textToSpeech.speak("danh bạ", TextToSpeech.QUEUE_FLUSH, null);
                 speechDanhBa();
             }
         });
-        checkPermissions();
-        loadWidthInImages();
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int i) {
-                if (i != TextToSpeech.ERROR) {
-                    textToSpeech.setLanguage(Locale.forLanguageTag("vi-VN"));
-                }
-            }
-        });
+
         findViewById(R.id.btnMic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
