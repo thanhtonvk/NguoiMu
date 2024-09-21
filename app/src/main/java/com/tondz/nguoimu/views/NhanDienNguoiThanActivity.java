@@ -146,27 +146,32 @@ public class NhanDienNguoiThanActivity extends AppCompatActivity implements Surf
     private void speakNguoiThan(NguoiThan nguoiThan) {
         textToSpeech.speak(nguoiThan.getTen(), TextToSpeech.QUEUE_FLUSH, null);
     }
+
     private NguoiThan timNguoi(String embedding) {
         NguoiThan result = null;
         double maxScore = 0;
         for (NguoiThan nguoiThan : dbContext.getNguoiThans()
         ) {
             String[] str_target = embedding.split(",");
-            double[] target = new double[512];
-            for (int i = 0; i < 512; i++) {
-                target[i] = Double.parseDouble(str_target[i]);
-            }
             String[] str_source = nguoiThan.getEmbedding().split(",");
-            double[] source = new double[512];
-            for (int i = 0; i < 512; i++) {
-                source[i] = Double.parseDouble(str_source[i]);
-            }
-            double score = Common.cosineSimilarity(target, source);
+            if (str_target.length == 512 && str_source.length == 512) {
+                double[] target = new double[512];
+                for (int i = 0; i < 512; i++) {
+                    target[i] = Double.parseDouble(str_target[i]);
+                }
 
-            if (score > 0.5 && score > maxScore) {
-                maxScore = score;
-                result = nguoiThan;
+                double[] source = new double[512];
+                for (int i = 0; i < 512; i++) {
+                    source[i] = Double.parseDouble(str_source[i]);
+                }
+                double score = Common.cosineSimilarity(target, source);
+
+                if (score > 0.5 && score > maxScore) {
+                    maxScore = score;
+                    result = nguoiThan;
+                }
             }
+
 
         }
         return result;
