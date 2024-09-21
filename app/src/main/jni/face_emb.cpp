@@ -101,12 +101,13 @@ cv::Mat align_face(const cv::Mat &image, const std::vector<cv::Point2f> &detecte
 int FaceEmb::getEmbeding(cv::Mat src, cv::Point2f landmark[5], std::vector<float> &result,
                          cv::Mat &faceAligned) {
 
+    // Tính embedding của ảnh gốc
     std::vector<cv::Point2f> landmarks;
     for (int i = 0; i < 5; i++) {
         cv::Point2f p1 = cv::Point(landmark[i].x, landmark[i].y);
         landmarks.push_back(p1);
     }
-//    aligner.AlignFace(src,landmarks,&faceAligned);
+
     faceAligned = align_face(src, landmarks);
     ncnn::Mat in_net = ncnn::Mat::from_pixels_resize(faceAligned.clone().data,
                                                      ncnn::Mat::PIXEL_RGB, faceAligned.cols,
@@ -120,11 +121,36 @@ int FaceEmb::getEmbeding(cv::Mat src, cv::Point2f landmark[5], std::vector<float
     extractor.input("input.1", in_net);
     ncnn::Mat outBlob;
     extractor.extract("516", outBlob);
-    for (int i = 0; i < outBlob.w; i++) {
-        float test = outBlob.row(0)[i];
 
-        result.push_back(test);
+    std::vector<float> originalEmb;
+    for (int i = 0; i < outBlob.w; i++) {
+        float value = outBlob.row(0)[i];
+        originalEmb.push_back(value);
     }
+
+    // Lật ảnh
+    cv::Mat faceAlignedFlip;
+    cv::flip(faceAligned.clone(), faceAlignedFlip, 1);
+    in_net = ncnn::Mat::from_pixels_resize(faceAlignedFlip.clone().data,
+                                           ncnn::Mat::PIXEL_RGB, faceAlignedFlip.cols,
+                                           faceAlignedFlip.rows,
+                                           112, 112);
+    in_net.substract_mean_normalize(mean, norm);
+    extractor.input("input.1", in_net);
+    extractor.extract("516", outBlob);
+
+    std::vector<float> flippedEmb;
+    for (int i = 0; i < outBlob.w; i++) {
+        float value = outBlob.row(0)[i];
+        flippedEmb.push_back(value);
+    }
+
+    result.clear(); // Đảm bảo vector result rỗng trước khi thêm giá trị
+    for (int i = 0; i < originalEmb.size(); i++) {
+        float avgEmb = (originalEmb[i] + flippedEmb[i]) / 2.0f;
+        result.push_back(avgEmb);
+    }
+
     return 0;
 }
 

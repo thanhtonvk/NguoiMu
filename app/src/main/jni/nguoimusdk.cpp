@@ -82,7 +82,7 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
         }
         if (g_scrfd) {
             g_scrfd->detect(rgb, faceObjects);
-            if (faceObjects.size() > 0) {
+            if (!faceObjects.empty()) {
                 g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding, faceAligned);
             }
             g_scrfd->draw(rgb, faceObjects);
