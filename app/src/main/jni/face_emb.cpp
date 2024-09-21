@@ -109,7 +109,7 @@ int FaceEmb::getEmbeding(cv::Mat src, cv::Point2f landmark[5], std::vector<float
 //    aligner.AlignFace(src,landmarks,&faceAligned);
     faceAligned = align_face(src, landmarks);
     ncnn::Mat in_net = ncnn::Mat::from_pixels_resize(faceAligned.clone().data,
-                                                     ncnn::Mat::PIXEL_BGR2RGB, faceAligned.cols,
+                                                     ncnn::Mat::PIXEL_RGB, faceAligned.cols,
                                                      faceAligned.rows,
                                                      112, 112);
 
