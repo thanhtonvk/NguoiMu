@@ -1,17 +1,3 @@
-// Tencent is pleased to support the open source community by making ncnn available.
-//
-// Copyright (C) 2021 THL A29 Limited, a Tencent company. All rights reserved.
-//
-// Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
-// in compliance with the License. You may obtain a copy of the License at
-//
-// https://opensource.org/licenses/BSD-3-Clause
-//
-// Unless required by applicable law or agreed to in writing, software distributed
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the
-// specific language governing permissions and limitations under the License.
-
 #include <android/asset_manager_jni.h>
 #include <android/native_window_jni.h>
 #include <android/native_window.h>
@@ -32,6 +18,8 @@
 #include "scrfd.h"
 #include "face_emb.h"
 #include "light_traffic.h"
+#include "emotion_recognition.h"
+#include "deaf_recognition.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -49,7 +37,8 @@ using namespace cv;
 static Yolo *g_yolo = 0;
 static SCRFD *g_scrfd = 0;
 static LightTraffic *g_lightTraffic = 0;
-
+static EmotionRecognition *g_emotion = 0;
+static DeafRecognition *g_deaf = 0;
 static FaceEmb *g_faceEmb = 0;
 
 static ncnn::Mutex lock;
@@ -60,6 +49,9 @@ static std::vector<FaceObject> faceObjects;
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
 static std::vector<float> resultLightTraffic;
+
+static std::vector<float> scoreEmotions;
+static std::vector<float> scoreDeafs;
 
 class MyNdkCamera : public NdkCameraWindow {
 public:
@@ -87,6 +79,24 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
             }
             g_scrfd->draw(rgb, faceObjects);
         }
+
+        if (g_scrfd && g_emotion) {
+            scoreEmotions.clear();
+            g_scrfd->detect(rgb, faceObjects);
+            if (!faceObjects.empty()) {
+                g_emotion->predict(rgb, faceObjects[0], scoreEmotions);
+                g_emotion->draw(rgb, faceObjects[0], scoreEmotions);
+            }
+
+        }
+        if (g_yolo && g_deaf) {
+            scoreDeafs.clear();
+            g_yolo->detect(rgb, objects);
+            if (!objects.empty()) {
+                g_deaf->predict(rgb, objects[0], scoreDeafs);
+                g_deaf->draw(rgb, objects[0], scoreDeafs);
+            }
+        }
     }
 }
 
@@ -111,6 +121,11 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
         g_faceEmb = 0;
         delete g_lightTraffic;
         g_lightTraffic = 0;
+
+        delete g_emotion;
+        g_emotion = 0;
+        delete g_deaf;
+        g_deaf = 0;
     }
 
     delete g_camera;
@@ -121,7 +136,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
                                             jint yoloDetect, jint faceDectector,
-                                            jint trafficLight) {
+                                            jint trafficLight, jint isCamDiec) {
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
@@ -176,9 +191,17 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             g_scrfd = 0;
             g_faceEmb = 0;
         }
-
-
     }
+    if(isCamDiec>0){
+        if (!g_emotion)
+            g_emotion = new EmotionRecognition;
+        g_emotion->load(mgr);
+
+        if (!g_deaf)
+            g_deaf = new DeafRecognition;
+        g_deaf->load(mgr);
+    }
+
     return JNI_TRUE;
 }
 extern "C" jboolean
@@ -399,6 +422,49 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getLightTraffic(JNIEnv *env, jobject thiz) {
         // Convert the stream to a string
         std::string embeddingStr = oss.str();
         resultLightTraffic.clear();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
+    if (!scoreEmotions.empty()) {
+        std::ostringstream oss;
+
+        // Convert each element to string and add it to the stream
+        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << scoreEmotions[i];
+        }
+
+        // Convert the stream to a string
+        std::string embeddingStr = oss.str();
+        scoreEmotions.clear();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
+    if (!scoreDeafs.empty()) {
+        std::ostringstream oss;
+
+        // Convert each element to string and add it to the stream
+        for (size_t i = 0; i < scoreDeafs.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << scoreDeafs[i];
+        }
+
+        // Convert the stream to a string
+        std::string embeddingStr = oss.str();
+        scoreDeafs.clear();
         return env->NewStringUTF(embeddingStr.c_str());
     }
     return env->NewStringUTF("");

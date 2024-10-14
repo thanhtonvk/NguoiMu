@@ -67,7 +67,7 @@ public class DetectFaceActivity extends AppCompatActivity implements SurfaceHold
 
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0,1,0);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0,1,0,0);
         if (!ret_init) {
             Log.e("MainActivity", "yolov8ncnn loadModel failed");
         }
