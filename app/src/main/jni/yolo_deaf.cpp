@@ -1,4 +1,4 @@
-#include "yolo.h"
+#include "yolo_deaf.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -50,13 +50,84 @@ static double knownDistances[] = {
         2.0, 1.5
 };
 
-double calculateFocalLength(double knownDistance, double knownWidth, int widthInImage) {
+double calculateFocalLengthDeaf(double knownDistance, double knownWidth, int widthInImage) {
     return (widthInImage * knownDistance) / knownWidth;
 }
 
 
-double calculateDistance(double knownWidth, double focalLength, int widthInImage) {
+double calculateDistanceDeaf(double knownWidth, double focalLength, int widthInImage) {
     return (knownWidth * focalLength) / widthInImage;
+}
+
+double distanceObject(int label, int width) {
+    double widthInImage = 0;
+    double alpha = knownWidths[label];
+    if (alpha == 0.1) {
+        widthInImage = 20;
+    }
+    if (alpha == 0.2) {
+        widthInImage = 30;
+    }
+    if (alpha == 0.25) {
+        widthInImage = 50;
+    }
+    if (alpha == 0.3) {
+        widthInImage = 100;
+    }
+    if (alpha == 0.4) {
+        widthInImage = 110;
+    }
+    if (alpha == 0.5) {
+        widthInImage = 110;
+    }
+    if (alpha == 0.6) {
+        widthInImage = 120;
+    }
+    if (alpha == 0.7) {
+        widthInImage = 130;
+    }
+    if (alpha == 0.75) {
+        widthInImage = 130;
+    }
+    if (alpha == 0.8) {
+        widthInImage = 140;
+    }
+    if (alpha == 1.0) {
+        widthInImage = 140;
+    }
+    if (alpha == 1.2) {
+        widthInImage = 140;
+    }
+    if (alpha == 1.5) {
+        widthInImage = 150;
+    }
+    if (alpha == 1.7) {
+        widthInImage = 170;
+    }
+    if (alpha == 1.8) {
+        widthInImage = 170;
+    }
+    if (alpha == 2.0) {
+        widthInImage = 100;
+    }
+    if (alpha == 2.5) {
+        widthInImage = 220;
+    }
+    if (alpha == 3.0) {
+        widthInImage = 250;
+    }
+    if (alpha == 4.0) {
+        widthInImage = 300;
+    }
+    if (alpha == 35) {
+        widthInImage = 3000;
+    }
+
+
+    float focalLength = calculateFocalLengthDeaf(knownDistances[label], knownWidths[label],
+                                             widthInImage);
+    float distance = calculateDistanceDeaf(knownWidths[label], focalLength, width);
+    return distance;
 }
 
 static float fast_exp(float x) {
@@ -244,38 +315,38 @@ static void generate_proposals(std::vector<GridAndStride> grid_strides, const nc
     }
 }
 
-Yolo::Yolo() {
+Yolo_Deaf::Yolo_Deaf() {
     blob_pool_allocator.set_size_compare_ratio(0.f);
     workspace_pool_allocator.set_size_compare_ratio(0.f);
 }
 
 
-int Yolo::load(AAssetManager *mgr, const char *modeltype, int _target_size, const float *_mean_vals,
+int Yolo_Deaf::load(AAssetManager *mgr, const char *modeltype, int _target_size, const float *_mean_vals,
                const float *_norm_vals, bool use_gpu) {
-    yolo.clear();
+    yolo_deaf.clear();
     blob_pool_allocator.clear();
     workspace_pool_allocator.clear();
 
     ncnn::set_cpu_powersave(2);
     ncnn::set_omp_num_threads(ncnn::get_big_cpu_count());
 
-    yolo.opt = ncnn::Option();
+    yolo_deaf.opt = ncnn::Option();
 
 #if NCNN_VULKAN
-    yolo.opt.use_vulkan_compute = use_gpu;
+    yolo_deaf.opt.use_vulkan_compute = use_gpu;
 #endif
 
-    yolo.opt.num_threads = ncnn::get_big_cpu_count();
-    yolo.opt.blob_allocator = &blob_pool_allocator;
-    yolo.opt.workspace_allocator = &workspace_pool_allocator;
+    yolo_deaf.opt.num_threads = ncnn::get_big_cpu_count();
+    yolo_deaf.opt.blob_allocator = &blob_pool_allocator;
+    yolo_deaf.opt.workspace_allocator = &workspace_pool_allocator;
 
     char parampath[256];
     char modelpath[256];
     sprintf(parampath, "yolov8n.param", modeltype);
     sprintf(modelpath, "yolov8n.bin", modeltype);
 
-    yolo.load_param(mgr, parampath);
-    yolo.load_model(mgr, modelpath);
+    yolo_deaf.load_param(mgr, parampath);
+    yolo_deaf.load_model(mgr, modelpath);
 
     target_size = _target_size;
     mean_vals[0] = _mean_vals[0];
@@ -288,7 +359,7 @@ int Yolo::load(AAssetManager *mgr, const char *modeltype, int _target_size, cons
     return 0;
 }
 
-int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_threshold,
+int Yolo_Deaf::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_threshold,
                  float nms_threshold) {
     int width = rgb.cols;
     int height = rgb.rows;
@@ -319,7 +390,7 @@ int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_th
 
     in_pad.substract_mean_normalize(0, norm_vals);
 
-    ncnn::Extractor ex = yolo.create_extractor();
+    ncnn::Extractor ex = yolo_deaf.create_extractor();
 
     ex.input("images", in_pad);
 
@@ -376,7 +447,7 @@ int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_th
     return 0;
 }
 
-int Yolo::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
+int Yolo_Deaf::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
 
 
     static const char *class_names[] = {
@@ -402,37 +473,42 @@ int Yolo::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
 
     for (size_t i = 0; i < objects.size(); i++) {
         const Object &obj = objects[i];
+        if (obj.label == 0) {
+            const unsigned char *color = colors[color_index % 19];
+            color_index++;
+
+            cv::Scalar cc(color[0], color[1], color[2]);
+
+            cv::rectangle(rgb, obj.rect, cc, 2);
+
+            char text[256];
+            sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
+
+            int baseLine = 0;
+            cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1,
+                                                  &baseLine);
+
+            int x = obj.rect.x;
+            int y = obj.rect.y - label_size.height - baseLine;
+            if (y < 0)
+                y = 0;
+            if (x + label_size.width > rgb.cols)
+                x = rgb.cols - label_size.width;
+
+            cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
+                                        cv::Size(label_size.width, label_size.height + baseLine)),
+                          cc,
+                          -1);
+
+            cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
+                                                                        : cv::Scalar(255, 255, 255);
+
+            cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        textcc, 1);
+        }
 
 
-        const unsigned char *color = colors[color_index % 19];
-        color_index++;
-
-        cv::Scalar cc(color[0], color[1], color[2]);
-
-        cv::rectangle(rgb, obj.rect, cc, 2);
-
-        char text[256];
-        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
-
-        int baseLine = 0;
-        cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-
-        int x = obj.rect.x;
-        int y = obj.rect.y - label_size.height - baseLine;
-        if (y < 0)
-            y = 0;
-        if (x + label_size.width > rgb.cols)
-            x = rgb.cols - label_size.width;
-
-        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-                                    cv::Size(label_size.width, label_size.height + baseLine)), cc,
-                      -1);
-
-        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
-                                                                    : cv::Scalar(255, 255, 255);
-
-        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
-                    textcc, 1);
     }
 
     return 0;

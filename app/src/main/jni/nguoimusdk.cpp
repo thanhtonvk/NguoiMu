@@ -20,6 +20,8 @@
 #include "light_traffic.h"
 #include "emotion_recognition.h"
 #include "deaf_recognition.h"
+#include "scrfd_deaf.h"
+#include "yolo_deaf.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -40,6 +42,8 @@ static LightTraffic *g_lightTraffic = 0;
 static EmotionRecognition *g_emotion = 0;
 static DeafRecognition *g_deaf = 0;
 static FaceEmb *g_faceEmb = 0;
+static SCRFD_DEAF *g_scrfd_deaf = 0;
+static Yolo_Deaf *g_yolo_deaf = 0;
 
 static ncnn::Mutex lock;
 
@@ -80,18 +84,18 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
             g_scrfd->draw(rgb, faceObjects);
         }
 
-        if (g_scrfd && g_emotion) {
+        if (g_scrfd_deaf && g_emotion) {
             scoreEmotions.clear();
-            g_scrfd->detect(rgb, faceObjects);
+            g_scrfd_deaf->detect(rgb, faceObjects);
             if (!faceObjects.empty()) {
                 g_emotion->predict(rgb, faceObjects[0], scoreEmotions);
                 g_emotion->draw(rgb, faceObjects[0], scoreEmotions);
             }
 
         }
-        if (g_yolo && g_deaf) {
+        if (g_yolo_deaf && g_deaf) {
             scoreDeafs.clear();
-            g_yolo->detect(rgb, objects);
+            g_yolo_deaf->detect(rgb, objects);
             if (!objects.empty()) {
                 g_deaf->predict(rgb, objects[0], scoreDeafs);
                 g_deaf->draw(rgb, objects[0], scoreDeafs);
@@ -122,6 +126,12 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
         delete g_lightTraffic;
         g_lightTraffic = 0;
 
+
+        delete g_yolo_deaf;
+        g_yolo_deaf = 0;
+        delete g_scrfd_deaf;
+        g_scrfd_deaf = 0;
+
         delete g_emotion;
         g_emotion = 0;
         delete g_deaf;
@@ -140,59 +150,90 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
-    if (trafficLight == 1) {
-        if (!g_lightTraffic) {
-            g_lightTraffic = new LightTraffic;
+    const float mean_vals[][3] =
+            {
+                    {103.53f, 116.28f, 123.675f},
+                    {103.53f, 116.28f, 123.675f},
+            };
+
+    const float norm_vals[][3] =
+            {
+                    {1 / 255.f, 1 / 255.f, 1 / 255.f},
+                    {1 / 255.f, 1 / 255.f, 1 / 255.f},
+            };
+
+    int target_size = 640;
+    if (isCamDiec == 0) {
+        delete g_yolo_deaf;
+        g_yolo_deaf = 0;
+        delete g_scrfd_deaf;
+        g_scrfd_deaf = 0;
+
+        delete g_emotion;
+        g_emotion = 0;
+        delete g_deaf;
+        g_deaf = 0;
+        if (trafficLight == 1) {
+            if (!g_lightTraffic) {
+                g_lightTraffic = new LightTraffic;
+            }
+            g_lightTraffic->load(mgr);
+        } else {
+            if (g_lightTraffic) {
+                delete g_lightTraffic;
+                g_lightTraffic = 0;
+            }
         }
-        g_lightTraffic->load(mgr);
-    } else {
-        if (g_lightTraffic) {
-            delete g_lightTraffic;
-            g_lightTraffic = 0;
+        if (yoloDetect == 1) {
+
+            if (!g_yolo) {
+                g_yolo = new Yolo;
+            }
+            g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
+                         norm_vals[0], false);
+        } else {
+            if (g_yolo) {
+                delete g_yolo;
+                g_yolo = 0;
+            }
+
+        }
+        if (faceDectector == 1) {
+            if (!g_scrfd)
+                g_scrfd = new SCRFD;
+            g_scrfd->load(mgr, modeltype, false);
+            if (!g_faceEmb)
+                g_faceEmb = new FaceEmb;
+            g_faceEmb->load(mgr);
+        } else {
+            if (g_scrfd) {
+                delete g_scrfd;
+                delete g_faceEmb;
+                g_scrfd = 0;
+                g_faceEmb = 0;
+            }
         }
     }
-    if (yoloDetect == 1) {
-        const float mean_vals[][3] =
-                {
-                        {103.53f, 116.28f, 123.675f},
-                        {103.53f, 116.28f, 123.675f},
-                };
 
-        const float norm_vals[][3] =
-                {
-                        {1 / 255.f, 1 / 255.f, 1 / 255.f},
-                        {1 / 255.f, 1 / 255.f, 1 / 255.f},
-                };
+    if (isCamDiec > 0) {
+        delete g_yolo;
+        g_yolo = 0;
+        delete g_scrfd;
+        g_scrfd = 0;
+        delete g_faceEmb;
+        g_faceEmb = 0;
+        delete g_lightTraffic;
+        g_lightTraffic = 0;
+        if (!g_scrfd_deaf)
+            g_scrfd_deaf = new SCRFD_DEAF;
+        g_scrfd_deaf->load(mgr, modeltype, false);
 
-        int target_size = 640;
-        if (!g_yolo) {
-            g_yolo = new Yolo;
+        if (!g_yolo_deaf) {
+            g_yolo_deaf = new Yolo_Deaf;
         }
-        g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
-                     norm_vals[0], false);
-    } else {
-        if (g_yolo) {
-            delete g_yolo;
-            g_yolo = 0;
-        }
+        g_yolo_deaf->load(mgr, modeltype, target_size, mean_vals[0],
+                          norm_vals[0], false);
 
-    }
-    if (faceDectector == 1) {
-        if (!g_scrfd)
-            g_scrfd = new SCRFD;
-        g_scrfd->load(mgr, modeltype, false);
-        if (!g_faceEmb)
-            g_faceEmb = new FaceEmb;
-        g_faceEmb->load(mgr);
-    } else {
-        if (g_scrfd) {
-            delete g_scrfd;
-            delete g_faceEmb;
-            g_scrfd = 0;
-            g_faceEmb = 0;
-        }
-    }
-    if(isCamDiec>0){
         if (!g_emotion)
             g_emotion = new EmotionRecognition;
         g_emotion->load(mgr);
