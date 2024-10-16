@@ -19,9 +19,8 @@
 #include "face_emb.h"
 #include "light_traffic.h"
 #include "emotion_recognition.h"
-#include "deaf_recognition.h"
 #include "scrfd_deaf.h"
-#include "yolo_deaf.h"
+#include "yolov9.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -40,16 +39,16 @@ static Yolo *g_yolo = 0;
 static SCRFD *g_scrfd = 0;
 static LightTraffic *g_lightTraffic = 0;
 static EmotionRecognition *g_emotion = 0;
-static DeafRecognition *g_deaf = 0;
 static FaceEmb *g_faceEmb = 0;
 static SCRFD_DEAF *g_scrfd_deaf = 0;
-static Yolo_Deaf *g_yolo_deaf = 0;
+static yolov9 *g_yolo9;
 
 static ncnn::Mutex lock;
 
 
 static std::vector<Object> objects;
 static std::vector<FaceObject> faceObjects;
+static std::vector<Object> objectsV9;
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
 static std::vector<float> resultLightTraffic;
@@ -84,21 +83,15 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
             g_scrfd->draw(rgb, faceObjects);
         }
 
-        if (g_scrfd_deaf && g_emotion) {
+        if (g_scrfd_deaf && g_emotion && g_yolo9) {
             scoreEmotions.clear();
+            objectsV9.clear();
             g_scrfd_deaf->detect(rgb, faceObjects);
+            g_yolo9->detect(rgb, objectsV9);
             if (!faceObjects.empty()) {
                 g_emotion->predict(rgb, faceObjects[0], scoreEmotions);
                 g_emotion->draw(rgb, faceObjects[0], scoreEmotions);
-            }
-
-        }
-        if (g_yolo_deaf && g_deaf) {
-            scoreDeafs.clear();
-            g_yolo_deaf->detect(rgb, objects);
-            if (!objects.empty()) {
-                g_deaf->predict(rgb, objects[0], scoreDeafs);
-                g_deaf->draw(rgb, objects[0], scoreDeafs);
+                g_yolo9->draw(rgb, objectsV9);
             }
         }
     }
@@ -127,15 +120,14 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
         g_lightTraffic = 0;
 
 
-        delete g_yolo_deaf;
-        g_yolo_deaf = 0;
         delete g_scrfd_deaf;
         g_scrfd_deaf = 0;
 
         delete g_emotion;
         g_emotion = 0;
-        delete g_deaf;
-        g_deaf = 0;
+
+        delete g_yolo9;
+        g_yolo9 = 0;
     }
 
     delete g_camera;
@@ -164,15 +156,14 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
 
     int target_size = 640;
     if (isCamDiec == 0) {
-        delete g_yolo_deaf;
-        g_yolo_deaf = 0;
         delete g_scrfd_deaf;
         g_scrfd_deaf = 0;
 
         delete g_emotion;
         g_emotion = 0;
-        delete g_deaf;
-        g_deaf = 0;
+
+        delete g_yolo9;
+        g_yolo9 = 0;
         if (trafficLight == 1) {
             if (!g_lightTraffic) {
                 g_lightTraffic = new LightTraffic;
@@ -224,23 +215,18 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
         g_faceEmb = 0;
         delete g_lightTraffic;
         g_lightTraffic = 0;
+
         if (!g_scrfd_deaf)
             g_scrfd_deaf = new SCRFD_DEAF;
         g_scrfd_deaf->load(mgr, modeltype, false);
-
-        if (!g_yolo_deaf) {
-            g_yolo_deaf = new Yolo_Deaf;
-        }
-        g_yolo_deaf->load(mgr, modeltype, target_size, mean_vals[0],
-                          norm_vals[0], false);
 
         if (!g_emotion)
             g_emotion = new EmotionRecognition;
         g_emotion->load(mgr);
 
-        if (!g_deaf)
-            g_deaf = new DeafRecognition;
-        g_deaf->load(mgr);
+        if (!g_yolo9)
+            g_yolo9 = new yolov9;
+        g_yolo9->load(mgr, 320, norm_vals[0]);
     }
 
     return JNI_TRUE;
@@ -492,20 +478,12 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
-    if (!scoreDeafs.empty()) {
+    if (!objectsV9.empty()) {
         std::ostringstream oss;
 
-        // Convert each element to string and add it to the stream
-        for (size_t i = 0; i < scoreDeafs.size(); ++i) {
-            if (i != 0) {
-                oss << ",";  // Add a separator between elements
-            }
-            oss << scoreDeafs[i];
-        }
-
-        // Convert the stream to a string
+        oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " " << objectsV9[0].rect.y << " "
+            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height;
         std::string embeddingStr = oss.str();
-        scoreDeafs.clear();
         return env->NewStringUTF(embeddingStr.c_str());
     }
     return env->NewStringUTF("");

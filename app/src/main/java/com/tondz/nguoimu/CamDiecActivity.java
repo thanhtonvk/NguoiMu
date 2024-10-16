@@ -120,17 +120,8 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private String getDeaf(String scoreDeaf) {
-        String[] arr = scoreDeaf.split(",");
-        float maxScore = 0;
-        int maxIdx = 0;
-        for (int i = 0; i < arr.length; i++) {
-            float score = Float.parseFloat(arr[i]);
-            if (score > maxScore) {
-                maxScore = score;
-                maxIdx = i;
-            }
-        }
-        return Common.classNames[maxIdx];
+        String[] arr = scoreDeaf.split(" ");
+        return Common.classNames[Integer.parseInt(arr[0])];
     }
 
     private String getEmotion(String scoreEmotion) {
