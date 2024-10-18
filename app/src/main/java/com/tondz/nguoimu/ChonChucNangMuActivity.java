@@ -38,6 +38,12 @@ public class ChonChucNangMuActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), CamDiecActivity.class));
             }
         });
+        findViewById(R.id.btnCau).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), CamDiecNoiCauActivity.class));
+            }
+        });
         findViewById(R.id.btnBt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

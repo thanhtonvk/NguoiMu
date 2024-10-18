@@ -30,7 +30,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnBt"
-        android:text="Người câm điếc" />
+        android:text="Giao tiếp từ" />
+
+    <Button
+        android:id="@+id/btnCau"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnCamDiec"
+        android:text="Giao tiếp câu" />
 
     <Spinner
         android:id="@+id/spinner"
