@@ -124,6 +124,56 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
                 facing = new_facing;
             }
         });
+        binding.btnVi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Common.classNames = new String[]{
+                        "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
+                        "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
+                        "nhớ", "tò mò", "yêu"
+                };
+                speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int i) {
+                        if (i != TextToSpeech.ERROR) {
+                            speak.setLanguage(Locale.forLanguageTag("vi-VN"));
+                        }
+                    }
+                });
+            }
+        });
+        binding.btnEn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Common.classNames = new String[]{"thank you", "see you later", "fine", "don't like", "nice to meet you", "scared", "goodbye",
+                        "like", "hello", "sorry", "know", "brother", "sister", "understand", "mother", "home",
+                        "miss", "curious", "love"};
+                speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int i) {
+                        if (i != TextToSpeech.ERROR) {
+                            speak.setLanguage(Locale.ENGLISH);
+                        }
+                    }
+                });
+            }
+        });
+        binding.btnCn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Common.classNames = new String[]{"谢谢", "待会儿见", "好吧", "不喜欢", "很高兴见到你", "害怕", "再见",
+                        "喜欢", "你好", "对不起", "知道", "哥哥", "姐姐", "理解", "妈妈", "家",
+                        "想念", "好奇", "爱"};
+                speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int i) {
+                        if (i != TextToSpeech.ERROR) {
+                            speak.setLanguage(Locale.CHINA);
+                        }
+                    }
+                });
+            }
+        });
 
     }
 
@@ -150,17 +200,16 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         binding.cameraview.getHolder().setFormat(PixelFormat.RGBA_8888);
         binding.cameraview.getHolder().addCallback(this);
+        Common.classNames = new String[]{
+                "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
+                "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
+                "nhớ", "tò mò", "yêu"
+        };
         speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
                 if (i != TextToSpeech.ERROR) {
-                    if (Common.ngonNgu == 0) {
-                        speak.setLanguage(Locale.forLanguageTag("vi-VN"));
-                    } else if (Common.ngonNgu == 1) {
-                        speak.setLanguage(Locale.US);
-                    } else if (Common.ngonNgu == 2) {
-                        speak.setLanguage(Locale.CHINA);
-                    }
+                    speak.setLanguage(Locale.forLanguageTag("vi-VN"));
                 }
             }
         });
