@@ -24,6 +24,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.tondz.nguoimu.databinding.ActivityCamDiecBinding;
 import com.tondz.nguoimu.databinding.ActivityCamDiecNoiCauBinding;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -57,10 +61,22 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         getObject();
     }
 
+    List<List<Integer>> noiCauTemp1 = new ArrayList<>();
+    List<List<Integer>> noiCauTemp2 = new ArrayList<>();
+    List<String> finalString = new ArrayList<>();
+    List<List<Integer>> noiCau = new ArrayList<>();
+
+    private void initNoiCau() {
+
+        noiCau.add(new ArrayList<>(List.of(1, 2, 3)));
+    }
+
+    //           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
+//           7:  "thích",8: "xin chào",9: "xin lỗi", 10:"biết",11: "anh trai", 12:"chị gái", 13:"hiểu",14: "mẹ", 15:"nhà",
+//           16:  "nhớ",17: "tò mò",18: "yêu"
     private void getObject() {
         new Thread(() -> {
             int count = 0;
-            StringBuilder finalString = new StringBuilder();
             while (true) {
                 String deafScore = nguoiMuSDK.getDeaf();
                 String emotionScore = nguoiMuSDK.getEmotion();
@@ -69,14 +85,41 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                     int deaf = getDeaf(deafScore);
                     String cuChi = getSource(emotion, deaf);
                     if (!cuChi.isEmpty()) {
-                        if (!finalString.toString().contains(cuChi)) {
-                            finalString.append(cuChi).append(" ");
-                            count++;
-                            if (canPlaySound && count == 2) {
-                                speak.speak(finalString, TextToSpeech.QUEUE_FLUSH, null, null);
+                        if (finalString.isEmpty()) {
+                            for (List cumTu : noiCau
+                            ) {
+                                if (Integer.valueOf(deaf).equals(cumTu.get(0))) {
+                                    noiCauTemp1.add(cumTu);
+                                    finalString.add(cuChi);
+                                }
+                            }
+                        }
+                        if (finalString.size() == 1) {
+                            for (List cumTu : noiCauTemp1
+                            ) {
+                                if (Integer.valueOf(deaf).equals(cumTu.get(1))) {
+                                    noiCauTemp2.add(cumTu);
+                                    finalString.add(cuChi);
+                                }
+                            }
+                        }
+                        if (finalString.size() == 2) {
+                            for (List cumTu : noiCauTemp2
+                            ) {
+                                if (Integer.valueOf(deaf).equals(cumTu.get(2))) {
+                                    finalString.add(cuChi);
+                                }
+                            }
+                        }
+                        if (finalString.size() == 3) {
+                            if (canPlaySound) {
+                                StringBuilder result = new StringBuilder();
+                                for (String i : finalString
+                                ) {
+                                    result.append(i).append(" ");
+                                }
+                                speak.speak(result, TextToSpeech.QUEUE_FLUSH, null, null);
                                 canPlaySound = false;
-                                count = 0;
-                                finalString = new StringBuilder();
                                 handler.postDelayed(runnable, 100);
                             }
                         }
@@ -91,6 +134,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
             }
         }).start();
     }
+
 
     private String getSource(String emotion, int deaf) {
         String source = "";
@@ -224,6 +268,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                 }
             }
         });
+        initNoiCau();
     }
 
     private void reload() {
