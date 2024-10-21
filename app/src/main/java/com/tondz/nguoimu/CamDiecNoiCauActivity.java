@@ -69,6 +69,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     private void initNoiCau() {
 
         noiCau.add(new ArrayList<>(List.of(1, 2, 3)));
+
     }
 
     //           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
@@ -119,6 +120,9 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                                     result.append(i).append(" ");
                                 }
                                 speak.speak(result, TextToSpeech.QUEUE_FLUSH, null, null);
+                                noiCauTemp1 = new ArrayList<>();
+                                noiCauTemp2 = new ArrayList<>();
+                                finalString = new ArrayList<>();
                                 canPlaySound = false;
                                 handler.postDelayed(runnable, 100);
                             }
