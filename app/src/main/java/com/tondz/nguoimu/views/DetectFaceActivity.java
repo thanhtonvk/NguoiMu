@@ -10,6 +10,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -31,6 +32,7 @@ public class DetectFaceActivity extends AppCompatActivity implements SurfaceHold
     NguoiMuSDK yolov8Ncnn = new NguoiMuSDK();
     private SurfaceView cameraView;
     private static final int REQUEST_CAMERA = 510;
+    private int facing = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,15 @@ public class DetectFaceActivity extends AppCompatActivity implements SurfaceHold
                     ThemNguoiThanActivity.imgAvatar.setImageBitmap(ThemNguoiThanActivity.bitmap);
                     onBackPressed();
                 }
+            }
+        });
+        findViewById(R.id.btnChangeCamera).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int new_facing = 1 - facing;
+                yolov8Ncnn.closeCamera();
+                yolov8Ncnn.openCamera(new_facing);
+                facing = new_facing;
             }
         });
     }
@@ -96,7 +107,7 @@ public class DetectFaceActivity extends AppCompatActivity implements SurfaceHold
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA);
         }
 
-        yolov8Ncnn.openCamera(1);
+        yolov8Ncnn.openCamera(facing);
     }
 
     @Override
