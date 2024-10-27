@@ -119,16 +119,16 @@ int EmotionRecognition::draw(cv::Mat &rgb, FaceObject &faceobject, std::vector<f
             y = 0;
         if (x + label_size.width > rgb.cols)
             x = rgb.cols - label_size.width;
-
-        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-                                    cv::Size(label_size.width, label_size.height + baseLine)), cc,
-                      -1);
-
-        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
-                                                                    : cv::Scalar(255, 255, 255);
-
-        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
-                    textcc, 1);
+//
+//        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
+//                                    cv::Size(label_size.width, label_size.height + baseLine)), cc,
+//                      -1);
+//
+//        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
+//                                                                    : cv::Scalar(255, 255, 255);
+//
+//        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
+//                    textcc, 1);
     }
 
 
