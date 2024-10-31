@@ -59,7 +59,13 @@
             android:name=".views.ThemNguoiThanActivity"
             android:exported="false" />
         <activity
+            android:name=".views.register.RegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".ManHinhChinhActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
