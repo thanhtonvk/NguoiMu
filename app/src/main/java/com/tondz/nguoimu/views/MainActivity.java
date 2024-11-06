@@ -16,6 +16,7 @@ import android.provider.ContactsContract;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -52,7 +53,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-    boolean isPass = false;
+    boolean isPass = true;
     TextToSpeech textToSpeech;
 
     @Override
@@ -72,38 +73,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        reference.child("pass").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue().toString().equals(PASSWORD)) {
-                    isPass = true;
-                } else {
-                    Toast.makeText(getApplicationContext(), "Đã hết thời gian dùng thử", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                finish();
-            }
-        });
         findViewById(R.id.btnDoDuong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isPass) {
-                    textToSpeech.speak("dò đường", TextToSpeech.QUEUE_FLUSH, null);
+                    textToSpeech.speak("nhận diện ", TextToSpeech.QUEUE_FLUSH, null);
                     startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
-                }
-
-            }
-        });
-        findViewById(R.id.btnNhanDienNguoi).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isPass) {
-                    textToSpeech.speak("nhận diện người thân", TextToSpeech.QUEUE_FLUSH, null);
-                    startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
                 }
 
             }
@@ -150,11 +125,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSION = 12000;
 
     private void actionMic(String text) {
-        if (text.toLowerCase().contains("do duong")) {
+        if (text.toLowerCase().contains("nhan dien")) {
             startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
-        }
-        if (text.toLowerCase().contains("nhan dien nguoi")) {
-            startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
         }
         if (text.toLowerCase().contains("goi dien")) {
             speechQuaySo();
@@ -229,6 +201,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            Intent intent
+                    = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
+                    Locale.getDefault());
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
+
+            try {
+                startActivityForResult(intent, REQUEST_MIC);
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            textToSpeech.speak("nhận diện", TextToSpeech.QUEUE_FLUSH, null);
+            startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @SuppressLint("Range")
     public void findContacts(String text) {

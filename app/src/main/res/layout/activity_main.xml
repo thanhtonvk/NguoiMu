@@ -10,50 +10,55 @@
     tools:context=".views.MainActivity">
 
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+
         android:gravity="center"
         android:text="Phần mềm hỗ trợ người khiếm thị"
-        android:textColor="#D84315"
+        android:textColor="#9C27B0"
         android:textSize="50sp" />
 
-    <Button
-        android:id="@+id/btnDoDuong"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
         android:layout_centerInParent="true"
-        android:text="Dò đường" />
+        android:layout_marginTop="50dp">
 
-    <Button
-        android:id="@+id/btnNhanDienNguoi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnDoDuong"
-        android:text="Nhận diện người thân" />
+        <Button
+            android:id="@+id/btnDoDuong"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentLeft="true"
+            android:text="Nhận diện" />
 
-    <Button
-        android:id="@+id/btnGoiDien"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnNhanDienNguoi"
-        android:text="Quay số" />
 
-    <Button
-        android:id="@+id/btnGoiDanhBa"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnGoiDien"
-        android:text="Gọi trong danh bạ" />
+        <Button
+            android:id="@+id/btnGoiDien"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_below="@id/btnDoDuong"
+            android:layout_alignParentLeft="true"
+            android:text="Quay số" />
 
-    <ImageButton
-        android:id="@+id/btnMic"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="#00FFFFFF"
-        android:src="@drawable/baseline_mic_24" />
+        <Button
+            android:id="@+id/btnGoiDanhBa"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentRight="true"
+            android:text="Gọi trong danh bạ" />
+
+        <ImageButton
+
+            android:id="@+id/btnMic"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_below="@id/btnGoiDanhBa"
+            android:layout_alignParentRight="true"
+            android:background="#00FFFFFF"
+            android:src="@drawable/baseline_mic_24" />
+    </RelativeLayout>
 
 
 </RelativeLayout>

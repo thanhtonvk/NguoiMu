@@ -504,6 +504,7 @@ int Yolo::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
 
         cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
                     textcc, 1);
+        break;
     }
 
     return 0;
