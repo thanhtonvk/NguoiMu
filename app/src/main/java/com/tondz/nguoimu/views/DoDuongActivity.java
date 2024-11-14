@@ -1,7 +1,5 @@
 package com.tondz.nguoimu.views;
 
-import static com.tondz.nguoimu.views.MainActivity.REQUEST_MIC;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
