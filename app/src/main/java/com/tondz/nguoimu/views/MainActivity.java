@@ -285,7 +285,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String keepOnlyDigits(String input) {
+    public String keepOnlyDigits(String input) {git add .
+
         // Biểu thức chính quy để giữ lại chỉ các chữ số (0-9)
         return input.replaceAll("[^\\d]", "");
     }
