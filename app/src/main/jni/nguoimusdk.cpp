@@ -1,17 +1,3 @@
-// Tencent is pleased to support the open source community by making ncnn available.
-//
-// Copyright (C) 2021 THL A29 Limited, a Tencent company. All rights reserved.
-//
-// Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
-// in compliance with the License. You may obtain a copy of the License at
-//
-// https://opensource.org/licenses/BSD-3-Clause
-//
-// Unless required by applicable law or agreed to in writing, software distributed
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the
-// specific language governing permissions and limitations under the License.
-
 #include <android/asset_manager_jni.h>
 #include <android/native_window_jni.h>
 #include <android/native_window.h>
@@ -32,6 +18,7 @@
 #include "scrfd.h"
 #include "face_emb.h"
 #include "light_traffic.h"
+#include "yolov9.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -51,15 +38,18 @@ static SCRFD *g_scrfd = 0;
 static LightTraffic *g_lightTraffic = 0;
 
 static FaceEmb *g_faceEmb = 0;
-
+static yolov9 *g_yolov9 = 0;
 static ncnn::Mutex lock;
 
 
 static std::vector<Object> objects;
+static std::vector<Object> moneyObjects;
 static std::vector<FaceObject> faceObjects;
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
 static std::vector<float> resultLightTraffic;
+static cv::Mat image;
+static int count = 0;
 
 class MyNdkCamera : public NdkCameraWindow {
 public:
@@ -69,24 +59,55 @@ public:
 void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
     {
         ncnn::MutexLockGuard g(lock);
-        if (g_yolo) {
-            g_yolo->detect(rgb, objects);
-            g_yolo->draw(rgb, objects);
-            for (Object obj: objects) {
-                if (obj.label == 9) {
-                    cv::Mat roi = rgb(obj.rect);
-                    g_lightTraffic->predict(roi, resultLightTraffic);
-                    break;
+        image = rgb.clone();
+
+        if (count % 2 == 0) {
+            if (g_yolov9) {
+                moneyObjects.clear();
+                g_yolov9->detect(rgb, moneyObjects);
+            }
+        }
+        if (count % 3 == 0) {
+            if (moneyObjects.empty()) {
+                if (g_yolo) {
+                    objects.clear();
+                    g_yolo->detect(rgb, objects);
+                    for (Object obj: objects) {
+                        if (obj.label == 9) {
+                            cv::Mat roi = rgb(obj.rect);
+                            g_lightTraffic->predict(roi, resultLightTraffic);
+                            break;
+                        }
+                    }
                 }
             }
         }
-        if (g_scrfd) {
-            g_scrfd->detect(rgb, faceObjects);
-            if (!faceObjects.empty()) {
-                g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding, faceAligned);
+        if (count % 1 == 0) {
+            if (moneyObjects.empty()) {
+                if (g_scrfd) {
+                    faceObjects.clear();
+                    g_scrfd->detect(rgb, faceObjects);
+                    if (!faceObjects.empty()) {
+                        g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding,
+                                               faceAligned);
+                    }
+
+                }
             }
+
+        }
+
+
+        if (!objects.empty()) {
+            g_yolo->draw(rgb, objects);
+        }
+        if (!moneyObjects.empty()) {
+            g_yolov9->draw(rgb, moneyObjects);
+        }
+        if (!faceObjects.empty()) {
             g_scrfd->draw(rgb, faceObjects);
         }
+        count += 1;
     }
 }
 
@@ -125,6 +146,16 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
+    if (trafficLight == 0 && yoloDetect == 0 & faceDectector == 0) {
+        delete g_yolo;
+        g_yolo = 0;
+        delete g_scrfd;
+        g_scrfd = 0;
+        delete g_faceEmb;
+        g_faceEmb = 0;
+        delete g_lightTraffic;
+        g_lightTraffic = 0;
+    }
     if (trafficLight == 1) {
         if (!g_lightTraffic) {
             g_lightTraffic = new LightTraffic;
@@ -153,8 +184,13 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
         if (!g_yolo) {
             g_yolo = new Yolo;
         }
+        if (!g_yolov9) {
+            g_yolov9 = new yolov9;
+        }
         g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
                      norm_vals[0], false);
+
+        g_yolov9->load(mgr, 320, norm_vals[0], false);
     } else {
         if (g_yolo) {
             delete g_yolo;
@@ -216,7 +252,7 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getListResult(JNIEnv *env, jobject thiz) {
     for (const Object &obj: objects) {
         std::ostringstream oss;
         oss << obj.label << " " << obj.rect.x << " " << obj.rect.y << " "
-            << obj.rect.width << " " << obj.rect.height;
+            << obj.rect.width << " " << obj.rect.height << " " << obj.prob;
         std::string objName = oss.str();
         jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
         env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
@@ -338,7 +374,7 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmbeddingFromPath(JNIEnv *env, jobject thiz
     __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len face %f", faceObjects1[0].rect.width);
     if (faceObjects1.size() > 0) {
         g_faceEmb->getEmbeding(bgr, faceObjects1[0].landmark, embedding1, faceAligned1);
-        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %zu", embedding1.size());
+
         std::ostringstream oss;
 
         // Convert each element to string and add it to the stream
@@ -402,4 +438,43 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getLightTraffic(JNIEnv *env, jobject thiz) {
         return env->NewStringUTF(embeddingStr.c_str());
     }
     return env->NewStringUTF("");
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getListMoneyResult(JNIEnv *env, jobject thiz) {
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jobject arrayList = env->NewObject(arrayListClass, arrayListConstructor);
+
+    // Get the add method of ArrayList
+    jmethodID arrayListAdd = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    for (const Object &obj: moneyObjects) {
+        std::ostringstream oss;
+        oss << obj.label << " " << obj.rect.x << " " << obj.rect.y << " "
+            << obj.rect.width << " " << obj.rect.height << " " << obj.prob;
+        std::string objName = oss.str();
+        jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
+        env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
+        env->DeleteLocalRef(javaString);  // Clean up local reference
+    }
+    moneyObjects.clear();
+    return arrayList;
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getImage(JNIEnv *env, jobject thiz) {
+    jobject bitmap = mat_to_bitmap(env, image, false);
+    return bitmap;
+}
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_onStop(JNIEnv *env, jobject thiz) {
+    delete g_yolo;
+    g_yolo = 0;
+    delete g_scrfd;
+    g_scrfd = 0;
+    delete g_faceEmb;
+    g_faceEmb = 0;
+    delete g_lightTraffic;
+    g_lightTraffic = 0;
 }

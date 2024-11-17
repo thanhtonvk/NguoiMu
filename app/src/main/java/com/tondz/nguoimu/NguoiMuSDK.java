@@ -12,6 +12,7 @@ public class NguoiMuSDK {
     public native boolean openCamera(int facing);
 
     public native boolean closeCamera();
+    public  native  boolean onStop();
 
     public native boolean setOutputWindow(Surface surface);
 
@@ -22,8 +23,14 @@ public class NguoiMuSDK {
     public native Bitmap getFaceAlign();
 
     public native String getEmbeddingFromPath(String path);
+
     public native Bitmap getFaceAlignFromPath(String path);
+
     public native String getLightTraffic();
+
+    public native List<String> getListMoneyResult();
+
+    public native Bitmap getImage();
 
     static {
         System.loadLibrary("nguoimusdk");

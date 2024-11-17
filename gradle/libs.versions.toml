@@ -1,5 +1,7 @@
 [versions]
 agp = "8.4.0"
+firebaseMlVisionVersion = "15.0.0"
+googleFirebaseMlVision = "24.0.3"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -9,8 +11,13 @@ activity = "1.9.0"
 constraintlayout = "2.1.4"
 googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
+firebaseMlVision = "24.1.0"
+playServicesLocation = "21.3.0"
 
 [libraries]
+firebase-ml-vision-text-recognition = { module = "com.google.firebase:firebase-ml-vision-text-recognition", version.ref = "firebaseMlVision" }
+firebase-ml-vision-v1500 = { module = "com.google.firebase:firebase-ml-vision", version.ref = "firebaseMlVisionVersion" }
+firebase-ml-vision-v2403 = { module = "com.google.firebase:firebase-ml-vision", version.ref = "googleFirebaseMlVision" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -19,6 +26,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+firebase-ml-vision = { group = "com.google.firebase", name = "firebase-ml-vision", version.ref = "firebaseMlVision" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

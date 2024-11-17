@@ -58,7 +58,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     boolean objectCanPlaySound = true;
     boolean personCanPlaySound = true;
     ImageView btnDoiCamera;
-    private int facing = 0;
+    private int facing = 1;
     TextView tvKhoangCach;
 
     @Override
@@ -115,24 +115,38 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
     NguoiThan nguoiThan = null;
 
+
     private void getObject() {
         new Thread(() -> {
             while (true) {
+
+                List<String> moneyList = yolov8Ncnn.getListMoneyResult();
+                if (!moneyList.isEmpty()) {
+                    if (objectCanPlaySound) {
+                        for (String money : moneyList
+                        ) {
+                            speakMoney(money);
+                            break;
+                        }
+                        objectCanPlaySound = false;
+                        handler.postDelayed(runnable, 3000);
+                    }
+
+                }
+
                 List<String> stringList = yolov8Ncnn.getListResult();
                 if (!stringList.isEmpty()) {
                     if (objectCanPlaySound) {
-                        countObject(stringList);
                         for (String result : stringList
                         ) {
                             speakObject(result);
                             break;
                         }
                         objectCanPlaySound = false;
-                        handler.postDelayed(runnable, 5000);
+                        handler.postDelayed(runnable, 3000);
                     }
 
                 }
-
                 nguoiThan = null;
                 String stringEmb = yolov8Ncnn.getEmbedding();
                 if (!stringEmb.isEmpty()) {
@@ -151,19 +165,33 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
                             speakNguoiThan(nguoiThan);
                             tvName.setText(nguoiThan.getTen());
                             personCanPlaySound = false;
-                            handler.postDelayed(runnable, 5000);
+                            handler.postDelayed(runnable, 3000);
                         }
                     }
                 }
 
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
         }).start();
+    }
+
+    private void speakMoney(String result) {
+        Log.e("TAGTOND", "speakMoney: " + result);
+        String[] arr = result.split(" ");
+        int label = Integer.parseInt(arr[0]);
+        double prob = Double.parseDouble(arr[5]);
+        if (prob > 0.9) {
+            String money = Common.moneys[label];
+            if (!textToSpeech.isSpeaking()) {
+                textToSpeech.speak(money, TextToSpeech.QUEUE_FLUSH, null);
+            }
+        }
+
     }
 
     private void speakNguoiThan(NguoiThan nguoiThan) {
@@ -264,16 +292,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
         return pattern.matcher(temp).replaceAll("").replaceAll("đ", "d").replaceAll("Đ", "D");
     }
 
-    private void loadWidthInImages() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String widthInImages = preferences.getString("widthInImages", "");
-        if (!widthInImages.equalsIgnoreCase("")) {
-            String[] arr = widthInImages.split(",");
-            for (int i = 0; i < arr.length; i++) {
-                CalDistance.widthInImages[i] = Double.parseDouble(arr[i]);
-            }
-        }
-    }
 
     ImageView imgView;
     TextView tvName;
@@ -299,123 +317,103 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
     }
 
-    private void countObject(List<String> stringObject) {
-        List<String> labels = new ArrayList<>();
-        for (String result : stringObject
-        ) {
-            String[] arr = result.split(" ");
-            labels.add(Common.listObject[Integer.parseInt(arr[0])]);
-        }
-        HashMap<String, Integer> elementCountMap = new HashMap<>();
-
-        // Duyệt qua mảng và đếm số lần xuất hiện của từng phần tử
-        for (String str : labels) {
-            if (elementCountMap.containsKey(str)) {
-                elementCountMap.put(str, elementCountMap.get(str) + 1);
-            } else {
-                elementCountMap.put(str, 1);
-            }
-        }
-        for (String key : elementCountMap.keySet()) {
-            int num_of_value = elementCountMap.get(key);
-            if (num_of_value > 1) {
-                String speak = "Có " + num_of_value + " " + key;
-                textToSpeech.speak(speak, TextToSpeech.QUEUE_FLUSH, null);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        }
-    }
-
 
     @SuppressLint("DefaultLocale")
     private void speakObject(String text) {
+        Log.e("TAGTOND", "speakObject: ");
         String[] arr = text.split(" ");
-        int label = Integer.parseInt(arr[0]);
-        double x = Double.parseDouble(arr[1]);
-        double y = Double.parseDouble(arr[2]);
-        double w = Double.parseDouble(arr[3]);
-        double h = Double.parseDouble(arr[4]);
-        double focalLength = CalDistance.calculateFocalLength(CalDistance.knownDistances[label], CalDistance.knownWidths[label],
-                CalDistance.widthInImages[label]);
-        double distance = CalDistance.calculateDistance(CalDistance.knownWidths[label], focalLength, w);
-        tvKhoangCach.post(new Runnable() {
-            @Override
-            public void run() {
-                tvKhoangCach.setText(String.format("Khoảng cách %,.2fm", distance));
-            }
-        });
 
-        String name = Common.listObject[label];
-        double[] position = Common.xywhToCenter(x, y, w, h);
-        double centerX = position[0];
-        double centerY = position[1];
-        String speaking = "";
-        //top
-        if (100 < centerX && centerX < 200 && 0 < centerY && centerY < 200) {
-            speaking = name + " " + "đang ở trên";
-        }
-        //right
-        if (200 < centerX && centerX < 320 && 200 < centerY && centerY < 400) {
-            speaking = name + " " + "đang ở bên phải";
-        }
-        //bottom
-        if (100 < centerX && centerX < 200 && 400 < centerY && centerY < 640) {
-            speaking = name + " " + "đang ở dưới";
-        }
-        //left
-        if (0 < centerX && centerX < 100 && 200 < centerY && centerY < 400) {
-            speaking = name + " " + "đang ở bên trái";
-        }
-        //top right
-        if (200 < centerX && centerX < 320 && 0 < centerY && centerY < 200) {
-            speaking = name + " " + "đang ở trên bên phải";
-        }
-        // bottom right
-        if (200 < centerX && centerX < 320 && 400 < centerY && centerY < 640) {
-            speaking = name + " " + "đang ở dưới bên phải";
-        }
-        //bottom left
-        if (0 < centerX && centerX < 100 && 400 < centerY && centerY < 640) {
-            speaking = name + " " + "đang ở dưới bên trái";
-        }
-        //top left
-        if (0 < centerX && centerX < 100 && 0 < centerY && centerY < 200) {
-            speaking = name + " " + "đang ở trên bên trái";
-        }
+        double prob = Double.parseDouble(arr[5]);
 
-        if (100 < centerX && centerX < 200 && 200 < centerY && centerY < 400) {
-            speaking = name + " " + "đang ở giữa ";
-        }
-        @SuppressLint("DefaultLocale") String valDistance = String.format("%.2f", distance);
-        speaking += valDistance + " met";
-        if (label == 9) {
-            String lightTraffic = yolov8Ncnn.getLightTraffic();
-            if (!lightTraffic.trim().isEmpty()) {
-                String resultLight = predictLight(lightTraffic);
-                String content = "đèn giao thông đang " + resultLight;
-                textToSpeech.speak(content, TextToSpeech.QUEUE_FLUSH, null);
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+        if (prob > 0.6) {
+            int label = Integer.parseInt(arr[0]);
+            double x = Double.parseDouble(arr[1]);
+            double y = Double.parseDouble(arr[2]);
+            double w = Double.parseDouble(arr[3]);
+            double h = Double.parseDouble(arr[4]);
+            double focalLength = CalDistance.calculateFocalLength(CalDistance.knownDistances[label], CalDistance.knownWidths[label],
+                    CalDistance.widthInImages[label]);
+            double distance = CalDistance.calculateDistance(CalDistance.knownWidths[label], focalLength, w);
+            tvKhoangCach.post(new Runnable() {
+                @Override
+                public void run() {
+                    tvKhoangCach.setText(String.format("Khoảng cách %,.2fm", distance));
                 }
+            });
+
+            String labelName = Common.listObject[label];
+            double[] position = Common.xywhToCenter(x, y, w, h);
+            double centerX = position[0];
+            double centerY = position[1];
+            String speaking = "";
+
+            //top
+            if (100 < centerX && centerX < 200 && 0 < centerY && centerY < 200) {
+                speaking = labelName + " " + "đang ở trên";
+            }
+            //right
+            else if (200 < centerX && centerX < 320 && 200 < centerY && centerY < 400) {
+                speaking = labelName + " " + "đang ở bên phải";
+            }
+            //bottom
+            else if (100 < centerX && centerX < 200 && 400 < centerY && centerY < 640) {
+                speaking = labelName + " " + "đang ở dưới";
+            }
+            //left
+            else if (0 < centerX && centerX < 100 && 200 < centerY && centerY < 400) {
+                speaking = labelName + " " + "đang ở bên trái";
+            }
+            //top right
+            else if (200 < centerX && centerX < 320 && 0 < centerY && centerY < 200) {
+                speaking = labelName + " " + "đang ở trên bên phải";
+            }
+            // bottom right
+            else if (200 < centerX && centerX < 320 && 400 < centerY && centerY < 640) {
+                speaking = labelName + " " + "đang ở dưới bên phải";
+            }
+            //bottom left
+            else if (0 < centerX && centerX < 100 && 400 < centerY && centerY < 640) {
+                speaking = labelName + " " + "đang ở dưới bên trái";
+            }
+            //top left
+            else if (0 < centerX && centerX < 100 && 0 < centerY && centerY < 200) {
+                speaking = labelName + " " + "đang ở trên bên trái";
+            } else if (100 < centerX && centerX < 200 && 200 < centerY && centerY < 400) {
+                speaking = labelName + " " + "đang ở giữa ";
+            } else {
+                speaking = labelName + " " + "đang ở giữa ";
+            }
+            @SuppressLint("DefaultLocale") String valDistance = String.format("%.2f", distance);
+            speaking += valDistance + " met";
+            if (label == 9) {
+                String lightTraffic = yolov8Ncnn.getLightTraffic();
+                if (!lightTraffic.trim().isEmpty()) {
+                    String resultLight = predictLight(lightTraffic);
+                    String content = "đèn giao thông đang " + resultLight;
+                    if (!textToSpeech.isSpeaking()) {
+                        textToSpeech.speak(content, TextToSpeech.QUEUE_FLUSH, null);
+                    }
+
+//                    try {
+//                        Thread.sleep(3000);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+                }
+
+            }
+            if (!textToSpeech.isSpeaking()) {
+                textToSpeech.speak(speaking, TextToSpeech.QUEUE_FLUSH, null);
             }
 
+
         }
 
-        textToSpeech.speak(speaking, TextToSpeech.QUEUE_FLUSH, null);
-
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 
@@ -480,4 +478,5 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
                     new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
         }
     }
+
 }

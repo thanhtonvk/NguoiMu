@@ -5,60 +5,87 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     android:orientation="vertical"
     tools:context=".views.MainActivity">
 
-    <TextView
-        android:id="@+id/tvTitle"
+    <LinearLayout
+        android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFEE58"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-        android:gravity="center"
-        android:text="Phần mềm hỗ trợ người khiếm thị"
-        android:textColor="#9C27B0"
-        android:textSize="50sp" />
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:src="@drawable/logo" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvTitle"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="50dp">
+        android:layout_below="@id/layout"
+        android:orientation="vertical">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnDoDuong"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_alignParentLeft="true"
-            android:text="Nhận diện" />
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/recognition"
+            android:text="Nhận diện thông minh" />
 
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGoiDien"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_below="@id/btnDoDuong"
-            android:layout_alignParentLeft="true"
-            android:text="Quay số" />
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/telephone"
+            android:text="Gọi điện" />
 
-        <Button
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGoiDanhBa"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_alignParentRight="true"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/contact_book"
             android:text="Gọi trong danh bạ" />
 
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDocChu"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/abc"
+            android:text="Đọc chữ" />
 
-            android:id="@+id/btnMic"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_below="@id/btnGoiDanhBa"
-            android:layout_alignParentRight="true"
-            android:background="#00FFFFFF"
-            android:src="@drawable/baseline_mic_24" />
-    </RelativeLayout>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDinhVi"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/location"
+            android:text="Gửi định vị" />
+    </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/btnMic"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#00FFFFFF"
+        android:scaleType="fitCenter"
+        android:src="@drawable/voice" />
 
 </RelativeLayout>

@@ -342,8 +342,8 @@ int Yolo::load(AAssetManager *mgr, const char *modeltype, int _target_size, cons
 
     char parampath[256];
     char modelpath[256];
-    sprintf(parampath, "yolov8n.param", modeltype);
-    sprintf(modelpath, "yolov8n.bin", modeltype);
+    sprintf(parampath, "yolov8s.param", modeltype);
+    sprintf(modelpath, "yolov8s.bin", modeltype);
 
     yolo.load_param(mgr, parampath);
     yolo.load_model(mgr, modelpath);
@@ -415,6 +415,7 @@ int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_th
 
     objects.resize(count);
     for (int i = 0; i < count; i++) {
+
         objects[i] = proposals[picked[i]];
 
         // adjust offset to original unpadded
@@ -432,11 +433,9 @@ int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_th
         objects[i].rect.y = y0;
         objects[i].rect.width = x1 - x0;
         objects[i].rect.height = y1 - y0;
-//        double distance = distanceObject(objects[i].label, objects[i].rect.width);
-//        objects[i].distance = distance;
-    }
 
-    // sort objects by area
+
+    }
     struct {
         bool operator()(const Object &a, const Object &b) const {
             return a.rect.area() > b.rect.area();
@@ -450,61 +449,74 @@ int Yolo::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_th
 int Yolo::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
 
 
-    static const char *class_names[] = {
-            "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat",
-            "traffic light",
-            "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse",
-            "sheep", "cow",
-            "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie",
-            "suitcase", "frisbee",
-            "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove",
-            "skateboard", "surfboard",
-            "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl",
-            "banana", "apple",
-            "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake",
-            "chair", "couch",
-            "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote",
-            "keyboard", "cell phone",
-            "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase",
-            "scissors", "teddy bear",
-            "hair drier", "toothbrush"
+    static const char *class_names[] = {"nguoi", "xe dap", "xe hoi", "xe may", "may bay", "xe buyt",
+                                        "tau hoa", "xe tai", "thuyen",
+                                        "den giao thong",
+                                        "cot chua nuoc", "bien dung", "dong ho tinh tien", "ghe da",
+                                        "chim", "meo", "cho", "ngua",
+                                        "cuu", "bo",
+                                        "voi", "gau", "ngua van", "huou cao co", "balo", "du",
+                                        "tui xach", "ca vat",
+                                        "vali", "dia bay",
+                                        "van truot tuyet", "van truot tuyet tren nuoc",
+                                        "bong the thao", "dieu", "gay danh bong chay",
+                                        "gang tay bong chay",
+                                        "van truot van", "van truot song",
+                                        "vot tennis", "chai", "ly ruou", "coc", "nia", "dao",
+                                        "muong", "to",
+                                        "chuoi", "tao",
+                                        "banh sandwich", "cam", "bong cai xanh", "ca rot",
+                                        "hot dog", "pizza", "banh ran", "banh kem",
+                                        "ghe", "ghe sofa",
+                                        "chau cay", "giuong", "ban an", "bon cau", "tv",
+                                        "may tinh xach tay", "chuot", "dieu khien tu xa",
+                                        "ban phim", "dien thoai di dong",
+                                        "lo vi song", "lo nuong", "may nuong banh", "bon rua",
+                                        "tu lanh", "sach", "dong ho", "binh hoa",
+                                        "keo", "gau bong",
+                                        "may say toc", "ban chai danh rang"
     };
     int color_index = 0;
 
     for (size_t i = 0; i < objects.size(); i++) {
         const Object &obj = objects[i];
+        if (obj.prob > 0.7) {
+            const unsigned char *color = colors[color_index % 19];
+            color_index++;
+
+            cv::Scalar cc(color[0], color[1], color[2]);
+
+            cv::rectangle(rgb, obj.rect, cc, 2);
+
+            char text[256];
+            sprintf(text, "%s", class_names[obj.label]);
+
+            int baseLine = 0;
+            cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1,
+                                                  &baseLine);
+
+            int x = obj.rect.x;
+            int y = obj.rect.y - label_size.height - baseLine;
+            if (y < 0)
+                y = 0;
+            if (x + label_size.width > rgb.cols)
+                x = rgb.cols - label_size.width;
+
+            cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
+                                        cv::Size(label_size.width, label_size.height + baseLine)),
+                          cc,
+                          -1);
+
+            cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
+                                                                        : cv::Scalar(255, 255, 255);
+
+            cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        textcc, 1);
+            break;
+        }
 
 
-        const unsigned char *color = colors[color_index % 19];
-        color_index++;
-
-        cv::Scalar cc(color[0], color[1], color[2]);
-
-        cv::rectangle(rgb, obj.rect, cc, 2);
-
-        char text[256];
-        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
-
-        int baseLine = 0;
-        cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-
-        int x = obj.rect.x;
-        int y = obj.rect.y - label_size.height - baseLine;
-        if (y < 0)
-            y = 0;
-        if (x + label_size.width > rgb.cols)
-            x = rgb.cols - label_size.width;
-
-        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-                                    cv::Size(label_size.width, label_size.height + baseLine)), cc,
-                      -1);
-
-        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
-                                                                    : cv::Scalar(255, 255, 255);
-
-        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
-                    textcc, 1);
-        break;
     }
 
     return 0;

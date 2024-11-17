@@ -15,6 +15,7 @@
 
 
     <LinearLayout
+
         android:id="@+id/head"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,24 +24,26 @@
         <ImageView
             android:id="@+id/btnChangeCamera"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="64dp"
             android:layout_weight="1"
-            android:src="@drawable/baseline_cameraswitch_24" />
+            android:scaleType="centerInside"
+            android:src="@drawable/camera" />
 
         <ImageView
             android:id="@+id/btnCanChinh"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="64dp"
             android:layout_weight="1"
-            android:src="@drawable/baseline_social_distance_24" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/metrics" />
 
         <ImageView
             android:id="@+id/btnThem"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_height="64dp"
             android:layout_weight="1"
-            android:src="@drawable/baseline_person_24" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/user" />
 
     </LinearLayout>
 
