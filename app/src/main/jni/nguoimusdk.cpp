@@ -146,26 +146,23 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
-    if (trafficLight == 0 && yoloDetect == 0 & faceDectector == 0) {
-        delete g_yolo;
-        g_yolo = 0;
-        delete g_scrfd;
-        g_scrfd = 0;
-        delete g_faceEmb;
-        g_faceEmb = 0;
-        delete g_lightTraffic;
-        g_lightTraffic = 0;
-    }
+    delete g_yolo;
+    g_yolo = 0;
+    delete g_scrfd;
+    g_scrfd = 0;
+    delete g_faceEmb;
+    g_faceEmb = 0;
+    delete g_lightTraffic;
+    g_lightTraffic = 0;
+    delete g_yolov9;
+    g_yolov9 = 0;
+
+
     if (trafficLight == 1) {
         if (!g_lightTraffic) {
             g_lightTraffic = new LightTraffic;
         }
         g_lightTraffic->load(mgr);
-    } else {
-        if (g_lightTraffic) {
-            delete g_lightTraffic;
-            g_lightTraffic = 0;
-        }
     }
     if (yoloDetect == 1) {
         const float mean_vals[][3] =
@@ -181,39 +178,17 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
                 };
 
         int target_size = 640;
-        if (!g_yolo) {
-            g_yolo = new Yolo;
-        }
-        if (!g_yolov9) {
-            g_yolov9 = new yolov9;
-        }
+        g_yolo = new Yolo;
+        g_yolov9 = new yolov9;
         g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
                      norm_vals[0], false);
-
         g_yolov9->load(mgr, 320, norm_vals[0], false);
-    } else {
-        if (g_yolo) {
-            delete g_yolo;
-            g_yolo = 0;
-        }
-
     }
     if (faceDectector == 1) {
-        if (!g_scrfd)
-            g_scrfd = new SCRFD;
+        g_scrfd = new SCRFD;
         g_scrfd->load(mgr, modeltype, false);
-        if (!g_faceEmb)
-            g_faceEmb = new FaceEmb;
+        g_faceEmb = new FaceEmb;
         g_faceEmb->load(mgr);
-    } else {
-        if (g_scrfd) {
-            delete g_scrfd;
-            delete g_faceEmb;
-            g_scrfd = 0;
-            g_faceEmb = 0;
-        }
-
-
     }
     return JNI_TRUE;
 }
