@@ -21,6 +21,7 @@
 #include "emotion_recognition.h"
 #include "scrfd_deaf.h"
 #include "yolov9.h"
+#include "yolov11.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -42,12 +43,13 @@ static EmotionRecognition *g_emotion = 0;
 static FaceEmb *g_faceEmb = 0;
 static SCRFD_DEAF *g_scrfd_deaf = 0;
 static yolov9 *g_yolo9;
-
+static yolov11 *g_yolov11 = 0;
 static ncnn::Mutex lock;
 
 
 static std::vector<Object> objects;
 static std::vector<FaceObject> faceObjects;
+static std::vector<Object> moneyObjects;
 static std::vector<Object> objectsV9;
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
@@ -55,6 +57,7 @@ static std::vector<float> resultLightTraffic;
 
 static std::vector<float> scoreEmotions;
 static std::vector<float> scoreDeafs;
+static cv::Mat image;
 
 class MyNdkCamera : public NdkCameraWindow {
 public:
@@ -64,9 +67,14 @@ public:
 void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
     {
         ncnn::MutexLockGuard g(lock);
+        image = rgb.clone();
+        if (g_yolov11) {
+            moneyObjects.clear();
+            g_yolov11->detect(rgb, moneyObjects);
+        }
         if (g_yolo) {
+            objects.clear();
             g_yolo->detect(rgb, objects);
-            g_yolo->draw(rgb, objects);
             for (Object obj: objects) {
                 if (obj.label == 9) {
                     cv::Mat roi = rgb(obj.rect);
@@ -76,10 +84,20 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
             }
         }
         if (g_scrfd) {
+            faceObjects.clear();
             g_scrfd->detect(rgb, faceObjects);
             if (!faceObjects.empty()) {
                 g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding, faceAligned);
             }
+        }
+
+        if (!objects.empty()) {
+            g_yolo->draw(rgb, objects);
+        }
+        if (!moneyObjects.empty()) {
+            g_yolov11->draw(rgb, moneyObjects);
+        }
+        if (!faceObjects.empty()) {
             g_scrfd->draw(rgb, faceObjects);
         }
 
@@ -118,6 +136,8 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
         g_faceEmb = 0;
         delete g_lightTraffic;
         g_lightTraffic = 0;
+        delete g_yolov11;
+        g_yolov11 = 0;
 
 
         delete g_scrfd_deaf;
@@ -155,6 +175,26 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             };
 
     int target_size = 640;
+    delete g_yolo;
+    g_yolo = 0;
+    delete g_scrfd;
+    g_scrfd = 0;
+    delete g_faceEmb;
+    g_faceEmb = 0;
+    delete g_lightTraffic;
+    g_lightTraffic = 0;
+    delete g_yolov11;
+    g_yolov11 = 0;
+
+
+    delete g_scrfd_deaf;
+    g_scrfd_deaf = 0;
+
+    delete g_emotion;
+    g_emotion = 0;
+
+    delete g_yolo9;
+    g_yolo9 = 0;
     if (isCamDiec == 0) {
         delete g_scrfd_deaf;
         g_scrfd_deaf = 0;
@@ -169,25 +209,13 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
                 g_lightTraffic = new LightTraffic;
             }
             g_lightTraffic->load(mgr);
-        } else {
-            if (g_lightTraffic) {
-                delete g_lightTraffic;
-                g_lightTraffic = 0;
-            }
         }
         if (yoloDetect == 1) {
-
-            if (!g_yolo) {
-                g_yolo = new Yolo;
-            }
+            g_yolo = new Yolo;
             g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
                          norm_vals[0], false);
-        } else {
-            if (g_yolo) {
-                delete g_yolo;
-                g_yolo = 0;
-            }
-
+            g_yolov11 = new yolov11;
+            g_yolov11->load(mgr, 320, norm_vals[0], false);
         }
         if (faceDectector == 1) {
             if (!g_scrfd)
@@ -196,14 +224,8 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             if (!g_faceEmb)
                 g_faceEmb = new FaceEmb;
             g_faceEmb->load(mgr);
-        } else {
-            if (g_scrfd) {
-                delete g_scrfd;
-                delete g_faceEmb;
-                g_scrfd = 0;
-                g_faceEmb = 0;
-            }
         }
+
     }
 
     if (isCamDiec > 0) {
@@ -487,4 +509,31 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
         return env->NewStringUTF(embeddingStr.c_str());
     }
     return env->NewStringUTF("");
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getListMoneyResult(JNIEnv *env, jobject thiz) {
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID arrayListConstructor = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jobject arrayList = env->NewObject(arrayListClass, arrayListConstructor);
+
+    // Get the add method of ArrayList
+    jmethodID arrayListAdd = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    for (const Object &obj: moneyObjects) {
+        std::ostringstream oss;
+        oss << obj.label << " " << obj.rect.x << " " << obj.rect.y << " "
+            << obj.rect.width << " " << obj.rect.height << " " << obj.prob;
+        std::string objName = oss.str();
+        jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
+        env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
+        env->DeleteLocalRef(javaString);  // Clean up local reference
+    }
+    moneyObjects.clear();
+    return arrayList;
+}
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getImage(JNIEnv *env, jobject thiz) {
+    jobject bitmap = mat_to_bitmap(env, image, false);
+    return bitmap;
 }

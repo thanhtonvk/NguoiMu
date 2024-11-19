@@ -56,6 +56,21 @@
             android:layout_alignParentRight="true"
             android:text="Gọi trong danh bạ" />
 
+        <Button
+            android:id="@+id/btnDocChu"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_below="@id/btnGoiDien"
+            android:layout_alignParentLeft="true"
+            android:text="Đọc chữ" />
+
+        <Button
+            android:id="@+id/btnDinhVi"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_below="@id/btnGoiDanhBa"
+            android:layout_alignParentRight="true"
+            android:text="Gửi định vị" />
 
     </RelativeLayout>
 

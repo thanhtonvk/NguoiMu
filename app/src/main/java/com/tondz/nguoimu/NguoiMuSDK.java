@@ -7,7 +7,7 @@ import android.view.Surface;
 import java.util.List;
 
 public class NguoiMuSDK {
-    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight,int camDiec);
+    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight, int camDiec);
 
     public native boolean openCamera(int facing);
 
@@ -22,10 +22,18 @@ public class NguoiMuSDK {
     public native Bitmap getFaceAlign();
 
     public native String getEmbeddingFromPath(String path);
+
     public native Bitmap getFaceAlignFromPath(String path);
+
     public native String getLightTraffic();
+
     public native String getEmotion();
+
     public native String getDeaf();
+
+    public native List<String> getListMoneyResult();
+
+    public native Bitmap getImage();
 
     static {
         System.loadLibrary("nguoimusdk");
