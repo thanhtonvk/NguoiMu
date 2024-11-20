@@ -237,7 +237,9 @@ public class MainActivity extends AppCompatActivity {
         if (text.toLowerCase().contains("dinh vi")) {
             getCurrentLocation();
         }
-
+        if (text.toLowerCase().contains("mau")) {
+            startActivity(new Intent(getApplicationContext(), MauSacActivity.class));
+        }
     }
 
     private void speechDanhBa() {
