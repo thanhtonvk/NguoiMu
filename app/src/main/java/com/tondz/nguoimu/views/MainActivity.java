@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
         }
         if (text.toLowerCase().contains("quay so")) {
-            speechQuaySo();d
+            speechQuaySo();
         }
         if (text.toLowerCase().contains("danh ba")) {
             speechDanhBa();
