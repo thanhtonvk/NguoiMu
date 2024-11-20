@@ -255,13 +255,19 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
         }
         if (text.toLowerCase().contains("quay so")) {
-            speechQuaySo();
+            speechQuaySo();d
         }
         if (text.toLowerCase().contains("danh ba")) {
             speechDanhBa();
         }
         if (text.toLowerCase().contains("chu")) {
             startActivity(new Intent(getApplicationContext(), OcrActivity.class));
+        }
+        if (text.toLowerCase().contains("dinh vi")) {
+            getCurrentLocation();
+        }
+        if (text.toLowerCase().contains("tien")) {
+            startActivity(new Intent(getApplicationContext(), NhanDienTienActivity.class));
         }
     }
 
