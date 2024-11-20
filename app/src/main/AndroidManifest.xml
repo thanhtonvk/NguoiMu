@@ -38,6 +38,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".views.MauSacActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.OcrActivity"
             android:exported="false" />
         <activity

@@ -24,6 +24,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,11 +63,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import android.provider.Settings;
+
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainActivity extends AppCompatActivity {
     TextToSpeech textToSpeech;
     FirebaseDatabase database;
     DatabaseReference reference;
+    Button btnId;
+    String lastFiveDigits;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,21 @@ public class MainActivity extends AppCompatActivity {
         loadWidthInImages();
         init();
         onClick();
+        getId();
+    }
+
+    private void getId() {
+
+
+        @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (deviceId != null && deviceId.length() >= 5) {
+            lastFiveDigits = deviceId.substring(deviceId.length() - 5);
+            btnId.setText("ID: " + lastFiveDigits);
+
+        } else {
+            System.out.println("Device ID không hợp lệ hoặc quá ngắn.");
+        }
+
     }
 
     private void init() {
@@ -90,10 +110,16 @@ public class MainActivity extends AppCompatActivity {
         });
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("NhanViTri");
-
+        btnId = findViewById(R.id.btnId);
     }
 
     private void onClick() {
+        findViewById(R.id.btnMauSach).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MauSacActivity.class));
+            }
+        });
         findViewById(R.id.btnDoDuong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     String formattedDateTime = currentDateTime.format(formatter);
                     maps.put("time", formattedDateTime);
-                    reference.setValue(maps);
+                    reference.child(lastFiveDigits).setValue(maps);
 
 
                     textToSpeech.speak("Đã gửi định vị tới người thân", TextToSpeech.QUEUE_FLUSH, null);

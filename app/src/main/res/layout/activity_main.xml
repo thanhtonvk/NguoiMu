@@ -19,7 +19,7 @@
         <ImageView
             android:id="@+id/logo"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="64dp"
             android:src="@drawable/logo" />
 
     </LinearLayout>
@@ -33,7 +33,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnDoDuong"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="64dp"
             android:layout_margin="5dp"
             android:background="@color/white"
             android:drawableLeft="@drawable/recognition"
@@ -43,7 +43,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGoiDien"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="64dp"
             android:layout_margin="5dp"
             android:background="@color/white"
             android:drawableLeft="@drawable/telephone"
@@ -53,7 +53,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnGoiDanhBa"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="64dp"
             android:layout_margin="5dp"
             android:background="@color/white"
             android:drawableLeft="@drawable/contact_book"
@@ -62,26 +62,44 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnDocChu"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="64dp"
             android:layout_margin="5dp"
             android:background="@color/white"
             android:drawableLeft="@drawable/abc"
             android:text="Đọc chữ" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnMauSach"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/palette"
+            android:text="Màu sắc" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnDinhVi"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="64dp"
             android:layout_margin="5dp"
             android:background="@color/white"
             android:drawableLeft="@drawable/location"
             android:text="Gửi định vị" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnId"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@color/white"
+            android:text="ID: "
+            android:textAllCaps="false" />
     </LinearLayout>
 
     <ImageButton
         android:id="@+id/btnMic"
         android:layout_width="100dp"
-        android:layout_height="80dp"
+        android:layout_height="64dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="#00FFFFFF"
