@@ -178,7 +178,7 @@ public class NhanDienNguoiThanActivity extends AppCompatActivity implements Surf
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 1, 0,0);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 1, 0,0,0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         }

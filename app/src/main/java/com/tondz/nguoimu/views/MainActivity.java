@@ -63,7 +63,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-    boolean isPass = false;
+    boolean isPass = true;
     TextToSpeech textToSpeech;
 
     @Override
@@ -108,6 +108,13 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
                 }
 
+            }
+        });
+        findViewById(R.id.btnNhanDienTien).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textToSpeech.speak("nhận diện tiền", TextToSpeech.QUEUE_FLUSH, null);
+                startActivity(new Intent(getApplicationContext(), NhanDienTienActivity.class));
             }
         });
         findViewById(R.id.btnNhanDienNguoi).setOnClickListener(new View.OnClickListener() {

@@ -38,6 +38,9 @@
         android:theme="@style/Theme.NguoiMu"
         tools:targetApi="31">
         <activity
+            android:name=".views.NhanDienTienActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.OcrActivity"
             android:exported="false" />
         <activity

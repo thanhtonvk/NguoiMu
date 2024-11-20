@@ -133,7 +133,7 @@ public class CanChinhKhoangCachActivity extends AppCompatActivity implements Sur
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 1, 0, 1,0);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 1, 0, 1,0,0);
         if (!ret_init) {
             Log.e("DoDuongActivity", "yolov8ncnn loadModel failed");
         }

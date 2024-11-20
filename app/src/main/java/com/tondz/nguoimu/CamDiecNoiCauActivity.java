@@ -276,7 +276,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     }
 
     private void reload() {
-        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1);
+        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1, 0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         } else {

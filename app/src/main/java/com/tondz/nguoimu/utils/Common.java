@@ -21,6 +21,15 @@ public class Common {
             "lò vi sóng", "lò nướng", "máy nướng bánh mì", "bồn rửa", "tủ lạnh", "sách", "đồng hồ", "bình hoa", "kéo", "gấu bông",
             "máy sấy tóc", "bàn chải đánh răng"
     };
+    public static String[] moneys = {"100 nghìn",
+            "10 nghìn",
+            "1 nghìn",
+            "200 nghìn",
+            "20 nghìn",
+            "2 nghìn",
+            "500 nghìn",
+            "50 nghìn",
+            "5 nghìn"};
     public static String[] lightTraffic = {"Xanh", "Đỏ", "Vàng"};
 
     public static String convertArrayToString(double[] list) {

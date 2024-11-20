@@ -158,7 +158,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
                                             jint yoloDetect, jint faceDectector,
-                                            jint trafficLight, jint isCamDiec) {
+                                            jint trafficLight, jint isCamDiec, jint money) {
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
@@ -214,8 +214,6 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             g_yolo = new Yolo;
             g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
                          norm_vals[0], false);
-            g_yolov11 = new yolov11;
-            g_yolov11->load(mgr, 320, norm_vals[0], false);
         }
         if (faceDectector == 1) {
             if (!g_scrfd)
@@ -226,6 +224,10 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             g_faceEmb->load(mgr);
         }
 
+        if (money == 1) {
+            g_yolov11 = new yolov11;
+            g_yolov11->load(mgr, 320, norm_vals[0], false);
+        }
     }
 
     if (isCamDiec > 0) {

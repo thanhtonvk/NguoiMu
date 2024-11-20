@@ -7,7 +7,7 @@ import android.view.Surface;
 import java.util.List;
 
 public class NguoiMuSDK {
-    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight, int camDiec);
+    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight, int camDiec, int money);
 
     public native boolean openCamera(int facing);
 
