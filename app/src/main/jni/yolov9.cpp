@@ -317,7 +317,7 @@ int yolov9::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
         cv::rectangle(rgb, obj.rect, cc, 2);
 
         char text[256];
-        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
+        sprintf(text, "%s", class_names[obj.label]);
 
         int baseLine = 0;
         cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1,
@@ -330,17 +330,17 @@ int yolov9::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
         if (x + label_size.width > rgb.cols)
             x = rgb.cols - label_size.width;
 
-//        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-//                                    cv::Size(label_size.width, label_size.height + baseLine)),
-//                      cc,
-//                      -1);
-//
-//        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
-//                                                                    : cv::Scalar(255, 255, 255);
-//
-//        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX,
-//                    0.5,
-//                    textcc, 1);
+        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
+                                    cv::Size(label_size.width, label_size.height + baseLine)),
+                      cc,
+                      -1);
+
+        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
+                                                                    : cv::Scalar(255, 255, 255);
+
+        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    textcc, 1);
     }
 
 

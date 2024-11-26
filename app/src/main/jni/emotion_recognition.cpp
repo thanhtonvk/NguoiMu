@@ -103,17 +103,17 @@ int EmotionRecognition::draw(cv::Mat &rgb, FaceObject &faceobject, std::vector<f
         const unsigned char *color = colors[0];
         color_index++;
 
-        cv::Scalar cc(color[0], color[1], color[2]);
+//        cv::Scalar cc(color[0], color[1], color[2]);
 
-        cv::rectangle(rgb, newRect, cc, 2);
+//        cv::rectangle(rgb, newRect, cc, 2);
 
         char text[256];
-        sprintf(text, "%s %.1f%%", class_names[index], result[index] * 100);
+        sprintf(text, "%s", class_names[index]);
 
         int baseLine = 0;
-        cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+        cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 1.0, 1, &baseLine);
 
-        int x = newRect.x;
+        int x = newRect.x+50;
         int y = newRect.y - label_size.height - baseLine;
         if (y < 0)
             y = 0;
@@ -124,11 +124,11 @@ int EmotionRecognition::draw(cv::Mat &rgb, FaceObject &faceobject, std::vector<f
 //                                    cv::Size(label_size.width, label_size.height + baseLine)), cc,
 //                      -1);
 //
-//        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
-//                                                                    : cv::Scalar(255, 255, 255);
-//
-//        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
-//                    textcc, 1);
+        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
+                                                                    : cv::Scalar(255, 255, 255);
+
+        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
+                    textcc, 1);
     }
 
 

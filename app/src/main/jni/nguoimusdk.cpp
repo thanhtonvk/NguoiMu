@@ -196,14 +196,6 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
     delete g_yolo9;
     g_yolo9 = 0;
     if (isCamDiec == 0) {
-        delete g_scrfd_deaf;
-        g_scrfd_deaf = 0;
-
-        delete g_emotion;
-        g_emotion = 0;
-
-        delete g_yolo9;
-        g_yolo9 = 0;
         if (trafficLight == 1) {
             if (!g_lightTraffic) {
                 g_lightTraffic = new LightTraffic;
@@ -231,15 +223,6 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
     }
 
     if (isCamDiec > 0) {
-        delete g_yolo;
-        g_yolo = 0;
-        delete g_scrfd;
-        g_scrfd = 0;
-        delete g_faceEmb;
-        g_faceEmb = 0;
-        delete g_lightTraffic;
-        g_lightTraffic = 0;
-
         if (!g_scrfd_deaf)
             g_scrfd_deaf = new SCRFD_DEAF;
         g_scrfd_deaf->load(mgr, modeltype, false);
