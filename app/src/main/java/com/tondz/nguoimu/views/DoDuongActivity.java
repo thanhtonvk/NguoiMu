@@ -325,7 +325,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
         double prob = Double.parseDouble(arr[5]);
 
-        if (prob > 0.6) {
+        if (prob > 0.5) {
             int label = Integer.parseInt(arr[0]);
             double x = Double.parseDouble(arr[1]);
             double y = Double.parseDouble(arr[2]);
