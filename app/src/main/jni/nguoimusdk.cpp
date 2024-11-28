@@ -483,18 +483,18 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
-    if (!objectsV9.empty() && !scoreEmotions.empty()) {
+    if (!objectsV9.empty()) {
         std::ostringstream oss;
 
         oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " " << objectsV9[0].rect.y << " "
-            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height<<"#";
+            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height;
 
-        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
-            if (i != 0) {
-                oss << ",";  // Add a separator between elements
-            }
-            oss << scoreEmotions[i];
-        }
+//        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
+//            if (i != 0) {
+//                oss << ",";  // Add a separator between elements
+//            }
+//            oss << scoreEmotions[i];
+//        }
 
 
         std::string embeddingStr = oss.str();
