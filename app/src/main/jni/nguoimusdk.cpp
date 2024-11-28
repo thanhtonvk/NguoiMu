@@ -105,8 +105,8 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
             scoreEmotions.clear();
             objectsV9.clear();
             g_scrfd_deaf->detect(rgb, faceObjects);
-            g_yolo9->detect(rgb, objectsV9);
             if (!faceObjects.empty()) {
+                g_yolo9->detect(rgb, objectsV9);
                 g_emotion->predict(rgb, faceObjects[0], scoreEmotions);
                 g_emotion->draw(rgb, faceObjects[0], scoreEmotions);
                 g_yolo9->draw(rgb, objectsV9);
@@ -474,10 +474,8 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
             }
             oss << scoreEmotions[i];
         }
-
         // Convert the stream to a string
         std::string embeddingStr = oss.str();
-        scoreEmotions.clear();
         return env->NewStringUTF(embeddingStr.c_str());
     }
     return env->NewStringUTF("");
@@ -485,11 +483,20 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
-    if (!objectsV9.empty()) {
+    if (!objectsV9.empty() && !scoreEmotions.empty()) {
         std::ostringstream oss;
 
         oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " " << objectsV9[0].rect.y << " "
-            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height;
+            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height<<"#";
+
+        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << scoreEmotions[i];
+        }
+
+
         std::string embeddingStr = oss.str();
         return env->NewStringUTF(embeddingStr.c_str());
     }

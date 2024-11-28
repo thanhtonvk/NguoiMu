@@ -59,13 +59,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     private void getObject() {
         new Thread(() -> {
             while (true) {
-                String deafScore = nguoiMuSDK.getDeaf();
-                String emotionScore = nguoiMuSDK.getEmotion();
-                if (!deafScore.isEmpty() && !emotionScore.isEmpty()) {
+                String deafEmotionScore = nguoiMuSDK.getDeaf();
+                if (!deafEmotionScore.isEmpty()) {
+                    String deafScore = deafEmotionScore.split("#")[0];
+                    String emotionScore = deafEmotionScore.split("#")[1];
                     String emotion = getEmotion(emotionScore);
                     int deaf = getDeaf(deafScore);
                     String cuChi = getSource(emotion, deaf);
-
                     if (canPlaySound && !cuChi.isEmpty()) {
                         speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
                         canPlaySound = false;
@@ -216,7 +216,7 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void reload() {
-        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1,0);
+        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1, 0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         } else {

@@ -306,9 +306,9 @@ int yolov9::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
 
     for (size_t i = 0; i < objects.size(); i++) {
         const Object &obj = objects[i];
-        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %s",
-                            class_names[obj.label]);
-        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %f", obj.prob);
+//        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %s",
+//                            class_names[obj.label]);
+//        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %f", obj.prob);
         const unsigned char *color = colors[color_index % 19];
         color_index++;
 

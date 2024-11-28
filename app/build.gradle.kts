@@ -54,4 +54,8 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+    implementation("com.google.guava:guava:31.0.1-android")
+    implementation("org.reactivestreams:reactive-streams:1.0.4")
+    implementation("io.noties.markwon:core:4.6.2")
 }

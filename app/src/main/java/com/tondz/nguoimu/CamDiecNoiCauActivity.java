@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -79,13 +80,17 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         new Thread(() -> {
             int count = 0;
             while (true) {
-                String deafScore = nguoiMuSDK.getDeaf();
-                String emotionScore = nguoiMuSDK.getEmotion();
-                if (!deafScore.isEmpty() && !emotionScore.isEmpty()) {
+                String deafEmotionScore = nguoiMuSDK.getDeaf();
+                if (!deafEmotionScore.isEmpty()) {
+                    String deafScore = deafEmotionScore.split("#")[0];
+                    String emotionScore = deafEmotionScore.split("#")[1];
                     String emotion = getEmotion(emotionScore);
                     int deaf = getDeaf(deafScore);
+
                     String cuChi = getSource(emotion, deaf);
                     if (!cuChi.isEmpty()) {
+
+
                         if (finalString.isEmpty()) {
                             for (List cumTu : noiCau
                             ) {

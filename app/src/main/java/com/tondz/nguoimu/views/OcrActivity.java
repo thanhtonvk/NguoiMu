@@ -1,8 +1,10 @@
 package com.tondz.nguoimu.views;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -18,8 +20,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -28,6 +37,11 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
 
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.text.TextContentRenderer;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +55,8 @@ public class OcrActivity extends AppCompatActivity implements SurfaceHolder.Call
     private int facing = 1;
     TextRecognizer recognizer;
     private boolean isSpeaking = false; // Trạng thái đọc nội dung
+    GenerativeModel gm;
+    GenerativeModelFutures model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +68,77 @@ public class OcrActivity extends AppCompatActivity implements SurfaceHolder.Call
         checkPermissions();
         reload();
         onClick();
+        initModel();
+        generateText("Xin chào các bạn");
+    }
+
+    private void initModel() {
+        gm = new GenerativeModel(/* modelName */ "gemini-1.5-flash", getResources().getString(R.string.api_key));
+        model = GenerativeModelFutures.from(gm);
+    }
+
+    public static List<String> splitParagraph(String paragraph, int maxWords) {
+        List<String> result = new ArrayList<>();
+
+        // Tách đoạn văn thành các câu cơ bản dựa vào dấu câu
+        String[] sentences = paragraph.split("(?<=[.!?])\\s+");
+
+        for (String sentence : sentences) {
+            String[] words = sentence.split("\\s+");
+            StringBuilder chunk = new StringBuilder();
+            int wordCount = 0;
+
+            for (String word : words) {
+                if (wordCount < maxWords) {
+                    chunk.append(word).append(" ");
+                    wordCount++;
+                } else {
+                    result.add(chunk.toString().trim());
+                    chunk = new StringBuilder(word).append(" ");
+                    wordCount = 1;
+                }
+            }
+
+            if (chunk.length() > 0) {
+                result.add(chunk.toString().trim());
+            }
+        }
+
+        return result;
+    }
+
+    private void generateText(String value) {
+        List<String> words = splitParagraph(value, 10);
+        for (String word : words
+        ) {
+            Content content = new Content.Builder()
+                    .addText(word)
+                    .build();
+            ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onSuccess(GenerateContentResponse result) {
+                        String resultText = result.getText();
+                        Parser parser = Parser.builder().build();
+                        Node document = parser.parse(resultText);
+                        TextContentRenderer renderer = TextContentRenderer.builder().build();
+                        String plainText = renderer.render(document);
+
+                        Log.d("OCR", word);
+                        Log.d("EDIT", plainText);
+
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        t.printStackTrace();
+                    }
+                }, this.getMainExecutor());
+            }
+        }
+
     }
 
     private void init() {
@@ -135,6 +222,7 @@ public class OcrActivity extends AppCompatActivity implements SurfaceHolder.Call
                                 String txt = block.getText();
                                 stringBuilder.append(txt);
                             }
+                            generateText("Sửa lỗi chính tả: " + stringBuilder.toString());
                             readContent(stringBuilder.toString());
                         }
 
@@ -151,7 +239,7 @@ public class OcrActivity extends AppCompatActivity implements SurfaceHolder.Call
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0,0);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0, 0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         }
