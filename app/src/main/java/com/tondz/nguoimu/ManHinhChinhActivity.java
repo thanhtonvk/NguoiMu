@@ -27,6 +27,9 @@ import java.util.regex.Pattern;
 public class ManHinhChinhActivity extends AppCompatActivity {
     int REQUEST_MIC = 123;
 
+    boolean isCamDiec = true;
+    boolean isKhiemThi = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +40,14 @@ public class ManHinhChinhActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        if (!isCamDiec) {
+            findViewById(R.id.btnCamDiec).setVisibility(View.GONE);
+        }
+        if (!isKhiemThi) {
+            findViewById(R.id.btnKhiemThi).setVisibility(View.GONE);
+        }
+
         findViewById(R.id.btnCamDiec).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,25 +58,6 @@ public class ManHinhChinhActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            }
-        });
-        findViewById(R.id.btnMic).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent
-                        = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
-                        Locale.getDefault());
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
-
-                try {
-
-                    startActivityForResult(intent, REQUEST_MIC);
-                } catch (Exception e) {
-                    Toast.makeText(ManHinhChinhActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
-                }
             }
         });
     }
