@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.tondz.nguoimu.views.MainActivity;
+import com.tondz.nguoimu.views.NguoiBinhThuongActivity;
 
 public class ChonChucNangMuActivity extends AppCompatActivity {
     @Override
@@ -44,10 +45,7 @@ public class ChonChucNangMuActivity extends AppCompatActivity {
         findViewById(R.id.btnBt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri webpage = Uri.parse("https://google.com");
-                Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-
-                startActivity(intent);
+                startActivity(new Intent(getApplicationContext(), NguoiBinhThuongActivity.class));
 
             }
         });

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,8 +34,6 @@ public class LoginActivity extends AppCompatActivity {
         onClick();
         loadAccount();
     }
-
-
 
 
     private void onClick() {
@@ -130,10 +129,8 @@ public class LoginActivity extends AppCompatActivity {
         String password = prefs.getString("password", "");
         binding.edtEmail.setText(email);
         binding.edtPassword.setText(password);
+        login();
     }
-
-
-
 
 
 }

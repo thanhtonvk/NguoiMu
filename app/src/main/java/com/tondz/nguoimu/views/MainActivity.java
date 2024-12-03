@@ -84,27 +84,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-//        reference.child("pass").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.getValue().toString().equals(PASSWORD)) {
-//                    isPass = true;
-//                } else {
-//                    Toast.makeText(getApplicationContext(), "Đã hết thời gian dùng thử", Toast.LENGTH_SHORT).show();
-//                    finish();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                finish();
-//            }
-//        });
         findViewById(R.id.btnDoDuong).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isPass) {
-                    textToSpeech.speak("dò đường", TextToSpeech.QUEUE_FLUSH, null);
+                    textToSpeech.speak("Mở dò đường", TextToSpeech.QUEUE_FLUSH, null);
                     startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
                 }
 
@@ -113,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnNhanDienTien).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textToSpeech.speak("nhận diện tiền", TextToSpeech.QUEUE_FLUSH, null);
+                textToSpeech.speak("Mở nhận diện tiền", TextToSpeech.QUEUE_FLUSH, null);
                 startActivity(new Intent(getApplicationContext(), NhanDienTienActivity.class));
             }
         });
@@ -121,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isPass) {
-                    textToSpeech.speak("nhận diện người thân", TextToSpeech.QUEUE_FLUSH, null);
+                    textToSpeech.speak("Mở nhận diện người thân", TextToSpeech.QUEUE_FLUSH, null);
                     startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
                 }
 
@@ -138,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                textToSpeech.speak("danh bạ", TextToSpeech.QUEUE_FLUSH, null);
+                textToSpeech.speak("Danh bạ", TextToSpeech.QUEUE_FLUSH, null);
                 speechDanhBa();
             }
         });
@@ -165,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), OcrActivity.class));
-                textToSpeech.speak("Đọc chữ", TextToSpeech.QUEUE_FLUSH, null);
+                textToSpeech.speak("Mở đọc chữ", TextToSpeech.QUEUE_FLUSH, null);
             }
         });
         findViewById(R.id.btnDinhVi).setOnClickListener(new View.OnClickListener() {
@@ -249,24 +233,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void actionMic(String text) {
         if (text.toLowerCase().contains("do duong")) {
+            textToSpeech.speak("Mở chức năng dò đường", TextToSpeech.QUEUE_FLUSH, null);
             startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
         }
         if (text.toLowerCase().contains("nhan dien nguoi")) {
+            textToSpeech.speak("Mở chức năng nhận diện người thân", TextToSpeech.QUEUE_FLUSH, null);
             startActivity(new Intent(getApplicationContext(), NhanDienNguoiThanActivity.class));
         }
         if (text.toLowerCase().contains("quay so")) {
+            textToSpeech.speak("Mở chức năng quay số", TextToSpeech.QUEUE_FLUSH, null);
             speechQuaySo();
         }
         if (text.toLowerCase().contains("danh ba")) {
+            textToSpeech.speak("Mở danh bạ", TextToSpeech.QUEUE_FLUSH, null);
             speechDanhBa();
         }
         if (text.toLowerCase().contains("chu")) {
+            textToSpeech.speak("Mở chức năng đọc chữ ", TextToSpeech.QUEUE_FLUSH, null);
             startActivity(new Intent(getApplicationContext(), OcrActivity.class));
         }
         if (text.toLowerCase().contains("dinh vi")) {
+            textToSpeech.speak("Mở chức năng định vị", TextToSpeech.QUEUE_FLUSH, null);
             getCurrentLocation();
         }
         if (text.toLowerCase().contains("tien")) {
+            textToSpeech.speak("Mở chức năng nhận diện tiền", TextToSpeech.QUEUE_FLUSH, null);
             startActivity(new Intent(getApplicationContext(), NhanDienTienActivity.class));
         }
     }
