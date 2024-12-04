@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -33,6 +35,8 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
     HashMap<String, Integer> keywordToVideoMap = new HashMap<>();
     GridView gridView;
     List<String> data = new ArrayList<>();
+    EditText editText;
+    TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +44,23 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nguoi_binh_thuong);
         videoView = findViewById(R.id.videoView);
         gridView = findViewById(R.id.gridView);
+        editText = findViewById(R.id.edtText);
         createDict();
         loadGridView();
         onClick();
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(Locale.forLanguageTag("vi-VN"));
+                }
+            }
+        });
 
+    }
+
+    private void readContent(String content) {
+        textToSpeech.speak(content, TextToSpeech.QUEUE_FLUSH, null, null);
     }
 
     void onClick() {
@@ -62,6 +79,17 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
                     startActivityForResult(intent, REQUEST_MIC);
                 } catch (Exception e) {
                     Toast.makeText(NguoiBinhThuongActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        findViewById(R.id.btnOk).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = editText.getText().toString();
+                if (text.isEmpty()) {
+                    Toast.makeText(NguoiBinhThuongActivity.this, "Vui lòng nhập từ khóa", Toast.LENGTH_SHORT).show();
+                } else {
+                    readContent(text);
                 }
             }
         });

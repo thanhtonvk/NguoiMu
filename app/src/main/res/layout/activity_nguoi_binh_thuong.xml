@@ -24,13 +24,29 @@
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" />
 
+    <EditText
+        android:id="@+id/edtText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gridView"
+        android:layout_toLeftOf="@id/btnMic" />
+
+    <Button
+        android:id="@+id/btnOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gridView"
+        android:layout_alignParentRight="true"
+        android:text="OK" />
+
     <ImageButton
         android:id="@+id/btnMic"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@id/btnOk"
         android:background="#00FFFFFF"
+        android:scaleType="fitCenter"
         android:src="@drawable/baseline_mic_24" />
 
 </RelativeLayout>
