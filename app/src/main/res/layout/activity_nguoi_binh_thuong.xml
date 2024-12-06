@@ -12,12 +12,38 @@
         android:layout_width="match_parent"
         android:layout_height="300dp" />
 
+    <LinearLayout
+        android:id="@+id/layout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoView"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCauVaTu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#FF7043"
+            android:text="Câu và từ"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnBangChuCai"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#EF5350"
+            android:text="Bảng chữ cái"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
     <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/btnMic"
-        android:layout_below="@id/videoView"
+        android:layout_below="@id/layout_button"
         android:gravity="center"
         android:horizontalSpacing="10dp"
         android:numColumns="3"

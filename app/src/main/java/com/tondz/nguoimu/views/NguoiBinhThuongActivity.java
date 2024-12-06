@@ -45,7 +45,7 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
         videoView = findViewById(R.id.videoView);
         gridView = findViewById(R.id.gridView);
         editText = findViewById(R.id.edtText);
-        createDict();
+        createCauDict();
         loadGridView();
         onClick();
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -64,6 +64,20 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
     }
 
     void onClick() {
+        findViewById(R.id.btnCauVaTu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createCauDict();
+                loadGridView();
+            }
+        });
+        findViewById(R.id.btnBangChuCai).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createChuCaiDict();
+                loadGridView();
+            }
+        });
         findViewById(R.id.btnMic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,7 +146,51 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
         });
     }
 
-    void createDict() {
+    void createChuCaiDict() {
+        keywordToVideoMap.clear();
+        keywordToVideoMap.put("chấm", R.raw.dau_cham);
+        keywordToVideoMap.put("hỏi", R.raw.dau_hoi);
+        keywordToVideoMap.put("huyền", R.raw.dau_huyen);
+        keywordToVideoMap.put("ngã", R.raw.dau_nga);
+        keywordToVideoMap.put("sắc", R.raw.dau_sac);
+        keywordToVideoMap.put("a", R.raw.chu_a);
+        keywordToVideoMap.put("ă", R.raw.chu_aw);
+        keywordToVideoMap.put("â", R.raw.chu_aa);
+        keywordToVideoMap.put("b", R.raw.chu_b);
+        keywordToVideoMap.put("c", R.raw.chu_c);
+
+        keywordToVideoMap.put("d", R.raw.chu_d);
+        keywordToVideoMap.put("đ", R.raw.chu_dd);
+        keywordToVideoMap.put("e", R.raw.chu_e);
+        keywordToVideoMap.put("ê", R.raw.chu_ee);
+        keywordToVideoMap.put("g", R.raw.chu_g);
+        keywordToVideoMap.put("h", R.raw.chu_h);
+
+        keywordToVideoMap.put("i", R.raw.chu_i);
+        keywordToVideoMap.put("k", R.raw.chu_k);
+        keywordToVideoMap.put("l", R.raw.chu_l);
+        keywordToVideoMap.put("m", R.raw.chu_m);
+        keywordToVideoMap.put("n", R.raw.chu_n);
+
+        keywordToVideoMap.put("o", R.raw.chu_o);
+        keywordToVideoMap.put("ô", R.raw.chu_oo);
+        keywordToVideoMap.put("ơ", R.raw.chu_ow);
+        keywordToVideoMap.put("p", R.raw.chu_p);
+        keywordToVideoMap.put("q", R.raw.chu_q);
+        keywordToVideoMap.put("r", R.raw.chu_r);
+        keywordToVideoMap.put("s", R.raw.chu_s);
+
+        keywordToVideoMap.put("t", R.raw.chu_t);
+        keywordToVideoMap.put("u", R.raw.chu_u);
+        keywordToVideoMap.put("ư", R.raw.chu_uw);
+        keywordToVideoMap.put("v", R.raw.chu_v);
+        keywordToVideoMap.put("x", R.raw.chu_x);
+        keywordToVideoMap.put("y", R.raw.chu_y);
+
+    }
+
+    void createCauDict() {
+        keywordToVideoMap.clear();
         keywordToVideoMap.put("xin chào", R.raw.xin_chao_vid);
         keywordToVideoMap.put("cảm ơn", R.raw.cam_on_vid);
         keywordToVideoMap.put("đánh vần ngón tay", R.raw.danh_van_ngon_tay);
