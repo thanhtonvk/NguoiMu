@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -59,18 +60,21 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     private void getObject() {
         new Thread(() -> {
             while (true) {
-                String deafEmotionScore = nguoiMuSDK.getDeaf();
-                if (!deafEmotionScore.isEmpty()) {
-                    String deafScore = deafEmotionScore;
+                String dataDeaf = nguoiMuSDK.getDeaf();
+                if (!dataDeaf.isEmpty()) {
+
+
+                    String deafScore = dataDeaf.split("#")[0];
+                    String emotion = getEmotion(dataDeaf.split("#")[1]);
+
+
                     int deaf = getDeaf(deafScore);
-                    String cuChi = getSource("", deaf);
+                    String cuChi = getSource(emotion, deaf);
                     if (canPlaySound && !cuChi.isEmpty()) {
                         speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
                         canPlaySound = false;
                         handler.postDelayed(runnable, 100);
                     }
-
-
                 }
                 try {
                     Thread.sleep(100);
@@ -88,28 +92,29 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
 ////                  7:  "thích",8: "xin chào",9: "xin lỗi", 10:"biết",11: "anh trai", 12:"chị gái", 13:"hiểu",14: "mẹ", 15:"nhà",
 ////                  16:  "nhớ",17: "tò mò",18: "yêu"
 ////        };
-//        if (emotion.equalsIgnoreCase("sợ") && deaf == 5) {
-//
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 4) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tức giận") && deaf == 3) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 0) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 2) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 7) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 9) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 1) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 8) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 6) {
-//            source = Common.classNames[deaf];
-//        }
-        source = Common.classNames[deaf];
+        if (emotion.equalsIgnoreCase("sợ") && deaf == 5) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 4) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 6) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tức giận") && deaf == 3) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 0) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 2) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 7) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 9) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 1) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 8) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 6) {
+            source = Common.classNames[deaf];
+        }
         return source;
     }
 

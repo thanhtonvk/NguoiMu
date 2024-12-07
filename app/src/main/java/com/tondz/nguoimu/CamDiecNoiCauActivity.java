@@ -74,7 +74,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     List<List<Integer>> noiCau = new ArrayList<>();
 
     private void initNoiCau() {
-        noiCau.add(new ArrayList<>(List.of(7,0,6)));
+        noiCau.add(new ArrayList<>(List.of(7, 0, 6)));
         noiCau.add(new ArrayList<>(List.of(0, 2, 4)));
         noiCau.add(new ArrayList<>(List.of(8, 2, 4)));
         noiCau.add(new ArrayList<>(List.of(3, 9, 6)));
@@ -113,9 +113,9 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
 
         new Thread(() -> {
             while (true) {
-                String deafEmotionScore = nguoiMuSDK.getDeaf();
-                if (!deafEmotionScore.isEmpty()) {
-                    String deafScore = deafEmotionScore;
+                String dataDeaf = nguoiMuSDK.getDeaf();
+                if (!dataDeaf.isEmpty()) {
+                    String deafScore = dataDeaf.split("#")[0];
                     int deaf = getDeaf(deafScore);
                     String cuChi = getSource("", deaf);
                     if (!cuChi.isEmpty()) {
