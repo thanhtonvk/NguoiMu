@@ -74,6 +74,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     List<List<Integer>> noiCau = new ArrayList<>();
 
     private void initNoiCau() {
+        noiCau.add(new ArrayList<>(List.of(7,0,6)));
         noiCau.add(new ArrayList<>(List.of(0, 2, 4)));
         noiCau.add(new ArrayList<>(List.of(8, 2, 4)));
         noiCau.add(new ArrayList<>(List.of(3, 9, 6)));
@@ -124,7 +125,6 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                                     if (!finalString.contains(cuChi)) {
                                         noiCauTemp1.add(cumTu);
                                         finalString.add(cuChi);
-
                                         StringBuilder temp = new StringBuilder();
                                         for (String i : finalString) {
                                             temp.append(i).append(" ");
@@ -132,7 +132,6 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-
                                                 binding.tvNoiDung.setText(temp);
                                             }
                                         });
