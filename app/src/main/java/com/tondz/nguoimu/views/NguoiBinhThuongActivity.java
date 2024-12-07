@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,14 +26,16 @@ import com.tondz.nguoimu.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class NguoiBinhThuongActivity extends AppCompatActivity {
     private static final int REQUEST_MIC = 12345;
     VideoView videoView;
-    HashMap<String, Integer> keywordToVideoMap = new HashMap<>();
+    LinkedHashMap<String, Integer> keywordToVideoMap = new LinkedHashMap<>();
     GridView gridView;
     List<String> data = new ArrayList<>();
     EditText editText;
@@ -124,9 +127,11 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
     }
 
     void loadGridView() {
+        data.clear();
         for (String key : keywordToVideoMap.keySet()
         ) {
             data.add(key);
+            Log.d("TAG", "loadGridView: " + key);
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
