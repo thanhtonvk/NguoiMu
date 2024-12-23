@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -47,11 +48,12 @@ public class CauHoiActivity extends AppCompatActivity {
         random = new Random();
         init();
         Collections.shuffle(Common.cauHoiArrayList);
-        nextCauHoi();
         onClick();
+        nextCauHoi();
     }
 
     private void speak(String noiDung) {
+        textToSpeech.stop();
         textToSpeech.speak(noiDung, TextToSpeech.QUEUE_FLUSH, null);
     }
 
@@ -59,7 +61,7 @@ public class CauHoiActivity extends AppCompatActivity {
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Hoàn thành bài kiểm tra");
-        float diem = (float) dung / (dung + sai);
+        float diem = (float) dung / (dung + sai) * 10;
 
         builder.setMessage("Trả lời đúng: " + dung + " câu hỏi\nTrả lời sai: " + sai + " câu hỏi\nĐiểm: " + diem + " điểm");
         String noiDung = "Bạn đã hoàn thành bài kiểm tra Trả lời đúng " + dung + " câu hỏi Trả lời sai: " + sai + " câu hỏi Điểm: " + diem + " điểm";
@@ -97,7 +99,8 @@ public class CauHoiActivity extends AppCompatActivity {
             btn_da2.setText(Common.CAU_HOI.getB());
             btn_da3.setText(Common.CAU_HOI.getC());
             btn_da4.setText(Common.CAU_HOI.getD());
-            String noiDung = "Câu hỏi: " + Common.CAU_HOI.getCauhoi() + " Đáp án 1: " + Common.CAU_HOI.getA() + " Đáp án 2: " + Common.CAU_HOI.getB() + " Đáp án 3: " + Common.CAU_HOI.getC() + " Đáp án 4: " + Common.CAU_HOI.getD();
+            String noiDung = "Câu hỏi " + Common.CAU_HOI.getCauhoi() + ", Đáp án 1 " + Common.CAU_HOI.getA() + ", Đáp án 2 " + Common.CAU_HOI.getB() + ", Đáp án 3 " + Common.CAU_HOI.getC() + ", Đáp án 4 " + Common.CAU_HOI.getD();
+            Log.d("TAG", "nextCauHoi: " + noiDung);
             speak(noiDung);
         }
     }

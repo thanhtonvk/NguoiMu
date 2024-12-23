@@ -33,49 +33,49 @@
             <Button
                 android:id="@+id/btnDoDuong"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Dò đường" />
 
             <Button
                 android:id="@+id/btnNhanDienNguoi"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Nhận diện người thân" />
 
             <Button
                 android:id="@+id/btnGoiDien"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Quay số" />
 
             <Button
                 android:id="@+id/btnGoiDanhBa"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Gọi trong danh bạ" />
 
             <Button
                 android:id="@+id/btnDocChu"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Đọc chữ" />
 
             <Button
                 android:id="@+id/btnDinhVi"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Gửi định vị" />
 
             <Button
                 android:id="@+id/btnNhanDienTien"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Nhận diện tiền" />
 
             <Button
                 android:id="@+id/btnThiOnline"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="80dp"
                 android:text="Thi online" />
         </LinearLayout>
     </ScrollView>

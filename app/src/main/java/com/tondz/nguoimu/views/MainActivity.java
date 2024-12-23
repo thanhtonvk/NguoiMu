@@ -163,10 +163,11 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.btnThiOnline).setOnClickListener(view -> {
             textToSpeech.speak("Làm bài thi", TextToSpeech.QUEUE_FLUSH, null);
-            reference.child("CauHoi").addValueEventListener(new ValueEventListener() {
+            database.getReference("CauHoi").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Common.cauHoiArrayList.clear();
+                    Log.d("TAG", "onDataChange: " + snapshot.toString());
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()
                     ) {
                         CauHoi cauHoi = dataSnapshot.getValue(CauHoi.class);
