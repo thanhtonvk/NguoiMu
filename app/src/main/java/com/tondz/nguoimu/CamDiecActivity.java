@@ -62,12 +62,9 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
                 if (!dataDeaf.isEmpty()) {
-
-
+                    if(dataDeaf.split("#").length != 2) continue;
                     String deafScore = dataDeaf.split("#")[0];
                     String emotion = getEmotion(dataDeaf.split("#")[1]);
-
-
                     int deaf = getDeaf(deafScore);
                     String cuChi = getSource(emotion, deaf);
                     if (canPlaySound && !cuChi.isEmpty()) {

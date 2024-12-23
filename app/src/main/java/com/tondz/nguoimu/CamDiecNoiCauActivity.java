@@ -115,6 +115,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
                 if (!dataDeaf.isEmpty()) {
+                    if (dataDeaf.split("#").length != 2) continue;
                     String deafScore = dataDeaf.split("#")[0];
                     int deaf = getDeaf(deafScore);
                     String cuChi = getSource("", deaf);

@@ -44,12 +44,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tondz.nguoimu.Common;
 import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
 import com.tondz.nguoimu.database.DBContext;
+import com.tondz.nguoimu.models.CauHoi;
 import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.CalDistance;
-import com.tondz.nguoimu.utils.Common;
+import com.tondz.nguoimu.views.exam.CauHoiActivity;
 
 import java.sql.Time;
 import java.text.Normalizer;
@@ -65,14 +67,15 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
     boolean isPass = true;
     TextToSpeech textToSpeech;
+    FirebaseDatabase database;
+    DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String PASSWORD = "12345";
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference();
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference();
         requestPermissionsIfNecessary();
         loadWidthInImages();
         init();
@@ -158,6 +161,27 @@ public class MainActivity extends AppCompatActivity {
                 getCurrentLocation();
             }
         });
+        findViewById(R.id.btnThiOnline).setOnClickListener(view -> {
+            textToSpeech.speak("Làm bài thi", TextToSpeech.QUEUE_FLUSH, null);
+            reference.child("CauHoi").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Common.cauHoiArrayList.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()
+                    ) {
+                        CauHoi cauHoi = dataSnapshot.getValue(CauHoi.class);
+                        Common.cauHoiArrayList.add(cauHoi);
+                    }
+                    startActivity(new Intent(MainActivity.this, CauHoiActivity.class));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+        });
         getId();
     }
 
@@ -192,8 +216,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private FusedLocationProviderClient fusedLocationClient;
-    FirebaseDatabase database;
-    DatabaseReference reference;
 
     private void getCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -259,6 +281,10 @@ public class MainActivity extends AppCompatActivity {
         if (text.toLowerCase().contains("tien")) {
             textToSpeech.speak("Mở chức năng nhận diện tiền", TextToSpeech.QUEUE_FLUSH, null);
             startActivity(new Intent(getApplicationContext(), NhanDienTienActivity.class));
+        }
+        if (text.toLowerCase().contains("thi")) {
+            textToSpeech.speak("Mở chức năng nhận thi", TextToSpeech.QUEUE_FLUSH, null);
+            startActivity(new Intent(getApplicationContext(), CauHoiActivity.class));
         }
     }
 
