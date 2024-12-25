@@ -1,7 +1,7 @@
 package com.tondz.nguoimu.models;
 
 public class CauHoi {
-    private String id, cauhoi, a, b, c, d, dapan;
+    private String id, cauhoi, a, b, c, d, dapan, giaithich;
 
     public String getId() {
         return id;
@@ -59,9 +59,15 @@ public class CauHoi {
         this.dapan = dapan;
     }
 
+    public String getGiaithich() {
+        return giaithich;
+    }
 
+    public void setGiaithich(String giaithich) {
+        this.giaithich = giaithich;
+    }
 
-    public CauHoi(String id, String cauhoi, String a, String b, String c, String d, String dapan) {
+    public CauHoi(String id, String cauhoi, String a, String b, String c, String d, String dapan, String giaithich) {
         this.id = id;
         this.cauhoi = cauhoi;
         this.a = a;
@@ -69,6 +75,7 @@ public class CauHoi {
         this.c = c;
         this.d = d;
         this.dapan = dapan;
+        this.giaithich = giaithich;
     }
 
     public CauHoi() {

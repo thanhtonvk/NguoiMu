@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views.exam;
+package com.tondz.nguoimu.views.hoctap;
 
 
 import android.app.AlertDialog;
@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class CauHoiActivity extends AppCompatActivity {
-    TextView tv_cauhoi;
+public class HocTapActivity extends AppCompatActivity {
+    TextView tv_CauHoi;
     Button btn_da1, btn_da2, btn_da3, btn_da4, btn_trove;
     Random random;
-    int idxCauHoi = -1;
+    int idxHocTap = -1;
     List<Integer> chonDapAns = new ArrayList<>();
     TextToSpeech textToSpeech;
     int REQUEST_MIC = 123;
@@ -48,7 +48,7 @@ public class CauHoiActivity extends AppCompatActivity {
         init();
         Collections.shuffle(Common.cauHoiArrayList);
         onClick();
-        nextCauHoi();
+        nextHocTap();
     }
 
     private void speak(String noiDung) {
@@ -59,11 +59,11 @@ public class CauHoiActivity extends AppCompatActivity {
 
     private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Hoàn thành bài học");
+        builder.setTitle("Hoàn thành bài kiểm tra");
         float diem = (float) dung / (dung + sai) * 10;
 
         builder.setMessage("Trả lời đúng: " + dung + " câu hỏi\nTrả lời sai: " + sai + " câu hỏi\nĐiểm: " + diem + " điểm");
-        String noiDung = "Chúc mừng Bạn đã hoàn thành bài kiểm tra Trả lời đúng " + dung + " câu hỏi Trả lời sai: " + sai + " câu hỏi Điểm: " + diem + " điểm";
+        String noiDung = "Bạn đã hoàn thành bài kiểm tra Trả lời đúng " + dung + " câu hỏi Trả lời sai: " + sai + " câu hỏi Điểm: " + diem + " điểm";
         speak(noiDung);
         // Add Yes button
         builder.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
@@ -74,25 +74,31 @@ public class CauHoiActivity extends AppCompatActivity {
             }
         });
 
+//        builder.setNegativeButton("Xem lại đáp án", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//
+//            }
+//        });
+
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
-    private void nextCauHoi() {
-        if (idxCauHoi == Common.cauHoiArrayList.size() - 1) {
+    private void nextHocTap() {
+        if (idxHocTap == Common.cauHoiArrayList.size() - 1) {
             showAlertDialog();
             return;
         } else {
-            idxCauHoi += 1;
-            Common.CAU_HOI = Common.cauHoiArrayList.get(idxCauHoi);
-            tv_cauhoi.setText(Common.CAU_HOI.getCauhoi());
+            idxHocTap += 1;
+            Common.CAU_HOI = Common.cauHoiArrayList.get(idxHocTap);
+            tv_CauHoi.setText(Common.CAU_HOI.getCauhoi());
             btn_da1.setText(Common.CAU_HOI.getA());
             btn_da2.setText(Common.CAU_HOI.getB());
             btn_da3.setText(Common.CAU_HOI.getC());
             btn_da4.setText(Common.CAU_HOI.getD());
-            String noiDung = "Câu hỏi " + Common.CAU_HOI.getCauhoi() + ", Đáp án 1 " + Common.CAU_HOI.getA() + ", Đáp án 2 " + Common.CAU_HOI.getB() + ", Đáp án 3 " + Common.CAU_HOI.getC() + ", Đáp án 4 " + Common.CAU_HOI.getD();
-            Log.d("TAG", "nextCauHoi: " + noiDung);
+            String noiDung = "Câu hỏi số " + (idxHocTap + 1) + " " + Common.CAU_HOI.getCauhoi() + ", Đáp án số một " + Common.CAU_HOI.getA() + ", Đáp án số hai " + Common.CAU_HOI.getB() + ", Đáp án số ba " + Common.CAU_HOI.getC() + ", Đáp án số bốn " + Common.CAU_HOI.getD();
             speak(noiDung);
         }
     }
@@ -111,7 +117,7 @@ public class CauHoiActivity extends AppCompatActivity {
 
     private void onClick() {
         findViewById(R.id.btnReplay).setOnClickListener(view -> {
-            String noiDung = "Câu hỏi: " + Common.CAU_HOI.getCauhoi() + " Đáp án 1: " + Common.CAU_HOI.getA() + " Đáp án 2: " + Common.CAU_HOI.getB() + " Đáp án 3: " + Common.CAU_HOI.getC() + " Đáp án 4: " + Common.CAU_HOI.getD();
+            String noiDung = "Câu hỏi số " + (idxHocTap + 1) + " " + Common.CAU_HOI.getCauhoi() + ", Đáp án số một " + Common.CAU_HOI.getA() + ", Đáp án số hai " + Common.CAU_HOI.getB() + ", Đáp án số ba " + Common.CAU_HOI.getC() + ", Đáp án số bốn " + Common.CAU_HOI.getD();
             speak(noiDung);
         });
         btn_trove.setOnClickListener(new View.OnClickListener() {
@@ -124,15 +130,18 @@ public class CauHoiActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (checkDapAn(btn_da1.getText().toString(), Common.CAU_HOI)) {
-
                     dung += 1;
+                    entry = 0;
+                    speak("Chúc mừng bạn đã trả lời đúng");
+                    nextHocTap();
                 } else {
-
-
-                    sai += 1;
-
+                    entry += 1;
+                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
+                    if (entry == 2) {
+                        sai += 1;
+                        nextHocTap();
+                    }
                 }
-                nextCauHoi();
             }
         });
         btn_da2.setOnClickListener(new View.OnClickListener() {
@@ -140,13 +149,18 @@ public class CauHoiActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (checkDapAn(btn_da2.getText().toString(), Common.CAU_HOI)) {
                     dung += 1;
-
+                    entry = 0;
+                    speak("Chúc mừng bạn đã trả lời đúng");
+                    nextHocTap();
                 } else {
-                    sai += 1;
-
-
+                    entry += 1;
+                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
+                    if (entry == 2) {
+                        sai += 1;
+                        nextHocTap();
+                    }
                 }
-                nextCauHoi();
+
             }
         });
         btn_da3.setOnClickListener(new View.OnClickListener() {
@@ -154,26 +168,35 @@ public class CauHoiActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (checkDapAn(btn_da3.getText().toString(), Common.CAU_HOI)) {
                     dung += 1;
-
+                    entry = 0;
+                    speak("Chúc mừng bạn đã trả lời đúng");
+                    nextHocTap();
                 } else {
-                    sai += 1;
-
-
+                    entry += 1;
+                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
+                    if (entry == 2) {
+                        sai += 1;
+                        nextHocTap();
+                    }
                 }
-                nextCauHoi();
             }
         });
         btn_da4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkDapAn(btn_da4.getText().toString(), Common.CAU_HOI)) {
+                if (checkDapAn(btn_da3.getText().toString(), Common.CAU_HOI)) {
                     dung += 1;
-
+                    entry = 0;
+                    speak("Chúc mừng bạn đã trả lời đúng");
+                    nextHocTap();
                 } else {
-                    sai += 1;
-
+                    entry += 1;
+                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
+                    if (entry == 2) {
+                        sai += 1;
+                        nextHocTap();
+                    }
                 }
-                nextCauHoi();
             }
         });
         findViewById(R.id.btnMic).setOnClickListener(view -> {
@@ -188,7 +211,7 @@ public class CauHoiActivity extends AppCompatActivity {
             try {
                 startActivityForResult(intent, REQUEST_MIC);
             } catch (Exception e) {
-                Toast.makeText(CauHoiActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HocTapActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -201,14 +224,20 @@ public class CauHoiActivity extends AppCompatActivity {
             ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (result != null && !result.isEmpty()) {
                 String text = result.get(0);
-                chonDapAn(text);
+                if (text.toLowerCase().contains("đọc")) {
+                    String noiDung = "Câu hỏi số " + (idxHocTap + 1) + " " + Common.CAU_HOI.getCauhoi() + ", Đáp án số một " + Common.CAU_HOI.getA() + ", Đáp án số hai " + Common.CAU_HOI.getB() + ", Đáp án số ba " + Common.CAU_HOI.getC() + ", Đáp án số bốn " + Common.CAU_HOI.getD();
+                    speak(noiDung);
+                } else {
+                    chonDapAn(text);
+                }
+
             }
         }
     }
 
 
     private void init() {
-        tv_cauhoi = findViewById(R.id.tv_cauhoi);
+        tv_CauHoi = findViewById(R.id.tv_cauhoi);
         btn_da1 = findViewById(R.id.btn_da1);
         btn_da2 = findViewById(R.id.btn_da2);
         btn_da3 = findViewById(R.id.btn_da3);
@@ -222,10 +251,11 @@ public class CauHoiActivity extends AppCompatActivity {
                 }
             }
         });
+        textToSpeech.setSpeechRate(0.5f);
     }
 
-    private boolean checkDapAn(String dapanchon, CauHoi cauHoi) {
-        if (dapanchon.equalsIgnoreCase(cauHoi.getDapan())) return true;
+    private boolean checkDapAn(String dapanchon, CauHoi HocTap) {
+        if (dapanchon.equalsIgnoreCase(HocTap.getDapan())) return true;
         else return false;
     }
 

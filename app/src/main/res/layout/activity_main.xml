@@ -71,12 +71,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="Nhận diện tiền" />
-
+            <Button
+                android:id="@+id/btnHoctap"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:text="Học tập" />
             <Button
                 android:id="@+id/btnThiOnline"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="Thi online" />
+
         </LinearLayout>
     </ScrollView>
 

@@ -52,6 +52,7 @@ import com.tondz.nguoimu.models.CauHoi;
 import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.views.exam.CauHoiActivity;
+import com.tondz.nguoimu.views.hoctap.HocTapActivity;
 
 import java.sql.Time;
 import java.text.Normalizer;
@@ -94,6 +95,31 @@ public class MainActivity extends AppCompatActivity {
                     textToSpeech.speak("Mở dò đường", TextToSpeech.QUEUE_FLUSH, null);
                     startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
                 }
+
+            }
+        });
+        findViewById(R.id.btnHoctap).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textToSpeech.speak("Học tập", TextToSpeech.QUEUE_FLUSH, null);
+                database.getReference("CauHoi").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Common.cauHoiArrayList.clear();
+                        Log.d("TAG", "onDataChange: " + snapshot.toString());
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()
+                        ) {
+                            CauHoi cauHoi = dataSnapshot.getValue(CauHoi.class);
+                            Common.cauHoiArrayList.add(cauHoi);
+                        }
+                        startActivity(new Intent(getApplicationContext(), HocTapActivity.class));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
             }
         });
@@ -284,8 +310,46 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), NhanDienTienActivity.class));
         }
         if (text.toLowerCase().contains("thi")) {
-            textToSpeech.speak("Mở chức năng nhận thi", TextToSpeech.QUEUE_FLUSH, null);
-            startActivity(new Intent(getApplicationContext(), CauHoiActivity.class));
+            textToSpeech.speak("Làm bài thi", TextToSpeech.QUEUE_FLUSH, null);
+            database.getReference("CauHoi").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Common.cauHoiArrayList.clear();
+                    Log.d("TAG", "onDataChange: " + snapshot.toString());
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()
+                    ) {
+                        CauHoi cauHoi = dataSnapshot.getValue(CauHoi.class);
+                        Common.cauHoiArrayList.add(cauHoi);
+                    }
+                    startActivity(new Intent(MainActivity.this, CauHoiActivity.class));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+        if (text.toLowerCase().contains("hoc")) {
+            textToSpeech.speak("Mở chức năng học bài", TextToSpeech.QUEUE_FLUSH, null);
+            database.getReference("CauHoi").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Common.cauHoiArrayList.clear();
+                    Log.d("TAG", "onDataChange: " + snapshot.toString());
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()
+                    ) {
+                        CauHoi cauHoi = dataSnapshot.getValue(CauHoi.class);
+                        Common.cauHoiArrayList.add(cauHoi);
+                    }
+                    startActivity(new Intent(getApplicationContext(), HocTapActivity.class));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     }
 
