@@ -125,13 +125,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/btnMic"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_weight="1"
-
-                android:src="@drawable/baseline_mic_24" />
 
             <ImageView
                 android:id="@+id/btnReplay"
@@ -155,6 +148,14 @@
                 android:layout_weight="1"
 
                 android:src="@drawable/baseline_skip_next_24" />
+
+            <ImageView
+                android:id="@+id/btnMic"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+
+                android:src="@drawable/baseline_mic_24" />
         </LinearLayout>
 
     </LinearLayout>
