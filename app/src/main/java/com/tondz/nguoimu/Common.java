@@ -9,7 +9,8 @@ public class Common {
     public static String[] classNames;
     public static CauHoi CAU_HOI = new CauHoi();
     public static List<CauHoi> cauHoiArrayList = new ArrayList<>();
-
+    public static List<CauHoi> cauHoiDaTraLoi = new ArrayList<>();
+    public static List<String> dapanChon = new ArrayList<>();
     public static String[] emotionClasses = {
             "tức giận", "ghê tởm", "sợ", "vui vẻ", "buồn", "bất ngờ", "tự nhiên", "khinh miệt"
     };
