@@ -22,6 +22,7 @@
 #include "scrfd_deaf.h"
 #include "yolov9.h"
 #include "yolov11.h"
+#include "indoor_detection.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -44,6 +45,7 @@ static FaceEmb *g_faceEmb = 0;
 static SCRFD_DEAF *g_scrfd_deaf = 0;
 static yolov9 *g_yolo9;
 static yolov11 *g_yolov11 = 0;
+static indoor_detection *indoorDetection = 0;
 static ncnn::Mutex lock;
 
 
@@ -51,6 +53,9 @@ static std::vector<Object> objects;
 static std::vector<FaceObject> faceObjects;
 static std::vector<Object> moneyObjects;
 static std::vector<Object> objectsV9;
+static std::vector<Object> indoorObjects;
+
+
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
 static std::vector<float> resultLightTraffic;
@@ -72,7 +77,11 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
             moneyObjects.clear();
             g_yolov11->detect(rgb, moneyObjects);
         }
-        if (g_yolo) {
+        if (g_yolo && indoorDetection) {
+
+            indoorObjects.clear();
+            indoorDetection->detect(rgb, indoorObjects);
+
             objects.clear();
             g_yolo->detect(rgb, objects);
             for (Object obj: objects) {
@@ -82,6 +91,7 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
                     break;
                 }
             }
+
         }
         if (g_scrfd) {
             faceObjects.clear();
@@ -99,6 +109,9 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
         }
         if (!faceObjects.empty()) {
             g_scrfd->draw(rgb, faceObjects);
+        }
+        if (!indoorObjects.empty()) {
+            indoorDetection->draw(rgb, indoorObjects);
         }
 
         if (g_scrfd_deaf && g_emotion && g_yolo9) {
@@ -148,6 +161,9 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 
         delete g_yolo9;
         g_yolo9 = 0;
+
+        delete indoorDetection;
+        indoorDetection = 0;
     }
 
     delete g_camera;
@@ -195,6 +211,10 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
 
     delete g_yolo9;
     g_yolo9 = 0;
+
+    delete indoorDetection;
+    indoorDetection = 0;
+
     if (isCamDiec == 0) {
         if (trafficLight == 1) {
             if (!g_lightTraffic) {
@@ -206,6 +226,8 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
             g_yolo = new Yolo;
             g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
                          norm_vals[0], false);
+            indoorDetection = new indoor_detection;
+            indoorDetection->load(mgr, 320, norm_vals[0], false);
         }
         if (faceDectector == 1) {
             if (!g_scrfd)
@@ -279,6 +301,16 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getListResult(JNIEnv *env, jobject thiz) {
         env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
         env->DeleteLocalRef(javaString);  // Clean up local reference
     }
+    for (const Object &obj: indoorObjects) {
+        std::ostringstream oss;
+        oss << (obj.label+80) << " " << obj.rect.x << " " << obj.rect.y << " "
+            << obj.rect.width << " " << obj.rect.height;
+        std::string objName = oss.str();
+        jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
+        env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
+        env->DeleteLocalRef(javaString);  // Clean up local reference
+    }
+    indoorObjects.clear();
     objects.clear();
     return arrayList;
 }
@@ -487,7 +519,7 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
         std::ostringstream oss;
 
         oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " " << objectsV9[0].rect.y << " "
-            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height<<"#";
+            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height << "#";
 
         for (size_t i = 0; i < scoreEmotions.size(); ++i) {
             if (i != 0) {
