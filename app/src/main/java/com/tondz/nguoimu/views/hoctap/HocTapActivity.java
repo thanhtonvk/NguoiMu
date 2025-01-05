@@ -2,14 +2,13 @@ package com.tondz.nguoimu.views.hoctap;
 
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import android.view.View;
+import android.speech.tts.UtteranceProgressListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,245 +17,239 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tondz.nguoimu.Common;
-import com.tondz.nguoimu.ManHinhChinhActivity;
 import com.tondz.nguoimu.R;
-import com.tondz.nguoimu.models.CauHoi;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.UUID;
 
 public class HocTapActivity extends AppCompatActivity {
-    TextView tv_CauHoi;
-    Button btn_da1, btn_da2, btn_da3, btn_da4, btn_trove;
-    Random random;
-    int idxHocTap = -1;
-    List<Integer> chonDapAns = new ArrayList<>();
-    TextToSpeech textToSpeech;
-    int REQUEST_MIC = 123;
-    int dung = 0, sai = 0;
-    int entry = 0;
+    private TextView tv_CauHoi;
+    private Button btn_da1, btn_da2, btn_da3, btn_da4, btn_trove;
+    private Random random;
+    private int idxHocTap = -1;
+    private int dung = 0, sai = 0, entry = 0;
+    private TextToSpeech textToSpeech;
+    private static final int REQUEST_MIC = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cau_hoi);
-        chonDapAns.clear();
-        random = new Random();
-        init();
-        Collections.shuffle(Common.cauHoiArrayList);
-        onClick();
-        nextHocTap();
+        setContentView(R.layout.activity_hoc_tap);
+
+        initViews();
+        initTextToSpeech();
+        shuffleQuestions();
+        setupClickListeners();
+        nextQuestion();
     }
 
-    private void speak(String noiDung) {
-        textToSpeech.stop();
-        textToSpeech.speak(noiDung, TextToSpeech.QUEUE_FLUSH, null);
-    }
-
-
-    private void showAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Hoàn thành bài kiểm tra");
-        float diem = (float) dung / (dung + sai) * 10;
-
-        builder.setMessage("Trả lời đúng: " + dung + " câu hỏi\nTrả lời sai: " + sai + " câu hỏi\nĐiểm: " + diem + " điểm");
-        String noiDung = "Bạn đã hoàn thành bài kiểm tra Trả lời đúng " + dung + " câu hỏi Trả lời sai: " + sai + " câu hỏi Điểm: " + diem + " điểm";
-        speak(noiDung);
-        // Add Yes button
-        builder.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss(); // Close the dialog
-                finish();
-            }
-        });
-
-//        builder.setNegativeButton("Xem lại đáp án", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//
-//            }
-//        });
-
-        // Create and show the AlertDialog
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private void nextHocTap() {
-        if (idxHocTap == Common.cauHoiArrayList.size() - 1) {
-            showAlertDialog();
-            return;
-        } else {
-            idxHocTap += 1;
-            Common.CAU_HOI = Common.cauHoiArrayList.get(idxHocTap);
-            tv_CauHoi.setText(Common.CAU_HOI.getCauhoi());
-            btn_da1.setText(Common.CAU_HOI.getA());
-            btn_da2.setText(Common.CAU_HOI.getB());
-            btn_da3.setText(Common.CAU_HOI.getC());
-            btn_da4.setText(Common.CAU_HOI.getD());
-            String noiDung = "Câu hỏi số " + (idxHocTap + 1) + " " + Common.CAU_HOI.getCauhoi() + ", Đáp án số một " + Common.CAU_HOI.getA() + ", Đáp án số hai " + Common.CAU_HOI.getB() + ", Đáp án số ba " + Common.CAU_HOI.getC() + ", Đáp án số bốn " + Common.CAU_HOI.getD();
-            speak(noiDung);
-        }
-    }
-
-    private void chonDapAn(String noiDung) {
-        if (noiDung.contains("1") || noiDung.contains("một") || noiDung.contains("đáp án 1")) {
-            btn_da1.performClick();
-        } else if (noiDung.contains("2") || noiDung.contains("hai") || noiDung.contains("đáp án 2")) {
-            btn_da2.performClick();
-        } else if (noiDung.contains("3") || noiDung.contains("ba") || noiDung.contains("đáp án 3")) {
-            btn_da2.performClick();
-        } else if (noiDung.contains("4") || noiDung.contains("bốn") || noiDung.contains("đáp án 4")) {
-            btn_da2.performClick();
-        }
-    }
-
-    private void onClick() {
-        findViewById(R.id.btnReplay).setOnClickListener(view -> {
-            String noiDung = "Câu hỏi số " + (idxHocTap + 1) + " " + Common.CAU_HOI.getCauhoi() + ", Đáp án số một " + Common.CAU_HOI.getA() + ", Đáp án số hai " + Common.CAU_HOI.getB() + ", Đáp án số ba " + Common.CAU_HOI.getC() + ", Đáp án số bốn " + Common.CAU_HOI.getD();
-            speak(noiDung);
-        });
-        btn_trove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-        btn_da1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkDapAn(btn_da1.getText().toString(), Common.CAU_HOI)) {
-                    dung += 1;
-                    entry = 0;
-                    speak("Chúc mừng bạn đã trả lời đúng");
-                    nextHocTap();
-                } else {
-                    entry += 1;
-                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
-                    if (entry == 2) {
-                        sai += 1;
-                        nextHocTap();
-                    }
-                }
-            }
-        });
-        btn_da2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkDapAn(btn_da2.getText().toString(), Common.CAU_HOI)) {
-                    dung += 1;
-                    entry = 0;
-                    speak("Chúc mừng bạn đã trả lời đúng");
-                    nextHocTap();
-                } else {
-                    entry += 1;
-                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
-                    if (entry == 2) {
-                        sai += 1;
-                        nextHocTap();
-                    }
-                }
-
-            }
-        });
-        btn_da3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkDapAn(btn_da3.getText().toString(), Common.CAU_HOI)) {
-                    dung += 1;
-                    entry = 0;
-                    speak("Chúc mừng bạn đã trả lời đúng");
-                    nextHocTap();
-                } else {
-                    entry += 1;
-                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
-                    if (entry == 2) {
-                        sai += 1;
-                        nextHocTap();
-                    }
-                }
-            }
-        });
-        btn_da4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkDapAn(btn_da3.getText().toString(), Common.CAU_HOI)) {
-                    dung += 1;
-                    entry = 0;
-                    speak("Chúc mừng bạn đã trả lời đúng");
-                    nextHocTap();
-                } else {
-                    entry += 1;
-                    speak("Câu trả lời chưa chính xác, bạn hãy chọn lại xem sao");
-                    if (entry == 2) {
-                        sai += 1;
-                        nextHocTap();
-                    }
-                }
-            }
-        });
-        findViewById(R.id.btnMic).setOnClickListener(view -> {
-            Intent intent
-                    = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
-                    Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
-
-            try {
-                startActivityForResult(intent, REQUEST_MIC);
-            } catch (Exception e) {
-                Toast.makeText(HocTapActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_MIC && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (result != null && !result.isEmpty()) {
-                String text = result.get(0);
-                if (text.toLowerCase().contains("đọc")) {
-                    String noiDung = "Câu hỏi số " + (idxHocTap + 1) + " " + Common.CAU_HOI.getCauhoi() + ", Đáp án số một " + Common.CAU_HOI.getA() + ", Đáp án số hai " + Common.CAU_HOI.getB() + ", Đáp án số ba " + Common.CAU_HOI.getC() + ", Đáp án số bốn " + Common.CAU_HOI.getD();
-                    speak(noiDung);
-                } else {
-                    chonDapAn(text);
-                }
-
-            }
-        }
-    }
-
-
-    private void init() {
+    private void initViews() {
         tv_CauHoi = findViewById(R.id.tv_cauhoi);
         btn_da1 = findViewById(R.id.btn_da1);
         btn_da2 = findViewById(R.id.btn_da2);
         btn_da3 = findViewById(R.id.btn_da3);
         btn_da4 = findViewById(R.id.btn_da4);
         btn_trove = findViewById(R.id.btn_trove);
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int i) {
-                if (i != TextToSpeech.ERROR) {
-                    textToSpeech.setLanguage(Locale.forLanguageTag("vi-VN"));
-                }
+    }
+
+    private void initTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                textToSpeech.setLanguage(new Locale("vi", "VN"));
             }
         });
-        textToSpeech.setSpeechRate(0.5f);
     }
 
-    private boolean checkDapAn(String dapanchon, CauHoi HocTap) {
-        if (dapanchon.equalsIgnoreCase(HocTap.getDapan())) return true;
-        else return false;
+    private void shuffleQuestions() {
+        random = new Random();
+        Collections.shuffle(Common.cauHoiArrayList);
     }
 
+    private void setupClickListeners() {
+        btn_da1.setOnClickListener(view -> handleAnswer(btn_da1.getText().toString()));
+        btn_da2.setOnClickListener(view -> handleAnswer(btn_da2.getText().toString()));
+        btn_da3.setOnClickListener(view -> handleAnswer(btn_da3.getText().toString()));
+        btn_da4.setOnClickListener(view -> handleAnswer(btn_da4.getText().toString()));
+        btn_trove.setOnClickListener(view -> finish());
+        findViewById(R.id.btnReplay).setOnClickListener(view -> repeatQuestion());
+        findViewById(R.id.btnMic).setOnClickListener(view -> startVoiceRecognition());
+    }
+
+    private void repeatQuestion() {
+        String noiDung = getCurrentQuestionContent();
+        speak(noiDung);
+    }
+
+    private void startVoiceRecognition() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hãy nói...");
+        try {
+            startActivityForResult(intent, REQUEST_MIC);
+        } catch (Exception e) {
+            Toast.makeText(this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handleAnswer(String selectedAnswer) {
+        if (Common.CAU_HOI != null && checkAnswer(selectedAnswer)) {
+            dung++;
+            speak("Chúc mừng bạn đã trả lời đúng");
+            delayAndProceed(this::nextQuestion, 3000);
+        } else {
+            entry++;
+            if (entry == 1) {
+                speak("Câu trả lời chưa chính xác, bạn hãy chọn lại.");
+            } else if (entry == 2) {
+                sai++;
+                String noiDung = "Câu trả lời chưa chính xác. Đáp án đúng là " + Common.CAU_HOI.getDapan() + ". giải thích. " + Common.CAU_HOI.getGiaithich();
+                entry = 0;
+                String utteranceId = UUID.randomUUID().toString();
+                textToSpeech.speak(noiDung, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+
+                textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override
+                    public void onStart(String utteranceId) {
+                    }
+
+                    @Override
+                    public void onDone(String utteranceId) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                nextQuestion();
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onError(String utteranceId) {
+                        runOnUiThread(() -> Toast.makeText(HocTapActivity.this, "Lỗi khi phát âm", Toast.LENGTH_SHORT).show());
+                    }
+                });
+
+            }
+        }
+    }
+
+    private boolean checkAnswer(String selectedAnswer) {
+        return selectedAnswer.equals(Common.CAU_HOI.getDapan());
+    }
+
+    private void nextQuestion() {
+        if (++idxHocTap >= Common.cauHoiArrayList.size()) {
+            showResultDialog();
+        } else {
+            Common.CAU_HOI = Common.cauHoiArrayList.get(idxHocTap);
+            updateUIForQuestion();
+        }
+    }
+
+    private void updateUIForQuestion() {
+        tv_CauHoi.setText(Common.CAU_HOI.getCauhoi());
+        btn_da1.setText(Common.CAU_HOI.getA());
+        btn_da2.setText(Common.CAU_HOI.getB());
+        btn_da3.setText(Common.CAU_HOI.getC());
+        btn_da4.setText(Common.CAU_HOI.getD());
+        speak(getCurrentQuestionContent());
+    }
+
+    private String getCurrentQuestionContent() {
+        return "Câu hỏi số " + (idxHocTap + 1) + ", " + Common.CAU_HOI.getCauhoi()
+                + ". Đáp án một, " + Common.CAU_HOI.getA()
+                + ". Đáp án hai, " + Common.CAU_HOI.getB()
+                + ". Đáp án ba, " + Common.CAU_HOI.getC()
+                + ". Đáp án bốn, " + Common.CAU_HOI.getD();
+    }
+
+    private void showResultDialog() {
+        float diem = (float) dung / (dung + sai) * 10;
+        String noiDung = "Bạn đã hoàn thành bài học. Trả lời đúng " + dung + " câu hỏi. "
+                + "Trả lời sai " + sai + " câu hỏi. Điểm, " + diem + " điểm.";
+        String utteranceId = UUID.randomUUID().toString();
+        textToSpeech.speak(noiDung, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+
+        textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+                runOnUiThread(() -> Toast.makeText(HocTapActivity.this, "Lỗi khi phát âm", Toast.LENGTH_SHORT).show());
+            }
+        });
+        new AlertDialog.Builder(this)
+                .setTitle("Hoàn thành bài kiểm tra")
+                .setMessage(noiDung)
+                .setPositiveButton("Thoát", (dialog, which) -> finish())
+                .create()
+                .show();
+
+
+    }
+
+    private void speak(String text) {
+        if (textToSpeech != null) {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+    }
+
+    private void delayAndProceed(Runnable action, int delayMillis) {
+        new Handler(Looper.getMainLooper()).postDelayed(action, delayMillis);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_MIC && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (results != null && !results.isEmpty()) {
+                String spokenText = results.get(0).toLowerCase(Locale.ROOT);
+                if (spokenText.contains("đọc")) {
+                    repeatQuestion();
+                } else {
+                    processSpokenAnswer(spokenText);
+                }
+            }
+        }
+    }
+
+    private void processSpokenAnswer(String spokenText) {
+        if (spokenText.contains("1") || spokenText.contains("một")) {
+            btn_da1.performClick();
+        } else if (spokenText.contains("2") || spokenText.contains("hai")) {
+            btn_da2.performClick();
+        } else if (spokenText.contains("3") || spokenText.contains("ba")) {
+            btn_da3.performClick();
+        } else if (spokenText.contains("4") || spokenText.contains("bốn")) {
+            btn_da4.performClick();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
 }
+
+

@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".views.exam.CauHoiActivity">
+    android:orientation="vertical"
+    tools:context=".views.review.ReviewActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -121,25 +121,42 @@
             </LinearLayout>
         </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:id="@+id/btnReplay"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+
+                android:src="@drawable/baseline_replay_24" />
+
+            <ImageView
+                android:id="@+id/btnPrev"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_skip_previous_24" />
+
+            <ImageView
+                android:id="@+id/btnNext"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+
+                android:src="@drawable/baseline_skip_next_24" />
 
             <ImageView
                 android:id="@+id/btnMic"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_alignParentRight="true"
+                android:layout_weight="1"
+
                 android:src="@drawable/baseline_mic_24" />
-
-            <ImageView
-
-                android:id="@+id/btnReplay"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_alignParentLeft="true"
-                android:src="@drawable/baseline_replay_24" />
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>
