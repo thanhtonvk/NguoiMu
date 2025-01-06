@@ -3,16 +3,12 @@ package com.tondz.nguoimu.views;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -20,10 +16,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
@@ -39,15 +33,12 @@ import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.utils.Common;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.Callback {
-    private static final int REQUEST_MIC = 1235;
     NguoiMuSDK yolov8Ncnn = new NguoiMuSDK();
     private SurfaceView cameraView;
     private static final int REQUEST_CAMERA = 510;
@@ -55,10 +46,9 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     DBContext dbContext;
     Handler handler;
     Runnable runnable;
-    boolean objectCanPlaySound = true;
-    boolean personCanPlaySound = true;
-    ImageView btnDoiCamera;
-    private int facing = 0;
+    private boolean canPlaySound = true;
+    Button btnDoiCamera;
+    private int facing = 1;
     TextView tvKhoangCach;
 
     @Override
@@ -74,13 +64,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
         runnable = new Runnable() {
             @Override
             public void run() {
-                if (!objectCanPlaySound) {
-                    objectCanPlaySound = true;
-                }
-                if (!personCanPlaySound) {
-                    personCanPlaySound = true;
-                }
-
+                canPlaySound = true;
             }
         };
         getObject();
@@ -104,59 +88,25 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
                 finish();
             }
         });
-        findViewById(R.id.btnThem).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), ThemNguoiThanActivity.class));
-            }
-        });
 
     }
-
-    NguoiThan nguoiThan = null;
 
     private void getObject() {
         new Thread(() -> {
             while (true) {
                 List<String> stringList = yolov8Ncnn.getListResult();
                 if (!stringList.isEmpty()) {
-                    if (objectCanPlaySound) {
+                    if (canPlaySound) {
                         countObject(stringList);
                         for (String result : stringList
                         ) {
                             speakObject(result);
-                            break;
                         }
-                        objectCanPlaySound = false;
+                        canPlaySound = false;
                         handler.postDelayed(runnable, 5000);
                     }
 
                 }
-
-                nguoiThan = null;
-                String stringEmb = yolov8Ncnn.getEmbedding();
-                if (!stringEmb.isEmpty()) {
-                    nguoiThan = timNguoi(stringEmb);
-                    Bitmap bitmap = yolov8Ncnn.getFaceAlign();
-                    if (bitmap != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                imgView.setImageBitmap(bitmap);
-                            }
-                        });
-                    }
-                    if (nguoiThan != null) {
-                        if (personCanPlaySound) {
-                            speakNguoiThan(nguoiThan);
-                            tvName.setText(nguoiThan.getTen());
-                            personCanPlaySound = false;
-                            handler.postDelayed(runnable, 5000);
-                        }
-                    }
-                }
-
-
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -166,118 +116,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
         }).start();
     }
 
-    private void speakNguoiThan(NguoiThan nguoiThan) {
-        textToSpeech.speak(nguoiThan.getTen(), TextToSpeech.QUEUE_FLUSH, null);
-    }
-
-    private NguoiThan timNguoi(String embedding) {
-        NguoiThan result = null;
-        double maxScore = 0;
-        for (NguoiThan nguoiThan : dbContext.getNguoiThans()
-        ) {
-            String[] str_target = embedding.split(",");
-            String[] str_source = nguoiThan.getEmbedding().split(",");
-            if (str_target.length == 512 && str_source.length == 512) {
-                double[] target = new double[512];
-                for (int i = 0; i < 512; i++) {
-                    target[i] = Double.parseDouble(str_target[i]);
-                }
-
-                double[] source = new double[512];
-                for (int i = 0; i < 512; i++) {
-                    source[i] = Double.parseDouble(str_source[i]);
-                }
-                double score = Common.cosineSimilarity(target, source);
-
-                if (score > 0.5 && score > maxScore) {
-                    maxScore = score;
-                    result = nguoiThan;
-                }
-            }
-
-
-        }
-        return result;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            Intent intent
-                    = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
-                    Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
-
-            try {
-                startActivityForResult(intent, REQUEST_MIC);
-            } catch (Exception e) {
-                Toast.makeText(DoDuongActivity.this, "Thiết bị không hỗ trợ tính năng này", Toast.LENGTH_SHORT).show();
-            }
-            return true;
-        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            textToSpeech.speak("nhận diện", TextToSpeech.QUEUE_FLUSH, null);
-            startActivity(new Intent(getApplicationContext(), DoDuongActivity.class));
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    private void actionMic(String text) {
-        if (text.toLowerCase().contains("doi")) {
-            int new_facing = 1 - facing;
-            yolov8Ncnn.closeCamera();
-            yolov8Ncnn.openCamera(new_facing);
-            facing = new_facing;
-        }
-        if (text.toLowerCase().contains("chinh")) {
-            startActivity(new Intent(getApplicationContext(), CanChinhKhoangCachActivity.class));
-            finish();
-        }
-        if (text.toLowerCase().contains("them")) {
-            startActivity(new Intent(getApplicationContext(), ThemNguoiThanActivity.class));
-        }
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_MIC && resultCode == RESULT_OK && data != null) {
-            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (result != null && !result.isEmpty()) {
-                String text = result.get(0);
-                text = removeAccent(text);
-                actionMic(text);
-            }
-        }
-    }
-
-    public String removeAccent(String s) {
-        // Normalize văn bản để chuyển các ký tự có dấu thành dạng ký tự tổ hợp
-        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
-
-        // Loại bỏ các dấu bằng cách loại bỏ các ký tự không phải ASCII
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        return pattern.matcher(temp).replaceAll("").replaceAll("đ", "d").replaceAll("Đ", "D");
-    }
-
-    private void loadWidthInImages() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String widthInImages = preferences.getString("widthInImages", "");
-        if (!widthInImages.equalsIgnoreCase("")) {
-            String[] arr = widthInImages.split(",");
-            for (int i = 0; i < arr.length; i++) {
-                CalDistance.widthInImages[i] = Double.parseDouble(arr[i]);
-            }
-        }
-    }
-
-    ImageView imgView;
-    TextView tvName;
-
     private void init() {
         btnDoiCamera = findViewById(R.id.btnChangeCamera);
         cameraView = findViewById(R.id.cameraview);
@@ -285,8 +123,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
         cameraView.getHolder().addCallback(this);
         tvKhoangCach = findViewById(R.id.tvKc);
-        imgView = findViewById(R.id.imgView);
-        tvName = findViewById(R.id.tvName);
+
         dbContext = new DBContext(DoDuongActivity.this);
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -343,7 +180,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
         double focalLength = CalDistance.calculateFocalLength(CalDistance.knownDistances[label], CalDistance.knownWidths[label],
                 CalDistance.widthInImages[label]);
         double distance = CalDistance.calculateDistance(CalDistance.knownWidths[label], focalLength, w);
-        tvKhoangCach.post(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 tvKhoangCach.setText(String.format("Khoảng cách %,.2fm", distance));
@@ -435,7 +272,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 1, 1, 1);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 1, 0, 1, 0, 0);
         if (!ret_init) {
             Log.e("DoDuongActivity", "yolov8ncnn loadModel failed");
         }

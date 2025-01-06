@@ -21,9 +21,10 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USB_PERMISSION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -36,6 +37,36 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NguoiMu"
         tools:targetApi="31">
+        <activity
+            android:name=".views.review.ReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.hoctap.HocTapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.exam.CauHoiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.NguoiBinhThuongActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.NhanDienTienActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.OcrActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CamDiecNoiCauActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChonChucNangMuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CamDiecActivity"
+            android:exported="false" />
         <activity
             android:name=".views.CanChinhKhoangCachActivity"
             android:exported="false" />
@@ -52,7 +83,13 @@
             android:name=".views.ThemNguoiThanActivity"
             android:exported="false" />
         <activity
-            android:name=".views.MainActivity"
+            android:name=".views.register.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManHinhChinhActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

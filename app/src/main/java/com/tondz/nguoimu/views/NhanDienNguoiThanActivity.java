@@ -104,7 +104,13 @@ public class NhanDienNguoiThanActivity extends AppCompatActivity implements Surf
                     if (nguoiThan != null) {
                         if (canPlaySound) {
                             speakNguoiThan(nguoiThan);
-                            tvName.setText(nguoiThan.getTen());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvName.setText(nguoiThan.getTen());
+                                }
+                            });
+
                             canPlaySound = false;
                             handler.postDelayed(runnable, 5000);
                         }
@@ -178,7 +184,7 @@ public class NhanDienNguoiThanActivity extends AppCompatActivity implements Surf
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 1, 0);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 1, 0, 0, 0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         }
