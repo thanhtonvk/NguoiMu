@@ -47,7 +47,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     Handler handler;
     Runnable runnable;
     private boolean canPlaySound = true;
-    Button btnDoiCamera;
     private int facing = 1;
     TextView tvKhoangCach;
 
@@ -72,7 +71,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void onClick() {
-        btnDoiCamera.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnChangeCamera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int new_facing = 1 - facing;
@@ -117,7 +116,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void init() {
-        btnDoiCamera = findViewById(R.id.btnChangeCamera);
         cameraView = findViewById(R.id.cameraview);
 
 
