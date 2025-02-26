@@ -51,8 +51,13 @@ import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.models.CauHoi;
 import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.CalDistance;
-import com.tondz.nguoimu.views.exam.CauHoiActivity;
-import com.tondz.nguoimu.views.hoctap.HocTapActivity;
+import com.tondz.nguoimu.views.nguoi_mu.CauHoiActivity;
+import com.tondz.nguoimu.views.nguoi_mu.DoDuongActivity;
+import com.tondz.nguoimu.views.nguoi_mu.HocTapActivity;
+import com.tondz.nguoimu.views.nguoi_mu.NhanDienNguoiThanActivity;
+import com.tondz.nguoimu.views.nguoi_mu.NhanDienTienActivity;
+import com.tondz.nguoimu.views.nguoi_mu.OcrActivity;
+
 
 import java.sql.Time;
 import java.text.Normalizer;

@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views;
+package com.tondz.nguoimu.views.nguoi_mu;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -32,6 +32,7 @@ import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.utils.Common;
+import com.tondz.nguoimu.views.nguoi_mu.CanChinhKhoangCachActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
