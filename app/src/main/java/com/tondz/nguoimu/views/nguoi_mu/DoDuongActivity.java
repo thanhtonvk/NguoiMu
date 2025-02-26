@@ -1,9 +1,10 @@
-package com.tondz.nguoimu.views.nguoi_mu;
+package com.tondz.nguoimu.views;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -13,15 +14,22 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
 import com.tondz.nguoimu.database.DBContext;
+import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.utils.Common;
 
@@ -39,7 +47,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     Handler handler;
     Runnable runnable;
     private boolean canPlaySound = true;
-    Button btnDoiCamera;
     private int facing = 1;
     TextView tvKhoangCach;
 
@@ -64,7 +71,7 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void onClick() {
-        btnDoiCamera.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnChangeCamera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int new_facing = 1 - facing;
@@ -109,7 +116,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void init() {
-        btnDoiCamera = findViewById(R.id.btnChangeCamera);
         cameraView = findViewById(R.id.cameraview);
 
 
