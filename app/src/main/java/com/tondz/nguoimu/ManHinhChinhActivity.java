@@ -2,7 +2,6 @@ package com.tondz.nguoimu;
 
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
@@ -15,9 +14,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.tondz.nguoimu.views.DoDuongActivity;
 import com.tondz.nguoimu.views.MainActivity;
-import com.tondz.nguoimu.views.NhanDienNguoiThanActivity;
+import com.tondz.nguoimu.views.cam_diec.ChonChucNangMuActivity;
 
 import java.text.Normalizer;
 import java.util.ArrayList;

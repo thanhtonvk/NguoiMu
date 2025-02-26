@@ -1,26 +1,17 @@
-package com.tondz.nguoimu.views;
+package com.tondz.nguoimu.views.nguoi_mu;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tondz.nguoimu.NguoiMuSDK;
@@ -29,12 +20,7 @@ import com.tondz.nguoimu.adapters.NguoiThanAdapter;
 import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.models.NguoiThan;
 import com.tondz.nguoimu.utils.BitmapUtils;
-import com.tondz.nguoimu.utils.Common;
 import com.tondz.nguoimu.utils.FileUtils;
-
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ThemNguoiThanActivity extends AppCompatActivity {
     DBContext dbContext;

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/image_background"
     android:orientation="vertical"
     tools:context=".views.MainActivity">
 
@@ -16,7 +16,7 @@
 
         android:gravity="center"
         android:text="Phần mềm hỗ trợ người khiếm thị"
-        android:textColor="#9C27B0"
+        android:textColor="#0D47A1"
         android:textSize="50sp" />
 
     <ScrollView
@@ -30,57 +30,86 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnDoDuong"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Dò đường" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Dò đường"
+                android:textColor="@android:color/white" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnNhanDienNguoi"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Nhận diện người thân" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Nhận diện người thân"
+                android:textColor="@android:color/white" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnGoiDien"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Quay số" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Quay số"
+                android:textColor="@android:color/white" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnGoiDanhBa"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Gọi trong danh bạ" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Gọi trong danh bạ"
+                android:textColor="@android:color/white" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnDocChu"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Đọc chữ" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Đọc chữ"
+                android:textColor="@android:color/white" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnDinhVi"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Gửi định vị" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Gửi định vị"
+                android:textColor="@android:color/white" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnNhanDienTien"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Nhận diện tiền" />
-            <Button
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Nhận diện tiền"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnHoctap"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Học tập" />
-            <Button
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Học tập"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnThiOnline"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="Thi online" />
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Thi online"
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
     </ScrollView>

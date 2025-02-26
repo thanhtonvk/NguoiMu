@@ -1,7 +1,6 @@
-package com.tondz.nguoimu.views;
+package com.tondz.nguoimu.views.nguoi_mu;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,44 +16,36 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
 import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.models.NguoiThan;
-import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.utils.Common;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
-public class NhanDienTienActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+public class NhanDienNguoiThanActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     NguoiMuSDK yolov8Ncnn = new NguoiMuSDK();
     private SurfaceView cameraView;
     private static final int REQUEST_CAMERA = 510;
     TextToSpeech textToSpeech;
+    ImageView imgView;
     DBContext dbContext;
+    TextView tvName;
     Handler handler;
     Runnable runnable;
     private boolean canPlaySound = true;
     Button btnDoiCamera;
     private int facing = 1;
-    TextView tvKhoangCach;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nhan_dien_tien);
+        setContentView(R.layout.activity_nhan_dien_nguoi_than);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         init();
         checkPermissions();
@@ -84,23 +75,39 @@ public class NhanDienTienActivity extends AppCompatActivity implements SurfaceHo
 
     }
 
+    NguoiThan nguoiThan = null;
+
     private void getObject() {
         new Thread(() -> {
             while (true) {
-                List<String> moneyList = yolov8Ncnn.getListMoneyResult();
-                if (!moneyList.isEmpty()) {
-                    if (canPlaySound) {
-                        for (String money : moneyList
-                        ) {
-                            speakMoney(money);
-                            break;
-                        }
-                        canPlaySound = false;
-                        handler.postDelayed(runnable, 3000);
+                nguoiThan = null;
+                String stringEmb = yolov8Ncnn.getEmbedding();
+                if (!stringEmb.isEmpty()) {
+                    nguoiThan = timNguoi(stringEmb);
+                    Bitmap bitmap = yolov8Ncnn.getFaceAlign();
+                    if (bitmap != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                imgView.setImageBitmap(bitmap);
+                            }
+                        });
                     }
+                    if (nguoiThan != null) {
+                        if (canPlaySound) {
+                            speakNguoiThan(nguoiThan);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvName.setText(nguoiThan.getTen());
+                                }
+                            });
 
+                            canPlaySound = false;
+                            handler.postDelayed(runnable, 5000);
+                        }
+                    }
                 }
-
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -113,12 +120,10 @@ public class NhanDienTienActivity extends AppCompatActivity implements SurfaceHo
     private void init() {
         btnDoiCamera = findViewById(R.id.btnChangeCamera);
         cameraView = findViewById(R.id.cameraview);
-
-
+        imgView = findViewById(R.id.imgView);
         cameraView.getHolder().addCallback(this);
-        tvKhoangCach = findViewById(R.id.tvKc);
-
-        dbContext = new DBContext(NhanDienTienActivity.this);
+        dbContext = new DBContext(NhanDienNguoiThanActivity.this);
+        tvName = findViewById(R.id.tvName);
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -127,59 +132,53 @@ public class NhanDienTienActivity extends AppCompatActivity implements SurfaceHo
                 }
             }
         });
+        findViewById(R.id.btnThem).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ThemNguoiThanActivity.class));
+            }
+        });
 
     }
 
-    private void countObject(List<String> stringObject) {
-        List<String> labels = new ArrayList<>();
-        for (String result : stringObject
-        ) {
-            String[] arr = result.split(" ");
-            labels.add(Common.listObject[Integer.parseInt(arr[0])]);
-        }
-        HashMap<String, Integer> elementCountMap = new HashMap<>();
+    private void speakNguoiThan(NguoiThan nguoiThan) {
+        textToSpeech.speak(nguoiThan.getTen(), TextToSpeech.QUEUE_FLUSH, null);
+    }
 
-        // Duyệt qua mảng và đếm số lần xuất hiện của từng phần tử
-        for (String str : labels) {
-            if (elementCountMap.containsKey(str)) {
-                elementCountMap.put(str, elementCountMap.get(str) + 1);
-            } else {
-                elementCountMap.put(str, 1);
-            }
-        }
-        for (String key : elementCountMap.keySet()) {
-            int num_of_value = elementCountMap.get(key);
-            if (num_of_value > 1) {
-                String speak = "Có " + num_of_value + " " + key;
-                textToSpeech.speak(speak, TextToSpeech.QUEUE_FLUSH, null);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+    private NguoiThan timNguoi(String embedding) {
+        NguoiThan result = null;
+        double maxScore = 0;
+        for (NguoiThan nguoiThan : dbContext.getNguoiThans()
+        ) {
+            String[] str_target = embedding.split(",");
+            String[] str_source = nguoiThan.getEmbedding().split(",");
+            if (str_target.length == 512 && str_source.length == 512) {
+                double[] target = new double[512];
+                for (int i = 0; i < 512; i++) {
+                    target[i] = Double.parseDouble(str_target[i]);
                 }
 
-            }
-        }
-    }
+                double[] source = new double[512];
+                for (int i = 0; i < 512; i++) {
+                    source[i] = Double.parseDouble(str_source[i]);
+                }
+                double score = Common.cosineSimilarity(target, source);
 
-    private void speakMoney(String result) {
-        Log.e("TAGTOND", "speakMoney: " + result);
-        String[] arr = result.split(" ");
-        int label = Integer.parseInt(arr[0]);
-        double prob = Double.parseDouble(arr[5]);
-        if (prob > 0.9) {
-            String money = Common.moneys[label];
-            if (!textToSpeech.isSpeaking()) {
-                textToSpeech.speak(money, TextToSpeech.QUEUE_FLUSH, null);
+                if (score > 0.5 && score > maxScore) {
+                    maxScore = score;
+                    result = nguoiThan;
+                }
             }
-        }
 
+
+        }
+        return result;
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0, 1);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 1, 0, 0, 0);
         if (!ret_init) {
-            Log.e("NhanDienTienActivity", "yolov8ncnn loadModel failed");
+            Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         }
     }
 

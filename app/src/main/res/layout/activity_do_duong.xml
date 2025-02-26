@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.DoDuongActivity">
+    tools:context=".views.nguoi_mu.DoDuongActivity">
 
 
     <SurfaceView
@@ -27,18 +27,24 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnChangeCamera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:background="@color/teal_700"
             android:text="Đổi camera" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnCanChinh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
             android:layout_weight="1"
+            android:background="@color/teal_700"
             android:text="Căn chỉnh khoảng cách" />
     </LinearLayout>
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".views.exam.CauHoiActivity">
+    tools:context=".views.nguoi_mu.CauHoiActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -39,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0.3"
+                android:backgroundTint="@color/red_500"
                 android:text="Xoá" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

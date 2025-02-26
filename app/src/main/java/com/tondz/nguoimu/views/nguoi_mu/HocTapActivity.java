@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views.hoctap;
+package com.tondz.nguoimu.views.nguoi_mu;
 
 
 import android.app.AlertDialog;

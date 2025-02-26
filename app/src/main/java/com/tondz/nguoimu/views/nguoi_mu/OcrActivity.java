@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views;
+package com.tondz.nguoimu.views.nguoi_mu;
 
 import android.Manifest;
 import android.annotation.SuppressLint;

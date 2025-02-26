@@ -1,4 +1,4 @@
-package com.tondz.nguoimu;
+package com.tondz.nguoimu.views.cam_diec;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -11,23 +11,17 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.tondz.nguoimu.databinding.ActivityCamDiecBinding;
+import com.tondz.nguoimu.Common;
+import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.databinding.ActivityCamDiecNoiCauBinding;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -203,7 +197,7 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
 
                 }
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

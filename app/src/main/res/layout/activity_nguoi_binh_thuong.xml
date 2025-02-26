@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.NguoiBinhThuongActivity">
+    tools:context=".views.cam_diec.NguoiBinhThuongActivity">
 
     <VideoView
         android:id="@+id/videoView"
@@ -57,7 +57,8 @@
         android:layout_below="@id/gridView"
         android:layout_toLeftOf="@id/btnMic" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:background="@color/teal_700"
         android:id="@+id/btnOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

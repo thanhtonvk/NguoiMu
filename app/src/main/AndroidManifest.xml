@@ -35,61 +35,59 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NguoiMu"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".views.review.ReviewActivity"
+            android:name=".views.nguoi_mu.ReviewActivity"
             android:exported="false" />
         <activity
-            android:name=".views.hoctap.HocTapActivity"
+            android:name=".views.nguoi_mu.HocTapActivity"
             android:exported="false" />
         <activity
-            android:name=".views.exam.CauHoiActivity"
+            android:name=".views.nguoi_mu.CauHoiActivity"
             android:exported="false" />
         <activity
-            android:name=".views.NguoiBinhThuongActivity"
+            android:name=".views.cam_diec.NguoiBinhThuongActivity"
             android:exported="false" />
         <activity
-            android:name=".views.NhanDienTienActivity"
+            android:name=".views.nguoi_mu.NhanDienTienActivity"
             android:exported="false" />
         <activity
-            android:name=".views.OcrActivity"
+            android:name=".views.nguoi_mu.OcrActivity"
             android:exported="false" />
         <activity
-            android:name=".CamDiecNoiCauActivity"
+            android:name=".views.cam_diec.CamDiecNoiCauActivity"
             android:exported="false" />
         <activity
-            android:name=".ChonChucNangMuActivity"
+            android:name=".views.cam_diec.ChonChucNangMuActivity"
             android:exported="false" />
         <activity
             android:name=".views.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".CamDiecActivity"
+            android:name=".views.cam_diec.CamDiecActivity"
             android:exported="false" />
         <activity
-            android:name=".views.CanChinhKhoangCachActivity"
+            android:name=".views.nguoi_mu.CanChinhKhoangCachActivity"
             android:exported="false" />
         <activity
-            android:name=".views.DoDuongActivity"
+            android:name=".views.nguoi_mu.DoDuongActivity"
             android:exported="false" />
         <activity
-            android:name=".views.NhanDienNguoiThanActivity"
+            android:name=".views.nguoi_mu.NhanDienNguoiThanActivity"
             android:exported="false" />
         <activity
-            android:name=".views.DetectFaceActivity"
+            android:name=".views.nguoi_mu.DetectFaceActivity"
             android:exported="false" />
         <activity
-            android:name=".views.ThemNguoiThanActivity"
+            android:name=".views.nguoi_mu.ThemNguoiThanActivity"
             android:exported="false" />
         <activity
             android:name=".views.register.RegisterActivity"
             android:exported="false" />
+
         <activity
-            android:name=".ManHinhChinhActivity"
-            android:exported="false" />
-        <activity
-            android:name=".views.login.LoginActivity"
+            android:name="ManHinhChinhActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

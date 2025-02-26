@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.NhanDienTienActivity">
+    tools:context=".views.nguoi_mu.NhanDienTienActivity">
 
 
     <SurfaceView
@@ -27,7 +27,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
+                    <androidx.appcompat.widget.AppCompatButton
+                android:textColor="@android:color/white"
+            android:background="@color/teal_700"
             android:id="@+id/btnChangeCamera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,13 +1,8 @@
-package com.tondz.nguoimu;
+package com.tondz.nguoimu.views.cam_diec;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.tondz.nguoimu.views.MainActivity;
-import com.tondz.nguoimu.views.NguoiBinhThuongActivity;
+import com.tondz.nguoimu.R;
 
 public class ChonChucNangMuActivity extends AppCompatActivity {
 

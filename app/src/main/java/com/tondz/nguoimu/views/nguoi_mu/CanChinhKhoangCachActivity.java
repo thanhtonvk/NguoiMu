@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views;
+package com.tondz.nguoimu.views.nguoi_mu;
 
 
 import android.Manifest;
@@ -6,29 +6,21 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.R;
-import com.tondz.nguoimu.database.DBContext;
 import com.tondz.nguoimu.utils.CalDistance;
 import com.tondz.nguoimu.utils.Common;
 

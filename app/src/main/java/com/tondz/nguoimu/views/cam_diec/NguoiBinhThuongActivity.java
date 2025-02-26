@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views;
+package com.tondz.nguoimu.views.cam_diec;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -15,22 +15,15 @@ import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.tondz.nguoimu.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class NguoiBinhThuongActivity extends AppCompatActivity {
     private static final int REQUEST_MIC = 12345;

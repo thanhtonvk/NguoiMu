@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.NhanDienNguoiThanActivity">
+    tools:context=".views.nguoi_mu.NhanDienNguoiThanActivity">
 
 
     <SurfaceView
@@ -37,7 +37,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
+                    <androidx.appcompat.widget.AppCompatButton
+                android:textColor="@android:color/white"
+            android:background="@color/teal_700"
             android:id="@+id/btnThem"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -45,7 +47,9 @@
             android:layout_weight="1"
             android:text="Thêm người thân" />
 
-        <Button
+                    <androidx.appcompat.widget.AppCompatButton
+                android:textColor="@android:color/white"
+            android:background="@color/teal_700"
             android:id="@+id/btnChangeCamera"
             android:layout_width="match_parent"
             android:layout_height="50dp"

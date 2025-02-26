@@ -1,4 +1,4 @@
-package com.tondz.nguoimu.views.exam;
+package com.tondz.nguoimu.views.nguoi_mu;
 
 
 import android.app.AlertDialog;
@@ -18,8 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tondz.nguoimu.Common;
 import com.tondz.nguoimu.R;
-import com.tondz.nguoimu.views.hoctap.HocTapActivity;
-import com.tondz.nguoimu.views.review.ReviewActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;

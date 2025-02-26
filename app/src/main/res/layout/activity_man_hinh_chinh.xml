@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/image_background"
     android:orientation="vertical"
     tools:context=".ManHinhChinhActivity">
 
@@ -15,22 +15,29 @@
         android:layout_marginTop="50dp"
         android:gravity="center"
         android:text="Phần mềm hỗ trợ người khuyết tật"
-        android:textColor="#D84315"
+        android:textColor="#0D47A1"
         android:textSize="50sp" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnKhiemThi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Khiếm thị" />
+        android:layout_margin="5dp"
+        android:background="@color/teal_700"
+        android:text="Khiếm thị"
+        android:textColor="@android:color/white" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnCamDiec"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnKhiemThi"
-        android:text="Câm điếc" />
+        android:layout_margin="5dp"
+        android:background="@color/teal_700"
+        android:text="Câm điếc"
+        android:textColor="@android:color/white" />
+
     <ImageButton
 
         android:id="@+id/btnMic"

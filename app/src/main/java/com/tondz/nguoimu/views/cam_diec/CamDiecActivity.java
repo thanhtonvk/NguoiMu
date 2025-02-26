@@ -1,4 +1,4 @@
-package com.tondz.nguoimu;
+package com.tondz.nguoimu.views.cam_diec;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -11,17 +11,14 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import com.tondz.nguoimu.Common;
+import com.tondz.nguoimu.NguoiMuSDK;
 import com.tondz.nguoimu.databinding.ActivityCamDiecBinding;
 
 import java.util.Locale;
@@ -62,7 +59,7 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
                 if (!dataDeaf.isEmpty()) {
-                    if(dataDeaf.split("#").length != 2) continue;
+                    if (dataDeaf.split("#").length != 2) continue;
                     String deafScore = dataDeaf.split("#")[0];
                     String emotion = getEmotion(dataDeaf.split("#")[1]);
                     int deaf = getDeaf(deafScore);
@@ -74,7 +71,7 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
                     }
                 }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
