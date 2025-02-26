@@ -442,16 +442,16 @@ int SCRFD::draw(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects)
 
         cv::rectangle(rgb, obj.rect, cv::Scalar(0, 255, 0));
 
-
-        cv::circle(rgb, obj.landmark[0], 2, cv::Scalar(255, 255, 0), -1);
-        cv::circle(rgb, obj.landmark[1], 2, cv::Scalar(255, 255, 0), -1);
-        cv::circle(rgb, obj.landmark[2], 2, cv::Scalar(255, 255, 0), -1);
-        cv::circle(rgb, obj.landmark[3], 2, cv::Scalar(255, 255, 0), -1);
-        cv::circle(rgb, obj.landmark[4], 2, cv::Scalar(255, 255, 0), -1);
+//
+//        cv::circle(rgb, obj.landmark[0], 2, cv::Scalar(255, 255, 0), -1);
+//        cv::circle(rgb, obj.landmark[1], 2, cv::Scalar(255, 255, 0), -1);
+//        cv::circle(rgb, obj.landmark[2], 2, cv::Scalar(255, 255, 0), -1);
+//        cv::circle(rgb, obj.landmark[3], 2, cv::Scalar(255, 255, 0), -1);
+//        cv::circle(rgb, obj.landmark[4], 2, cv::Scalar(255, 255, 0), -1);
 
 
         char text[256];
-        sprintf(text, "%.1f%%", obj.prob * 100);
+//        sprintf(text, "%.1f%%", obj.prob * 100);
 
         int baseLine = 0;
         cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
@@ -463,9 +463,9 @@ int SCRFD::draw(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects)
         if (x + label_size.width > rgb.cols)
             x = rgb.cols - label_size.width;
 
-        cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)), cv::Scalar(255, 255, 255), -1);
+//        cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)), cv::Scalar(255, 255, 255), -1);
 
-        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
+//        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
     }
 
     return 0;

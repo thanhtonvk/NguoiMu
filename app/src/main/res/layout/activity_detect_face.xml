@@ -5,12 +5,23 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.DetectFaceActivity">
+    tools:context=".views.nguoi_mu.DetectFaceActivity">
 
     <SurfaceView
         android:id="@+id/cameraview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:background="@color/teal_700"
+        android:id="@+id/btnBt"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+
+        android:text="Đổi camera"
+        android:textColor="@color/white" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnCapture"

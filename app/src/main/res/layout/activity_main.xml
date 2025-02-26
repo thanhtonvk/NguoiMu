@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/image_background"
     android:orientation="vertical"
     tools:context=".views.MainActivity">
 
@@ -16,49 +16,112 @@
 
         android:gravity="center"
         android:text="Phần mềm hỗ trợ người khiếm thị"
-        android:textColor="#9C27B0"
+        android:textColor="#0D47A1"
         android:textSize="50sp" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvTitle"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="50dp">
+        android:layout_above="@id/btnMic"
+        android:layout_below="@id/tvTitle">
 
-        <Button
-            android:id="@+id/btnDoDuong"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_alignParentLeft="true"
-            android:text="Nhận diện" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDoDuong"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Dò đường"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnNhanDienNguoi"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Nhận diện người thân"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoiDien"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Quay số"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoiDanhBa"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Gọi trong danh bạ"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDocChu"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Đọc chữ"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDinhVi"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Gửi định vị"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnNhanDienTien"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Nhận diện tiền"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnHoctap"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Học tập"
+                android:textColor="@android:color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnThiOnline"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_margin="5dp"
+                android:background="@color/teal_700"
+                android:text="Thi online"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+    </ScrollView>
 
 
-        <Button
-            android:id="@+id/btnGoiDien"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_below="@id/btnDoDuong"
-            android:layout_alignParentLeft="true"
-            android:text="Quay số" />
-
-        <Button
-            android:id="@+id/btnGoiDanhBa"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_alignParentRight="true"
-            android:text="Gọi trong danh bạ" />
-
-        <ImageButton
-
-            android:id="@+id/btnMic"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_below="@id/btnGoiDanhBa"
-            android:layout_alignParentRight="true"
-            android:background="#00FFFFFF"
-            android:src="@drawable/baseline_mic_24" />
-    </RelativeLayout>
-
+    <ImageButton
+        android:id="@+id/btnMic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#00FFFFFF"
+        android:src="@drawable/baseline_mic_24" />
 
 </RelativeLayout>

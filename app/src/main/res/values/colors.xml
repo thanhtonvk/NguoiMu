@@ -2,4 +2,27 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="teal_700">#00897B</color>
+    <color name="blue_500">#1E88E5</color>
+    <color name="green_500">#43A047</color>
+    <color name="red_500">#E53935</color>
+    <color name="blue_primary">#1E88E5</color>
+    <color name="blue_dark">#1565C0</color>
+    <color name="blue_secondary">#64B5F6</color>
+
+
+    <color name="primary_blue">#1976D2</color> <!-- Màu Toolbar, Button -->
+    <color name="primary_light">#2196F3</color> <!-- Màu nhấn -->
+    <color name="primary_green">#388E3C</color> <!-- Màu nhấn (Button "Thêm") -->
+    <color name="secondary_green">#4CAF50</color> <!-- Màu Ripple -->
+
+    <color name="text_primary">#212121</color> <!-- Màu chữ chính -->
+    <color name="text_secondary">#757575</color> <!-- Màu chữ phụ -->
+
+    <color name="background_primary">#FFFFFF</color> <!-- Màu nền chính -->
+    <color name="background_secondary">#F5F5F5</color> <!-- Màu nền phụ -->
+
+    <color name="gray_200">#EEEEEE</color> <!-- Màu nền Card -->
+    <color name="gray_600">#757575</color> <!-- Màu Icon -->
 </resources>
