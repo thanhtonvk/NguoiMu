@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.OcrActivity">
+    tools:context=".views.nguoi_mu.OcrActivity">
 
 
     <SurfaceView
@@ -20,5 +20,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="5dp"
         android:layout_weight="1"
-        android:text="Đổi camera" />
+        android:background="#FFEE58"
+        android:text="Đổi camera"
+        android:textColor="@color/black" />
 </RelativeLayout>

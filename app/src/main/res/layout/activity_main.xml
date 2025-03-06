@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".views.MainActivity">
+    tools:context=".views.nguoi_mu.MainActivity">
 
     <LinearLayout
         android:id="@+id/layout"
@@ -24,77 +24,107 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layout"
-        android:orientation="vertical">
+        android:layout_above="@id/btnMic"
+        android:layout_below="@id/layout">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnDoDuong"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:drawableLeft="@drawable/recognition"
-            android:text="Nhận diện thông minh" />
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDoDuong"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/recognition"
+                android:text="Nhận diện thông minh" />
 
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnGoiDien"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:drawableLeft="@drawable/telephone"
-            android:text="Gọi điện" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoiDien"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/telephone"
+                android:text="Gọi điện" />
 
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnGoiDanhBa"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:drawableLeft="@drawable/contact_book"
-            android:text="Gọi trong danh bạ" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoiDanhBa"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/contact_book"
+                android:text="Gọi trong danh bạ" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnDocChu"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:drawableLeft="@drawable/abc"
-            android:text="Đọc chữ" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDocChu"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/abc"
+                android:text="Đọc chữ" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnMauSach"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:drawableLeft="@drawable/palette"
-            android:text="Màu sắc" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnMauSach"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/palette"
+                android:text="Màu sắc"
+                android:visibility="gone" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnDinhVi"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:drawableLeft="@drawable/location"
-            android:text="Gửi định vị" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDinhVi"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/location"
+                android:text="Gửi định vị" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnId"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_margin="5dp"
-            android:background="@color/white"
-            android:text="ID: "
-            android:textAllCaps="false" />
-    </LinearLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnId"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:text="ID: "
+                android:textAllCaps="false" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnHoctap"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/study"
+                android:text="Học tập"
+                android:textColor="@android:color/black" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnThiOnline"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:drawableLeft="@drawable/exam"
+                android:text="Thi online"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+    </ScrollView>
+
 
     <ImageButton
         android:id="@+id/btnMic"

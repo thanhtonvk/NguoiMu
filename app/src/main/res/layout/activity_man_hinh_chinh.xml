@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#FFCCBC"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".views.ManHinhChinh">
+
+    <androidx.appcompat.widget.AppCompatButton
+
+        android:id="@+id/btnNguoiMu"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_margin="10dp"
+        android:backgroundTint="#EF5350"
+        android:text="Dành cho khiếm thị"
+        android:textColor="@color/white" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCamdiec"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_margin="10dp"
+        android:backgroundTint="#AB47BC"
+        android:text="Dành cho câm điếc"
+        android:textColor="@color/white" />
+</LinearLayout>

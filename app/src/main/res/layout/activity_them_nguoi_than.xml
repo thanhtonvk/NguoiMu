@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
-    tools:context=".views.ThemNguoiThanActivity">
+    tools:context=".views.nguoi_mu.ThemNguoiThanActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -41,16 +41,20 @@
         android:src="@drawable/user" />
 
     <androidx.appcompat.widget.AppCompatButton
+
         android:id="@+id/openGallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFEE58"
         android:text=" Mở thư viện " />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnThem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="thêm" />
+        android:background="#EF5350"
+        android:text="thêm"
+        android:textColor="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvView"

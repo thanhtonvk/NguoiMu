@@ -33,13 +33,15 @@
                 android:textColor="@color/black"
                 android:textSize="24sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnXoa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0.3"
-                android:text="Xoá" />
+                android:background="#EF5350"
+                android:text="Xoá"
+                android:textColor="@color/white" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

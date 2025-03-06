@@ -167,8 +167,8 @@ int yolov9::load(AAssetManager *mgr, int _target_size, const float *_norm_vals, 
 
     char parampath[256];
     char modelpath[256];
-    sprintf(parampath, "money_detection.param");
-    sprintf(modelpath, "money_detection.bin");
+    sprintf(parampath, "best_cu_chi_v9.param");
+    sprintf(modelpath, "best_cu_chi_v9.bin");
 
     yolo.load_param(mgr, parampath);
     yolo.load_model(mgr, modelpath);
@@ -242,13 +242,14 @@ int yolov9::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_
     std::vector<Object> newobjects;
     newobjects.resize(count);
     for (int i = 0; i < count; i++) {
-
         newobjects[i] = objects[picked[i]];
+        // adjust offset to original unpadded
         float x0 = (newobjects[i].rect.x - dw) / scale;
         float y0 = (newobjects[i].rect.y - dh) / scale;
         float x1 = (newobjects[i].rect.x + newobjects[i].rect.width - dw) / scale;
         float y1 = (newobjects[i].rect.y + newobjects[i].rect.height - dh) / scale;
 
+        //clip
         x0 = std::max(std::min(x0, (float) (width - 1)), 0.f);
         y0 = std::max(std::min(y0, (float) (height - 1)), 0.f);
         x1 = std::max(std::min(x1, (float) (width - 1)), 0.f);
@@ -258,24 +259,26 @@ int yolov9::detect(const cv::Mat &rgb, std::vector<Object> &objects, float prob_
         newobjects[i].rect.y = y0;
         newobjects[i].rect.width = x1 - x0;
         newobjects[i].rect.height = y1 - y0;
-
-
     }
+
     objects = newobjects;
+    auto max_prob_obj = std::max_element(objects.begin(), objects.end(),
+                                         [](const Object &a, const Object &b) {
+                                             return a.prob < b.prob;
+                                         });
+    if (max_prob_obj != objects.end()) {
+        objects = {*max_prob_obj};
+    }
+
     return 0;
 
 }
 
 int yolov9::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
-    static const char *class_names_money[] = {"100k",
-                                              "10k",
-                                              "1k",
-                                              "200k",
-                                              "20k",
-                                              "2k",
-                                              "500k",
-                                              "50k",
-                                              "5k"};
+    static const char *class_names[] = {"cam on", "hen gap lai", "khoe", "khong thich",
+                                        "rat vui duoc gap ban", "so", "tam biet", "thich",
+                                        "xin chao", "xin loi", "biet", "anh trai", "chi gai",
+                                        "hieu", "me", "nha", "nho", "to mo", "yeu"};
     static const unsigned char colors[19][3] = {
             {54,  67,  244},
             {99,  30,  233},
@@ -300,44 +303,44 @@ int yolov9::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
 
     int color_index = 0;
     std::cout << objects.size() << std::endl;
+
     for (size_t i = 0; i < objects.size(); i++) {
         const Object &obj = objects[i];
-        if (obj.prob >= 0.9) {
-            const unsigned char *color = colors[color_index % 19];
-            color_index++;
+//        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %s",
+//                            class_names[obj.label]);
+//        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %f", obj.prob);
+        const unsigned char *color = colors[color_index % 19];
+        color_index++;
 
-            cv::Scalar cc(color[0], color[1], color[2]);
+        cv::Scalar cc(color[0], color[1], color[2]);
 
-            cv::rectangle(rgb, obj.rect, cc, 2);
+        cv::rectangle(rgb, obj.rect, cc, 2);
 
-            char text[256];
-            sprintf(text, "%s", class_names_money[obj.label]);
+        char text[256];
+        sprintf(text, "%s", class_names[obj.label]);
 
-            int baseLine = 0;
-            cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1,
-                                                  &baseLine);
+        int baseLine = 0;
+        cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1,
+                                              &baseLine);
 
-            int x = obj.rect.x;
-            int y = obj.rect.y - label_size.height - baseLine;
-            if (y < 0)
-                y = 0;
-            if (x + label_size.width > rgb.cols)
-                x = rgb.cols - label_size.width;
+        int x = obj.rect.x;
+        int y = obj.rect.y - label_size.height - baseLine;
+        if (y < 0)
+            y = 0;
+        if (x + label_size.width > rgb.cols)
+            x = rgb.cols - label_size.width;
 
-            cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
-                                        cv::Size(label_size.width, label_size.height + baseLine)),
-                          cc,
-                          -1);
+        cv::rectangle(rgb, cv::Rect(cv::Point(x, y),
+                                    cv::Size(label_size.width, label_size.height + baseLine)),
+                      cc,
+                      -1);
 
-            cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
-                                                                        : cv::Scalar(255, 255, 255);
+        cv::Scalar textcc = (color[0] + color[1] + color[2] >= 381) ? cv::Scalar(0, 0, 0)
+                                                                    : cv::Scalar(255, 255, 255);
 
-            cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        textcc, 1);
-        }
-
-
+        cv::putText(rgb, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    textcc, 1);
     }
 
 

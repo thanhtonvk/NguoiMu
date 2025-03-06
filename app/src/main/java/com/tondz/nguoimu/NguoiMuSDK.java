@@ -7,12 +7,11 @@ import android.view.Surface;
 import java.util.List;
 
 public class NguoiMuSDK {
-    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight);
+    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight, int camDiec, int money);
 
     public native boolean openCamera(int facing);
 
     public native boolean closeCamera();
-    public  native  boolean onStop();
 
     public native boolean setOutputWindow(Surface surface);
 
@@ -27,6 +26,10 @@ public class NguoiMuSDK {
     public native Bitmap getFaceAlignFromPath(String path);
 
     public native String getLightTraffic();
+
+    public native String getEmotion();
+
+    public native String getDeaf();
 
     public native List<String> getListMoneyResult();
 

@@ -18,7 +18,11 @@
 #include "scrfd.h"
 #include "face_emb.h"
 #include "light_traffic.h"
+#include "emotion_recognition.h"
+#include "scrfd_deaf.h"
 #include "yolov9.h"
+#include "yolov11.h"
+#include "indoor_detection.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -36,20 +40,29 @@ using namespace cv;
 static Yolo *g_yolo = 0;
 static SCRFD *g_scrfd = 0;
 static LightTraffic *g_lightTraffic = 0;
-
+static EmotionRecognition *g_emotion = 0;
 static FaceEmb *g_faceEmb = 0;
-static yolov9 *g_yolov9 = 0;
+static SCRFD_DEAF *g_scrfd_deaf = 0;
+static yolov9 *g_yolo9;
+static yolov11 *g_yolov11 = 0;
+static indoor_detection *indoorDetection = 0;
 static ncnn::Mutex lock;
 
 
 static std::vector<Object> objects;
-static std::vector<Object> moneyObjects;
 static std::vector<FaceObject> faceObjects;
+static std::vector<Object> moneyObjects;
+static std::vector<Object> objectsV9;
+static std::vector<Object> indoorObjects;
+
+
 static std::vector<float> embedding;
 static cv::Mat faceAligned;
 static std::vector<float> resultLightTraffic;
+
+static std::vector<float> scoreEmotions;
+static std::vector<float> scoreDeafs;
 static cv::Mat image;
-static int count = 0;
 
 class MyNdkCamera : public NdkCameraWindow {
 public:
@@ -60,54 +73,58 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
     {
         ncnn::MutexLockGuard g(lock);
         image = rgb.clone();
-
-        if (count % 2 == 0) {
-            if (g_yolov9) {
-                moneyObjects.clear();
-                g_yolov9->detect(rgb, moneyObjects);
-            }
+        if (g_yolov11) {
+            moneyObjects.clear();
+            g_yolov11->detect(rgb, moneyObjects);
         }
-        if (count % 3 == 0) {
-            if (moneyObjects.empty()) {
-                if (g_yolo) {
-                    objects.clear();
-                    g_yolo->detect(rgb, objects);
-                    for (Object obj: objects) {
-                        if (obj.label == 9) {
-                            cv::Mat roi = rgb(obj.rect);
-                            g_lightTraffic->predict(roi, resultLightTraffic);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (count % 1 == 0) {
-            if (moneyObjects.empty()) {
-                if (g_scrfd) {
-                    faceObjects.clear();
-                    g_scrfd->detect(rgb, faceObjects);
-                    if (!faceObjects.empty()) {
-                        g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding,
-                                               faceAligned);
-                    }
+        if (g_yolo && indoorDetection) {
 
+            indoorObjects.clear();
+            indoorDetection->detect(rgb, indoorObjects);
+
+            objects.clear();
+            g_yolo->detect(rgb, objects);
+            for (Object obj: objects) {
+                if (obj.label == 9) {
+                    cv::Mat roi = rgb(obj.rect);
+                    g_lightTraffic->predict(roi, resultLightTraffic);
+                    break;
                 }
             }
 
         }
-
+        if (g_scrfd) {
+            faceObjects.clear();
+            g_scrfd->detect(rgb, faceObjects);
+            if (!faceObjects.empty()) {
+                g_faceEmb->getEmbeding(rgb, faceObjects[0].landmark, embedding, faceAligned);
+            }
+        }
 
         if (!objects.empty()) {
             g_yolo->draw(rgb, objects);
         }
         if (!moneyObjects.empty()) {
-            g_yolov9->draw(rgb, moneyObjects);
+            g_yolov11->draw(rgb, moneyObjects);
         }
         if (!faceObjects.empty()) {
             g_scrfd->draw(rgb, faceObjects);
         }
-        count += 1;
+        if (!indoorObjects.empty()) {
+            indoorDetection->draw(rgb, indoorObjects);
+        }
+
+        if (g_scrfd_deaf && g_emotion && g_yolo9) {
+            scoreEmotions.clear();
+            objectsV9.clear();
+            g_scrfd_deaf->detect(rgb, faceObjects);
+            if (!faceObjects.empty()) {
+                g_yolo9->detect(rgb, objectsV9);
+                g_emotion->predict(rgb, faceObjects[0], scoreEmotions);
+                g_emotion->draw(rgb, faceObjects[0], scoreEmotions);
+                g_yolo9->draw(rgb, objectsV9);
+            }
+        }
     }
 }
 
@@ -132,6 +149,21 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
         g_faceEmb = 0;
         delete g_lightTraffic;
         g_lightTraffic = 0;
+        delete g_yolov11;
+        g_yolov11 = 0;
+
+
+        delete g_scrfd_deaf;
+        g_scrfd_deaf = 0;
+
+        delete g_emotion;
+        g_emotion = 0;
+
+        delete g_yolo9;
+        g_yolo9 = 0;
+
+        delete indoorDetection;
+        indoorDetection = 0;
     }
 
     delete g_camera;
@@ -142,10 +174,23 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
                                             jint yoloDetect, jint faceDectector,
-                                            jint trafficLight) {
+                                            jint trafficLight, jint isCamDiec, jint money) {
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
+    const float mean_vals[][3] =
+            {
+                    {103.53f, 116.28f, 123.675f},
+                    {103.53f, 116.28f, 123.675f},
+            };
+
+    const float norm_vals[][3] =
+            {
+                    {1 / 255.f, 1 / 255.f, 1 / 255.f},
+                    {1 / 255.f, 1 / 255.f, 1 / 255.f},
+            };
+
+    int target_size = 640;
     delete g_yolo;
     g_yolo = 0;
     delete g_scrfd;
@@ -154,42 +199,65 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
     g_faceEmb = 0;
     delete g_lightTraffic;
     g_lightTraffic = 0;
-    delete g_yolov9;
-    g_yolov9 = 0;
+    delete g_yolov11;
+    g_yolov11 = 0;
 
 
-    if (trafficLight == 1) {
-        if (!g_lightTraffic) {
-            g_lightTraffic = new LightTraffic;
+    delete g_scrfd_deaf;
+    g_scrfd_deaf = 0;
+
+    delete g_emotion;
+    g_emotion = 0;
+
+    delete g_yolo9;
+    g_yolo9 = 0;
+
+    delete indoorDetection;
+    indoorDetection = 0;
+
+    if (isCamDiec == 0) {
+        if (trafficLight == 1) {
+            if (!g_lightTraffic) {
+                g_lightTraffic = new LightTraffic;
+            }
+            g_lightTraffic->load(mgr);
         }
-        g_lightTraffic->load(mgr);
-    }
-    if (yoloDetect == 1) {
-        const float mean_vals[][3] =
-                {
-                        {103.53f, 116.28f, 123.675f},
-                        {103.53f, 116.28f, 123.675f},
-                };
+        if (yoloDetect == 1) {
+            g_yolo = new Yolo;
+            g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
+                         norm_vals[0], false);
+            indoorDetection = new indoor_detection;
+            indoorDetection->load(mgr, 320, norm_vals[0], false);
+        }
+        if (faceDectector == 1) {
+            if (!g_scrfd)
+                g_scrfd = new SCRFD;
+            g_scrfd->load(mgr, modeltype, false);
+            if (!g_faceEmb)
+                g_faceEmb = new FaceEmb;
+            g_faceEmb->load(mgr);
+        }
 
-        const float norm_vals[][3] =
-                {
-                        {1 / 255.f, 1 / 255.f, 1 / 255.f},
-                        {1 / 255.f, 1 / 255.f, 1 / 255.f},
-                };
+        if (money == 1) {
+            g_yolov11 = new yolov11;
+            g_yolov11->load(mgr, 320, norm_vals[0], false);
+        }
+    }
 
-        int target_size = 640;
-        g_yolo = new Yolo;
-        g_yolov9 = new yolov9;
-        g_yolo->load(mgr, modeltype, target_size, mean_vals[0],
-                     norm_vals[0], false);
-        g_yolov9->load(mgr, 320, norm_vals[0], false);
+    if (isCamDiec > 0) {
+        if (!g_scrfd_deaf)
+            g_scrfd_deaf = new SCRFD_DEAF;
+        g_scrfd_deaf->load(mgr, modeltype, false);
+
+        if (!g_emotion)
+            g_emotion = new EmotionRecognition;
+        g_emotion->load(mgr);
+
+        if (!g_yolo9)
+            g_yolo9 = new yolov9;
+        g_yolo9->load(mgr, 320, norm_vals[0]);
     }
-    if (faceDectector == 1) {
-        g_scrfd = new SCRFD;
-        g_scrfd->load(mgr, modeltype, false);
-        g_faceEmb = new FaceEmb;
-        g_faceEmb->load(mgr);
-    }
+
     return JNI_TRUE;
 }
 extern "C" jboolean
@@ -227,12 +295,22 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getListResult(JNIEnv *env, jobject thiz) {
     for (const Object &obj: objects) {
         std::ostringstream oss;
         oss << obj.label << " " << obj.rect.x << " " << obj.rect.y << " "
-            << obj.rect.width << " " << obj.rect.height << " " << obj.prob;
+            << obj.rect.width << " " << obj.rect.height;
         std::string objName = oss.str();
         jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
         env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
         env->DeleteLocalRef(javaString);  // Clean up local reference
     }
+    for (const Object &obj: indoorObjects) {
+        std::ostringstream oss;
+        oss << (obj.label + 80) << " " << obj.rect.x << " " << obj.rect.y << " "
+            << obj.rect.width << " " << obj.rect.height;
+        std::string objName = oss.str();
+        jstring javaString = env->NewStringUTF(objName.c_str());  // Convert to jstring
+        env->CallBooleanMethod(arrayList, arrayListAdd, javaString);
+        env->DeleteLocalRef(javaString);  // Clean up local reference
+    }
+    indoorObjects.clear();
     objects.clear();
     return arrayList;
 }
@@ -349,7 +427,7 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmbeddingFromPath(JNIEnv *env, jobject thiz
     __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len face %f", faceObjects1[0].rect.width);
     if (faceObjects1.size() > 0) {
         g_faceEmb->getEmbeding(bgr, faceObjects1[0].landmark, embedding1, faceAligned1);
-
+        __android_log_print(ANDROID_LOG_DEBUG, "LOGFACE", "len embedding %zu", embedding1.size());
         std::ostringstream oss;
 
         // Convert each element to string and add it to the stream
@@ -414,6 +492,63 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getLightTraffic(JNIEnv *env, jobject thiz) {
     }
     return env->NewStringUTF("");
 }
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
+    if (g_scrfd_deaf && g_emotion && g_yolo9) {
+        scoreEmotions.clear();
+        faceObjects.clear();
+        g_scrfd_deaf->detect(image, faceObjects);
+        if (!faceObjects.empty()) {
+            g_emotion->predict(image, faceObjects[0], scoreEmotions);
+        }
+    }
+    if (!scoreEmotions.empty()) {
+        std::ostringstream oss;
+        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << scoreEmotions[i];
+        }
+        // Convert the stream to a string
+        std::string embeddingStr = oss.str();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
+    if (g_scrfd_deaf && g_yolo9 && g_emotion) {
+        scoreEmotions.clear();
+        objectsV9.clear();
+        faceObjects.clear();
+        g_scrfd_deaf->detect(image, faceObjects);
+        if (!faceObjects.empty()) {
+            g_yolo9->detect(image, objectsV9);
+            g_emotion->predict(image, faceObjects[0], scoreEmotions);
+        }
+    }
+    if (!objectsV9.empty() && !scoreEmotions.empty()) {
+        std::ostringstream oss;
+        oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " " << objectsV9[0].rect.y << " "
+            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height << "#";
+
+        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
+            if (i != 0) {
+                oss << ",";  // Add a separator between elements
+            }
+            oss << scoreEmotions[i];
+        }
+
+
+        std::string embeddingStr = oss.str();
+        return env->NewStringUTF(embeddingStr.c_str());
+    }
+    return env->NewStringUTF("");
+}
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getListMoneyResult(JNIEnv *env, jobject thiz) {
@@ -440,16 +575,4 @@ JNIEXPORT jobject JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getImage(JNIEnv *env, jobject thiz) {
     jobject bitmap = mat_to_bitmap(env, image, false);
     return bitmap;
-}
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tondz_nguoimu_NguoiMuSDK_onStop(JNIEnv *env, jobject thiz) {
-    delete g_yolo;
-    g_yolo = 0;
-    delete g_scrfd;
-    g_scrfd = 0;
-    delete g_faceEmb;
-    g_faceEmb = 0;
-    delete g_lightTraffic;
-    g_lightTraffic = 0;
 }
