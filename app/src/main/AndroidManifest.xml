@@ -71,7 +71,7 @@
             android:name=".views.nguoi_mu.CanChinhKhoangCachActivity"
             android:exported="false" />
         <activity
-            android:name=".views.DoDuongActivity"
+            android:name=".views.nguoi_mu.DoDuongActivity"
             android:exported="false" />
         <activity
             android:name=".views.nguoi_mu.NhanDienNguoiThanActivity"
