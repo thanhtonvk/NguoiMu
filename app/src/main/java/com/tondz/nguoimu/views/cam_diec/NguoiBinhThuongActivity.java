@@ -146,21 +146,15 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
 
     void createChuCaiDict() {
         keywordToVideoMap.clear();
-        keywordToVideoMap.put("chấm", R.raw.dau_cham);
-        keywordToVideoMap.put("hỏi", R.raw.dau_hoi);
-        keywordToVideoMap.put("huyền", R.raw.dau_huyen);
-        keywordToVideoMap.put("ngã", R.raw.dau_nga);
-        keywordToVideoMap.put("sắc", R.raw.dau_sac);
         keywordToVideoMap.put("a", R.raw.chu_a);
-        keywordToVideoMap.put("ă", R.raw.chu_aw);
-        keywordToVideoMap.put("â", R.raw.chu_aa);
+
         keywordToVideoMap.put("b", R.raw.chu_b);
         keywordToVideoMap.put("c", R.raw.chu_c);
 
         keywordToVideoMap.put("d", R.raw.chu_d);
-        keywordToVideoMap.put("đ", R.raw.chu_dd);
+
         keywordToVideoMap.put("e", R.raw.chu_e);
-        keywordToVideoMap.put("ê", R.raw.chu_ee);
+
         keywordToVideoMap.put("g", R.raw.chu_g);
         keywordToVideoMap.put("h", R.raw.chu_h);
 
@@ -171,8 +165,7 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
         keywordToVideoMap.put("n", R.raw.chu_n);
 
         keywordToVideoMap.put("o", R.raw.chu_o);
-        keywordToVideoMap.put("ô", R.raw.chu_oo);
-        keywordToVideoMap.put("ơ", R.raw.chu_ow);
+
         keywordToVideoMap.put("p", R.raw.chu_p);
         keywordToVideoMap.put("q", R.raw.chu_q);
         keywordToVideoMap.put("r", R.raw.chu_r);
@@ -180,7 +173,7 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
 
         keywordToVideoMap.put("t", R.raw.chu_t);
         keywordToVideoMap.put("u", R.raw.chu_u);
-        keywordToVideoMap.put("ư", R.raw.chu_uw);
+
         keywordToVideoMap.put("v", R.raw.chu_v);
         keywordToVideoMap.put("x", R.raw.chu_x);
         keywordToVideoMap.put("y", R.raw.chu_y);
@@ -189,52 +182,37 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
 
     void createCauDict() {
         keywordToVideoMap.clear();
-        keywordToVideoMap.put("xin chào", R.raw.xin_chao_vid);
-        keywordToVideoMap.put("cảm ơn", R.raw.cam_on_vid);
-        keywordToVideoMap.put("đánh vần ngón tay", R.raw.danh_van_ngon_tay);
-        keywordToVideoMap.put("bạn khỏe không", R.raw.ban_khoe_khong);
-        keywordToVideoMap.put("bạn thật tuyệt vời", R.raw.ban_that_tuyet_voi);
-        keywordToVideoMap.put("hẹn gặp lại", R.raw.hen_gap_lai_vid);
-        keywordToVideoMap.put("rất vui được gặp bạn", R.raw.rat_vui_duoc_gap_ban_vid);
-        keywordToVideoMap.put("tên tôi là", R.raw.ten_toi_la);
-        keywordToVideoMap.put("vỗ tay", R.raw.vo_tay);
-        keywordToVideoMap.put("xin lỗi", R.raw.xin_loi_vid);
-        keywordToVideoMap.put("bất ngờ", R.raw.bat_ngo);
-        keywordToVideoMap.put("buồn", R.raw.buon_vid);
-        keywordToVideoMap.put("thất vọng", R.raw.that_vong);
-        keywordToVideoMap.put("tức giận", R.raw.tuc_gian);
-        keywordToVideoMap.put("vui", R.raw.vui);
-        keywordToVideoMap.put("biết", R.raw.biet);
-        keywordToVideoMap.put("chấp nhận", R.raw.chap_nhan);
-        keywordToVideoMap.put("ghen", R.raw.ghen);
-        keywordToVideoMap.put("ghét", R.raw.ghet);
-        keywordToVideoMap.put("hiểu", R.raw.hieu);
-        keywordToVideoMap.put("hồi hộp", R.raw.hoi_hop);
-        keywordToVideoMap.put("không biết", R.raw.khong_biet);
-        keywordToVideoMap.put("không hiểu", R.raw.khong_hieu);
-        keywordToVideoMap.put("không thích", R.raw.khong_thich_vid);
-        keywordToVideoMap.put("mắc cở", R.raw.mac_co);
-        keywordToVideoMap.put("nhớ", R.raw.nho);
-        keywordToVideoMap.put("sợ", R.raw.so_vid);
-        keywordToVideoMap.put("bạn thích không", R.raw.thich_vid);
-        keywordToVideoMap.put("thông cảm", R.raw.thong_cam);
-        keywordToVideoMap.put("tỉnh cảm", R.raw.tinh_cam);
-        keywordToVideoMap.put("tò mò", R.raw.to_mo);
-        keywordToVideoMap.put("xấu hổ", R.raw.xau_ho);
-        keywordToVideoMap.put("yên tâm", R.raw.yen_tam);
-        keywordToVideoMap.put("yêu", R.raw.yeu);
+        keywordToVideoMap.put("ăn", R.raw.an);
         keywordToVideoMap.put("anh trai", R.raw.anh_trai);
+        keywordToVideoMap.put("bánh mì", R.raw.banh_mi);
+        keywordToVideoMap.put("bệnh viện", R.raw.benh_vien);
+        keywordToVideoMap.put("biết", R.raw.biet);
+        keywordToVideoMap.put("bún", R.raw.bun);
+        keywordToVideoMap.put("cảm ơn", R.raw.cam_on);
         keywordToVideoMap.put("chị gái", R.raw.chi_gai);
-        keywordToVideoMap.put("con", R.raw.con01);
-        keywordToVideoMap.put("cha", R.raw.cha);
+        keywordToVideoMap.put("đi", R.raw.di);
+        keywordToVideoMap.put("đi vệ sinh", R.raw.di_ve_sinh);
+        keywordToVideoMap.put("đọc sách", R.raw.doc_sach);
+        keywordToVideoMap.put("đồng ý", R.raw.dong_y);
+        keywordToVideoMap.put("hẹn gặp lại", R.raw.hen_gap_lai);
+        keywordToVideoMap.put("hiểu", R.raw.hieu);
+        keywordToVideoMap.put("khỏe", R.raw.khoe);
+        keywordToVideoMap.put("không thích", R.raw.khong_thich);
         keywordToVideoMap.put("mẹ", R.raw.me);
         keywordToVideoMap.put("nhà", R.raw.nha);
-        keywordToVideoMap.put("gia đình", R.raw.gia_dinh);
-        keywordToVideoMap.put("con trai", R.raw.con_trai);
-        keywordToVideoMap.put("con gái", R.raw.con_gai);
-        keywordToVideoMap.put("yêu thương", R.raw.yeu_thuong);
-        keywordToVideoMap.put("biết ơn", R.raw.biet_on);
-        keywordToVideoMap.put("hạnh phúc", R.raw.hanh_phuc);
+        keywordToVideoMap.put("nhớ", R.raw.nho);
+        keywordToVideoMap.put("rất vui được gặp bạn", R.raw.rat_vui_duoc_gap_ban);
+        keywordToVideoMap.put("siêu thị", R.raw.sieu_thi);
+        keywordToVideoMap.put("sợ", R.raw.so);
+        keywordToVideoMap.put("tạm biệt", R.raw.tam_biet);
+        keywordToVideoMap.put("thích", R.raw.thich);
+        keywordToVideoMap.put("tò mò", R.raw.to_mo);
+        keywordToVideoMap.put("uống", R.raw.uong);
+        keywordToVideoMap.put("xe mô tô", R.raw.xe_mo_to);
+        keywordToVideoMap.put("xin chào", R.raw.xin_chao);
+        keywordToVideoMap.put("xin lỗi", R.raw.xin_loi);
+        keywordToVideoMap.put("yêu", R.raw.yeu);
+
 
     }
 

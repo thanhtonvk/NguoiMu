@@ -128,6 +128,10 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
                         "xe mô tô"
 
                 };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -171,6 +175,10 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
                         "supermarket",
                         "drink",
                         "motorbike"};
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -214,6 +222,10 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
                         "超级市场 ",
                         "喝 ",
                         "摩托车 "};
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -332,12 +344,20 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     @Override
     protected void onPause() {
         super.onPause();
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         nguoiMuSDK.closeCamera();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         nguoiMuSDK.closeCamera();
         if (mediaPlayer != null) {
             mediaPlayer.release();
