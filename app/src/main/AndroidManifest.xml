@@ -38,6 +38,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".views.cam_diec.GhepTuActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.nguoi_mu.ReviewActivity"
             android:exported="false" />
         <activity
@@ -85,9 +88,8 @@
         <activity
             android:name=".views.register.RegisterActivity"
             android:exported="false" />
-
         <activity
-            android:name="ManHinhChinhActivity"
+            android:name=".ManHinhChinhActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -45,6 +45,9 @@ public class ChonChucNangMuActivity extends AppCompatActivity {
 
             }
         });
+        findViewById(R.id.btnGhepTu).setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), GhepTuActivity.class));
+        });
 
 
     }

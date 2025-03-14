@@ -9,34 +9,16 @@
 
     <VideoView
         android:id="@+id/videoView"
-        android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_width="wrap_content"
+        android:layout_height="350dp"
+        android:layout_centerHorizontal="true" />
 
     <LinearLayout
         android:id="@+id/layout_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/videoView"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnCauVaTu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#FF7043"
-            android:text="Câu và từ"
-            android:textColor="@color/white" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnBangChuCai"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#EF5350"
-            android:text="Bảng chữ cái"
-            android:textColor="@color/white" />
-    </LinearLayout>
+        android:orientation="horizontal"></LinearLayout>
 
     <GridView
         android:id="@+id/gridView"
@@ -58,12 +40,12 @@
         android:layout_toLeftOf="@id/btnMic" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:background="@color/teal_700"
         android:id="@+id/btnOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/gridView"
         android:layout_alignParentRight="true"
+        android:background="@color/teal_700"
         android:text="OK" />
 
     <ImageButton

@@ -6,6 +6,7 @@ import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -35,8 +36,6 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     Runnable runnable;
     MediaPlayer mediaPlayer;
     TextToSpeech speak;
-    Handler handlerClearString;
-    Runnable runnableClearString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,199 +64,92 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     List<List<Integer>> noiCauTemp1 = new ArrayList<>();
     List<List<Integer>> noiCauTemp2 = new ArrayList<>();
     List<String> finalString = new ArrayList<>();
-    List<List<Integer>> noiCau = new ArrayList<>();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Handler backgroundHandler = new Handler(Looper.getMainLooper());
+    private boolean isRunning = true;
+    private boolean isSpeaking = false; // Đánh dấu đang đọc
+    Runnable clearFinalStringRunnable = () -> {
+        finalString.clear();
+        binding.tvNoiDung.setText("");
+        canPlaySound = true; // Cho phép đọc tiếp
+        isSpeaking = false;
+    };
 
-    private void initNoiCau() {
-        noiCau.add(new ArrayList<>(List.of(7, 0, 6)));
-        noiCau.add(new ArrayList<>(List.of(0, 2, 4)));
-        noiCau.add(new ArrayList<>(List.of(8, 2, 4)));
-        noiCau.add(new ArrayList<>(List.of(3, 9, 6)));
-        noiCau.add(new ArrayList<>(List.of(11, 16, 15)));
-        noiCau.add(new ArrayList<>(List.of(12, 16, 15)));
-        noiCau.add(new ArrayList<>(List.of(0, 13, 1)));
-        noiCau.add(new ArrayList<>(List.of(0, 3, 6)));
-        noiCau.add(new ArrayList<>(List.of(9, 3, 1)));
-        noiCau.add(new ArrayList<>(List.of(12, 18, 14)));
-        noiCau.add(new ArrayList<>(List.of(17, 18, 11)));
-        noiCau.add(new ArrayList<>(List.of(0, 3, 1)));
-        noiCau.add(new ArrayList<>(List.of(16, 14, 11)));
-        noiCau.add(new ArrayList<>(List.of(16, 11, 12)));
-        noiCau.add(new ArrayList<>(List.of(16, 12, 14)));
-        noiCau.add(new ArrayList<>(List.of(17, 7, 18)));
-        noiCau.add(new ArrayList<>(List.of(17, 18, 12)));
-
-
-    }
-
-    //           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
-//           7:  "thích",8: "xin chào",9: "xin lỗi", 10:"biết",11: "anh trai", 12:"chị gái", 13:"hiểu",14: "mẹ", 15:"nhà",
-//           16:  "nhớ",17: "tò mò",18: "yêu"
     private void getObject() {
-        Handler clearHandler = new Handler(); // Tạo handler để xóa finalString
-        Runnable clearFinalStringRunnable = new Runnable() {
-            @Override
-            public void run() {
-                noiCauTemp1.clear();
-                noiCauTemp2.clear();
-                finalString.clear();
-                binding.tvNoiDung.setText("");
 
-            }
-        };
 
         new Thread(() -> {
-            while (true) {
-                String dataDeaf = nguoiMuSDK.getDeaf();
-                if (!dataDeaf.isEmpty()) {
-                    if (dataDeaf.split("#").length != 2) continue;
-                    String deafScore = dataDeaf.split("#")[0];
-                    int deaf = getDeaf(deafScore);
-                    String cuChi = getSource("", deaf);
-                    if (!cuChi.isEmpty()) {
-                        if (finalString.isEmpty()) {
-                            for (List cumTu : noiCau) {
-                                if (Integer.valueOf(deaf).equals(cumTu.get(0))) {
-                                    if (!finalString.contains(cuChi)) {
-                                        noiCauTemp1.add(cumTu);
-                                        finalString.add(cuChi);
-                                        StringBuilder temp = new StringBuilder();
-                                        for (String i : finalString) {
-                                            temp.append(i).append(" ");
-                                        }
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                binding.tvNoiDung.setText(temp);
-                                            }
-                                        });
-
-                                    }
-                                }
-                            }
-                        }
-                        if (finalString.size() == 1) {
-                            for (List cumTu : noiCauTemp1) {
-                                if (Integer.valueOf(deaf).equals(cumTu.get(1))) {
-                                    if (!finalString.contains(cuChi)) {
-                                        noiCauTemp2.add(cumTu);
-                                        finalString.add(cuChi);
-
-                                        StringBuilder temp = new StringBuilder();
-                                        for (String i : finalString) {
-                                            temp.append(i).append(" ");
-                                        }
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-
-                                                binding.tvNoiDung.setText(temp);
-                                            }
-                                        });
-
-                                    }
-                                }
-                            }
-                        }
-                        if (finalString.size() == 2) {
-                            for (List cumTu : noiCauTemp2) {
-                                if (Integer.valueOf(deaf).equals(cumTu.get(2))) {
-                                    if (!finalString.contains(cuChi)) {
-                                        finalString.add(cuChi);
-                                        StringBuilder temp = new StringBuilder();
-                                        for (String i : finalString) {
-                                            temp.append(i).append(" ");
-                                        }
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-
-
-                                                binding.tvNoiDung.setText(temp);
-                                            }
-                                        });
-
-                                    }
-                                }
-                            }
-                        }
-                        if (finalString.size() == 3) {
-                            if (canPlaySound) {
-                                StringBuilder result = new StringBuilder();
-                                for (String i : finalString) {
-                                    result.append(i).append(" ");
-                                }
-                                speak.speak(result, TextToSpeech.QUEUE_FLUSH, null, null);
-                                canPlaySound = false;
-                                handler.postDelayed(runnable, 100);
-                            }
-                        }
-                        clearHandler.removeCallbacks(clearFinalStringRunnable); // Loại bỏ tác vụ trước đó
-                        clearHandler.postDelayed(clearFinalStringRunnable, 10000); // Đặt lại sau 10 giây
+            while (isRunning) {
+                try {
+                    // Nếu đang đọc thì không nhận thêm cử chỉ mới
+                    if (isSpeaking) {
+                        Thread.sleep(100);
+                        continue;
                     }
 
-                }
-                try {
-                    Thread.sleep(300);
+                    String dataDeaf = nguoiMuSDK.getDeaf();
+                    if (dataDeaf.isEmpty()) {
+                        Thread.sleep(10);
+                        continue;
+                    }
+
+                    int deaf = getDeaf(dataDeaf);
+                    String cuChi = getSource("", deaf);
+                    if (cuChi.isEmpty()) {
+                        Thread.sleep(10);
+                        continue;
+                    }
+
+                    if (!finalString.contains(cuChi)) {
+                        mainHandler.post(() -> addToFinalString(cuChi));
+                    }
+
+                    // Xóa sau 10 giây nếu không có hành động mới
+                    backgroundHandler.removeCallbacks(clearFinalStringRunnable);
+                    backgroundHandler.postDelayed(clearFinalStringRunnable, 5000);
+
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    isRunning = false;
                 }
             }
         }).start();
     }
 
+    private void addToFinalString(String cuChi) {
+        finalString.add(cuChi);
+        binding.tvNoiDung.setText(String.join(" ", finalString));
+
+        // Khi đủ 3 câu, tạm dừng nhận cử chỉ 1 giây rồi đọc
+        if (finalString.size() == 3 && canPlaySound) {
+            isSpeaking = true;
+            canPlaySound = false;
+
+            mainHandler.postDelayed(() -> {
+                speak.speak(String.join(" ", finalString), TextToSpeech.QUEUE_FLUSH, null, null);
+            }, 1000); // Đợi 1 giây trước khi đọc
+            speak.setOnUtteranceCompletedListener(s -> {
+                mainHandler.post(clearFinalStringRunnable);
+            });
+
+        }
+    }
+
 
     private String getSource(String emotion, int deaf) {
         String source = "";
-        source = Common.classNames[deaf];
+        if (deaf < 33) {
+            source = Common.classNames[deaf];
+        }
+
         return source;
-//        {
-//           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
-//                  7:  "thích",8: "xin chào",9: "xin lỗi", 10:"biết",11: "anh trai", 12:"chị gái", 13:"hiểu",14: "mẹ", 15:"nhà",
-//                  16:  "nhớ",17: "tò mò",18: "yêu"
-//        };
-//        if (emotion.equalsIgnoreCase("sợ") && deaf == 5) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 4) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tức giận") && deaf == 3) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 0) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 2) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 7) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 9) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 1) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 8) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 6) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 16) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 13) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("bất ngờ") && deaf == 17) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 12) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 11) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 14) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 15) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 18) {
-//            source = Common.classNames[deaf];
-//        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 10) {
-//            source = Common.classNames[deaf];
-//        }
-//        return source;
     }
 
     private void onClick() {
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         binding.tvNoiDung.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -279,7 +171,79 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.btnVi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt", "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà", "nhớ", "tò mò", "yêu"};
+                Common.classNames = new String[]{
+                        "anh trai",
+                        "biết",
+                        "cảm ơn",
+                        "chăm sóc",
+                        "chị gái",
+                        "con người",
+                        "công cộng",
+                        "công việc",
+                        "giúp đỡ",
+                        "giường",
+                        "giống nhau",
+                        "hẹn gặp lại",
+                        "hiểu",
+                        "hợp tác",
+                        "khám bệnh",
+                        "khát nước",
+                        "khen",
+                        "khỏe",
+                        "không thích",
+                        "lắng nghe",
+                        "lễ phép",
+                        "mẹ",
+                        "năn nỉ",
+                        "nhà",
+                        "nhớ",
+                        "rất vui được gặp bạn",
+                        "sợ",
+                        "tạm biệt",
+                        "thích",
+                        "tò mò",
+                        "xin chào",
+                        "xin lỗi",
+                        "yêu",
+                        "a",
+                        "ă",
+                        "â",
+                        "b",
+                        "c",
+                        "d",
+                        "đ",
+                        "e",
+                        "ê",
+                        "g",
+                        "h",
+                        "i",
+                        "k",
+                        "l",
+                        "m",
+                        "n",
+                        "o",
+                        "ô",
+                        "ơ",
+                        "p",
+                        "q",
+                        "r",
+                        "s",
+                        "t",
+                        "u",
+                        "ú",
+                        "v",
+                        "x",
+                        "y",
+                        "dấu chấm",
+                        "dấu hỏi",
+                        "dấu huyền",
+                        "dấu ngã",
+                        "dấu sắc"
+                };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -293,7 +257,79 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.btnEn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"thank you", "see you later", "fine", "don't like", "nice to meet you", "scared", "goodbye", "like", "hello", "sorry", "know", "brother", "sister", "understand", "mother", "home", "miss", "curious", "love"};
+                Common.classNames = new String[]{
+                        "brother",
+                        "know",
+                        "thank you",
+                        "take care",
+                        "sister",
+                        "human",
+                        "public",
+                        "job",
+                        "help",
+                        "bed",
+                        "similar",
+                        "see you again",
+                        "understand",
+                        "cooperate",
+                        "medical checkup",
+                        "thirsty",
+                        "praise",
+                        "healthy",
+                        "dislike",
+                        "listen",
+                        "polite",
+                        "mother",
+                        "beg",
+                        "house",
+                        "miss",
+                        "nice to meet you",
+                        "afraid",
+                        "goodbye",
+                        "like",
+                        "curious",
+                        "hello",
+                        "sorry",
+                        "love",
+                        "a",
+                        "ă",
+                        "â",
+                        "b",
+                        "c",
+                        "d",
+                        "đ",
+                        "e",
+                        "ê",
+                        "g",
+                        "h",
+                        "i",
+                        "k",
+                        "l",
+                        "m",
+                        "n",
+                        "o",
+                        "ô",
+                        "ơ",
+                        "p",
+                        "q",
+                        "r",
+                        "s",
+                        "t",
+                        "u",
+                        "ú",
+                        "v",
+                        "x",
+                        "y",
+                        "period",
+                        "question mark",
+                        "grave accent",
+                        "tilde",
+                        "acute accent"
+                };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -307,7 +343,79 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.btnCn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"谢谢", "待会儿见", "好吧", "不喜欢", "很高兴见到你", "害怕", "再见", "喜欢", "你好", "对不起", "知道", "哥哥", "姐姐", "理解", "妈妈", "家", "想念", "好奇", "爱"};
+                Common.classNames = new String[]{
+                        "哥哥",  // anh trai
+                        "知道",  // biết
+                        "谢谢",  // cảm ơn
+                        "照顾",  // chăm sóc
+                        "姐姐",  // chị gái
+                        "人类",  // con người
+                        "公共",  // công cộng
+                        "工作",  // công việc
+                        "帮助",  // giúp đỡ
+                        "床",  // giường
+                        "相似",  // giống nhau
+                        "再见",  // hẹn gặp lại
+                        "理解",  // hiểu
+                        "合作",  // hợp tác
+                        "看病",  // khám bệnh
+                        "口渴",  // khát nước
+                        "称赞",  // khen
+                        "健康",  // khỏe
+                        "不喜欢",  // không thích
+                        "倾听",  // lắng nghe
+                        "礼貌",  // lễ phép
+                        "妈妈",  // mẹ
+                        "恳求",  // năn nỉ
+                        "家",  // nhà
+                        "想念",  // nhớ
+                        "很高兴认识你",  // rất vui được gặp bạn
+                        "害怕",  // sợ
+                        "再见",  // tạm biệt
+                        "喜欢",  // thích
+                        "好奇",  // tò mò
+                        "你好",  // xin chào
+                        "对不起",  // xin lỗi
+                        "爱",  // yêu
+                        "a",
+                        "ă",
+                        "â",
+                        "b",
+                        "c",
+                        "d",
+                        "đ",
+                        "e",
+                        "ê",
+                        "g",
+                        "h",
+                        "i",
+                        "k",
+                        "l",
+                        "m",
+                        "n",
+                        "o",
+                        "ô",
+                        "ơ",
+                        "p",
+                        "q",
+                        "r",
+                        "s",
+                        "t",
+                        "u",
+                        "ú",
+                        "v",
+                        "x",
+                        "y",
+                        "句号",  // dấu chấm
+                        "问号",  // dấu hỏi
+                        "抑音符",  // dấu huyền
+                        "波浪号",  // dấu ngã
+                        "重音符"   // dấu sắc
+                };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -346,7 +454,79 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.cameraview.getHolder().setFormat(PixelFormat.RGBA_8888);
         binding.cameraview.getHolder().addCallback(this);
 
-        Common.classNames = new String[]{"cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt", "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà", "nhớ", "tò mò", "yêu"};
+        Common.classNames = new String[]{
+                "anh trai",
+                "biết",
+                "cảm ơn",
+                "chăm sóc",
+                "chị gái",
+                "con người",
+                "công cộng",
+                "công việc",
+                "giúp đỡ",
+                "giường",
+                "giống nhau",
+                "hẹn gặp lại",
+                "hiểu",
+                "hợp tác",
+                "khám bệnh",
+                "khát nước",
+                "khen",
+                "khỏe",
+                "không thích",
+                "lắng nghe",
+                "lễ phép",
+                "mẹ",
+                "năn nỉ",
+                "nhà",
+                "nhớ",
+                "rất vui được gặp bạn",
+                "sợ",
+                "tạm biệt",
+                "thích",
+                "tò mò",
+                "xin chào",
+                "xin lỗi",
+                "yêu",
+                "a",
+                "ă",
+                "â",
+                "b",
+                "c",
+                "d",
+                "đ",
+                "e",
+                "ê",
+                "g",
+                "h",
+                "i",
+                "k",
+                "l",
+                "m",
+                "n",
+                "o",
+                "ô",
+                "ơ",
+                "p",
+                "q",
+                "r",
+                "s",
+                "t",
+                "u",
+                "ú",
+                "v",
+                "x",
+                "y",
+                "dấu chấm",
+                "dấu hỏi",
+                "dấu huyền",
+                "dấu ngã",
+                "dấu sắc"
+        };
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -355,7 +535,6 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                 }
             }
         });
-        initNoiCau();
     }
 
     private void reload() {
@@ -393,12 +572,20 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
     @Override
     protected void onPause() {
         super.onPause();
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         nguoiMuSDK.closeCamera();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         nguoiMuSDK.closeCamera();
         if (mediaPlayer != null) {
             mediaPlayer.release();

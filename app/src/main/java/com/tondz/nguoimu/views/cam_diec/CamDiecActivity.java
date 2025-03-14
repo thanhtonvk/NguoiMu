@@ -59,19 +59,17 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
                 if (!dataDeaf.isEmpty()) {
-                    if (dataDeaf.split("#").length != 2) continue;
-                    String deafScore = dataDeaf.split("#")[0];
-                    String emotion = getEmotion(dataDeaf.split("#")[1]);
+                    String deafScore = dataDeaf;
                     int deaf = getDeaf(deafScore);
-                    String cuChi = getSource(emotion, deaf);
+                    String cuChi = getSource("emotion", deaf);
                     if (canPlaySound && !cuChi.isEmpty()) {
                         speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
                         canPlaySound = false;
-                        handler.postDelayed(runnable, 100);
+                        handler.postDelayed(runnable, 2000);
                     }
                 }
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -81,36 +79,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
 
     private String getSource(String emotion, int deaf) {
         String source = "";
-////        {
-////           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
-////                  7:  "thích",8: "xin chào",9: "xin lỗi", 10:"biết",11: "anh trai", 12:"chị gái", 13:"hiểu",14: "mẹ", 15:"nhà",
-////                  16:  "nhớ",17: "tò mò",18: "yêu"
-////        };
-        if (emotion.equalsIgnoreCase("sợ") && deaf == 5) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 4) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 6) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("tức giận") && deaf == 3) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 0) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 2) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 7) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 9) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 1) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 8) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 6) {
+        if (deaf < 33) {
             source = Common.classNames[deaf];
         }
+
         return source;
     }
+
 
     private void onClick() {
         binding.btnChangeCamera.setOnClickListener(new View.OnClickListener() {
@@ -126,10 +101,78 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             @Override
             public void onClick(View v) {
                 Common.classNames = new String[]{
-                        "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
-                        "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
-                        "nhớ", "tò mò", "yêu"
+                        "anh trai",
+                        "biết",
+                        "cảm ơn",
+                        "chăm sóc",
+                        "chị gái",
+                        "con người",
+                        "công cộng",
+                        "công việc",
+                        "giúp đỡ",
+                        "giường",
+                        "giống nhau",
+                        "hẹn gặp lại",
+                        "hiểu",
+                        "hợp tác",
+                        "khám bệnh",
+                        "khát nước",
+                        "khen",
+                        "khỏe",
+                        "không thích",
+                        "lắng nghe",
+                        "lễ phép",
+                        "mẹ",
+                        "năn nỉ",
+                        "nhà",
+                        "nhớ",
+                        "rất vui được gặp bạn",
+                        "sợ",
+                        "tạm biệt",
+                        "thích",
+                        "tò mò",
+                        "xin chào",
+                        "xin lỗi",
+                        "yêu",
+                        "a",
+                        "ă",
+                        "â",
+                        "b",
+                        "c",
+                        "d",
+                        "đ",
+                        "e",
+                        "ê",
+                        "g",
+                        "h",
+                        "i",
+                        "k",
+                        "l",
+                        "m",
+                        "n",
+                        "o",
+                        "ô",
+                        "ơ",
+                        "p",
+                        "q",
+                        "r",
+                        "s",
+                        "t",
+                        "u",
+                        "ú",
+                        "v",
+                        "x",
+                        "y",
+                        "dấu chấm",
+                        "dấu hỏi",
+                        "dấu huyền",
+                        "dấu ngã",
+                        "dấu sắc"
                 };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -143,9 +186,79 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.btnEn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"thank you", "see you later", "fine", "don't like", "nice to meet you", "scared", "goodbye",
-                        "like", "hello", "sorry", "know", "brother", "sister", "understand", "mother", "home",
-                        "miss", "curious", "love"};
+                Common.classNames = new String[]{
+                        "brother",
+                        "know",
+                        "thank you",
+                        "take care",
+                        "sister",
+                        "human",
+                        "public",
+                        "job",
+                        "help",
+                        "bed",
+                        "similar",
+                        "see you again",
+                        "understand",
+                        "cooperate",
+                        "medical checkup",
+                        "thirsty",
+                        "praise",
+                        "healthy",
+                        "dislike",
+                        "listen",
+                        "polite",
+                        "mother",
+                        "beg",
+                        "house",
+                        "miss",
+                        "nice to meet you",
+                        "afraid",
+                        "goodbye",
+                        "like",
+                        "curious",
+                        "hello",
+                        "sorry",
+                        "love",
+                        "a",
+                        "ă",
+                        "â",
+                        "b",
+                        "c",
+                        "d",
+                        "đ",
+                        "e",
+                        "ê",
+                        "g",
+                        "h",
+                        "i",
+                        "k",
+                        "l",
+                        "m",
+                        "n",
+                        "o",
+                        "ô",
+                        "ơ",
+                        "p",
+                        "q",
+                        "r",
+                        "s",
+                        "t",
+                        "u",
+                        "ú",
+                        "v",
+                        "x",
+                        "y",
+                        "period",
+                        "question mark",
+                        "grave accent",
+                        "tilde",
+                        "acute accent"
+                };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -159,9 +272,79 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.btnCn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"谢谢", "待会儿见", "好吧", "不喜欢", "很高兴见到你", "害怕", "再见",
-                        "喜欢", "你好", "对不起", "知道", "哥哥", "姐姐", "理解", "妈妈", "家",
-                        "想念", "好奇", "爱"};
+                Common.classNames = new String[]{
+                        "哥哥",  // anh trai
+                        "知道",  // biết
+                        "谢谢",  // cảm ơn
+                        "照顾",  // chăm sóc
+                        "姐姐",  // chị gái
+                        "人类",  // con người
+                        "公共",  // công cộng
+                        "工作",  // công việc
+                        "帮助",  // giúp đỡ
+                        "床",  // giường
+                        "相似",  // giống nhau
+                        "再见",  // hẹn gặp lại
+                        "理解",  // hiểu
+                        "合作",  // hợp tác
+                        "看病",  // khám bệnh
+                        "口渴",  // khát nước
+                        "称赞",  // khen
+                        "健康",  // khỏe
+                        "不喜欢",  // không thích
+                        "倾听",  // lắng nghe
+                        "礼貌",  // lễ phép
+                        "妈妈",  // mẹ
+                        "恳求",  // năn nỉ
+                        "家",  // nhà
+                        "想念",  // nhớ
+                        "很高兴认识你",  // rất vui được gặp bạn
+                        "害怕",  // sợ
+                        "再见",  // tạm biệt
+                        "喜欢",  // thích
+                        "好奇",  // tò mò
+                        "你好",  // xin chào
+                        "对不起",  // xin lỗi
+                        "爱",  // yêu
+                        "a",
+                        "ă",
+                        "â",
+                        "b",
+                        "c",
+                        "d",
+                        "đ",
+                        "e",
+                        "ê",
+                        "g",
+                        "h",
+                        "i",
+                        "k",
+                        "l",
+                        "m",
+                        "n",
+                        "o",
+                        "ô",
+                        "ơ",
+                        "p",
+                        "q",
+                        "r",
+                        "s",
+                        "t",
+                        "u",
+                        "ú",
+                        "v",
+                        "x",
+                        "y",
+                        "句号",  // dấu chấm
+                        "问号",  // dấu hỏi
+                        "抑音符",  // dấu huyền
+                        "波浪号",  // dấu ngã
+                        "重音符"   // dấu sắc
+                };
+                if (speak != null) {
+                    speak.stop();  // Dừng đọc nếu đang nói
+                    speak.shutdown();  // Giải phóng tài nguyên cũ
+                }
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -199,10 +382,78 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.cameraview.getHolder().setFormat(PixelFormat.RGBA_8888);
         binding.cameraview.getHolder().addCallback(this);
         Common.classNames = new String[]{
-                "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
-                "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
-                "nhớ", "tò mò", "yêu"
+                "anh trai",
+                "biết",
+                "cảm ơn",
+                "chăm sóc",
+                "chị gái",
+                "con người",
+                "công cộng",
+                "công việc",
+                "giúp đỡ",
+                "giường",
+                "giống nhau",
+                "hẹn gặp lại",
+                "hiểu",
+                "hợp tác",
+                "khám bệnh",
+                "khát nước",
+                "khen",
+                "khỏe",
+                "không thích",
+                "lắng nghe",
+                "lễ phép",
+                "mẹ",
+                "năn nỉ",
+                "nhà",
+                "nhớ",
+                "rất vui được gặp bạn",
+                "sợ",
+                "tạm biệt",
+                "thích",
+                "tò mò",
+                "xin chào",
+                "xin lỗi",
+                "yêu",
+                "a",
+                "ă",
+                "â",
+                "b",
+                "c",
+                "d",
+                "đ",
+                "e",
+                "ê",
+                "g",
+                "h",
+                "i",
+                "k",
+                "l",
+                "m",
+                "n",
+                "o",
+                "ô",
+                "ơ",
+                "p",
+                "q",
+                "r",
+                "s",
+                "t",
+                "u",
+                "ú",
+                "v",
+                "x",
+                "y",
+                "dấu chấm",
+                "dấu hỏi",
+                "dấu huyền",
+                "dấu ngã",
+                "dấu sắc"
         };
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -239,7 +490,7 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     @Override
     protected void onResume() {
         super.onResume();
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
         }
         nguoiMuSDK.openCamera(facing);
@@ -248,12 +499,20 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     @Override
     protected void onPause() {
         super.onPause();
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         nguoiMuSDK.closeCamera();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         nguoiMuSDK.closeCamera();
         if (mediaPlayer != null) {
             mediaPlayer.release();

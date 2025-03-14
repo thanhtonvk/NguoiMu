@@ -37,7 +37,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="@color/teal_700"
-            android:text="Người bình thường" />
+            android:text="Người bình thường"
+            android:textColor="@color/white" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -46,7 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="@color/teal_700"
-            android:text="Giao tiếp từ" />
+            android:text="Giao tiếp từ"
+            android:textColor="@color/white" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -55,7 +57,18 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="@color/teal_700"
-            android:text="Giao tiếp câu" />
+            android:text="Giao tiếp câu"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnGhepTu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/teal_700"
+            android:text="Ghép từ"
+            android:textColor="@color/white" />
     </LinearLayout>
+
 
 </RelativeLayout>
