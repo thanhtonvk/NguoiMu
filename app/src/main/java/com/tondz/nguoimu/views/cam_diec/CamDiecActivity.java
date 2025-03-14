@@ -96,9 +96,37 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             @Override
             public void onClick(View v) {
                 Common.classNames = new String[]{
-                        "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
-                        "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
-                        "nhớ", "tò mò", "yêu"
+                        "cám ơn",
+                        "hẹn gặp lại",
+                        "khỏe",
+                        "không thích",
+                        "rất vui được gặp bạn",
+                        "sợ",
+                        "tạm biệt",
+                        "thích",
+                        "xin chào",
+                        "xin lỗi",
+                        "biết",
+                        "anh trai",
+                        "chị gái",
+                        "hiểu",
+                        "mẹ",
+                        "nhà",
+                        "nhớ",
+                        "tò mò",
+                        "yêu",
+                        "ăn",
+                        "bánh mì",
+                        "bệnh viện",
+                        "bún",
+                        "đi",
+                        "đi vệ sinh",
+                        "đọc sách",
+                        "đồng ý",
+                        "siêu thị",
+                        "uống",
+                        "xe mô tô"
+
                 };
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
@@ -113,9 +141,36 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.btnEn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"thank you", "see you later", "fine", "don't like", "nice to meet you", "scared", "goodbye",
-                        "like", "hello", "sorry", "know", "brother", "sister", "understand", "mother", "home",
-                        "miss", "curious", "love"};
+                Common.classNames = new String[]{"thank you",
+                        "see you again",
+                        "well",
+                        "don't like",
+                        "nice to meet you",
+                        "scared",
+                        "bye",
+                        "like",
+                        "hello",
+                        "sorry",
+                        "know",
+                        "brother",
+                        "sister",
+                        "understand",
+                        "mother",
+                        "home",
+                        "miss",
+                        "curious",
+                        "love",
+                        "eat",
+                        "bread",
+                        "hospital",
+                        "noodles",
+                        "go",
+                        "go to the toilet",
+                        "read",
+                        "agree",
+                        "supermarket",
+                        "drink",
+                        "motorbike"};
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -129,9 +184,36 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.btnCn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{"谢谢", "待会儿见", "好吧", "不喜欢", "很高兴见到你", "害怕", "再见",
-                        "喜欢", "你好", "对不起", "知道", "哥哥", "姐姐", "理解", "妈妈", "家",
-                        "想念", "好奇", "爱"};
+                Common.classNames = new String[]{"谢谢 ",
+                        "再见 ",
+                        "强的 ",
+                        "不喜欢 ",
+                        "很高兴见到你 ",
+                        "害怕的 ",
+                        "再见 ",
+                        "更喜欢 ",
+                        "你好 ",
+                        "对不起 ",
+                        "知道 ",
+                        "哥哥 ",
+                        "姐姐 ",
+                        "理解 ",
+                        "妈妈 ",
+                        "家 ",
+                        "错过 ",
+                        "好奇的 ",
+                        "爱 ",
+                        "吃 ",
+                        "面包 ",
+                        "医院 ",
+                        "米线",
+                        "去 ",
+                        "去厕所 ",
+                        "读一本书 ",
+                        "同意 ",
+                        "超级市场 ",
+                        "喝 ",
+                        "摩托车 "};
                 speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int i) {
@@ -169,10 +251,42 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.cameraview.getHolder().setFormat(PixelFormat.RGBA_8888);
         binding.cameraview.getHolder().addCallback(this);
         Common.classNames = new String[]{
-                "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
-                "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
-                "nhớ", "tò mò", "yêu"
+                "cám ơn",
+                "hẹn gặp lại",
+                "khỏe",
+                "không thích",
+                "rất vui được gặp bạn",
+                "sợ",
+                "tạm biệt",
+                "thích",
+                "xin chào",
+                "xin lỗi",
+                "biết",
+                "anh trai",
+                "chị gái",
+                "hiểu",
+                "mẹ",
+                "nhà",
+                "nhớ",
+                "tò mò",
+                "yêu",
+                "ăn",
+                "bánh mì",
+                "bệnh viện",
+                "bún",
+                "đi",
+                "đi vệ sinh",
+                "đọc sách",
+                "đồng ý",
+                "siêu thị",
+                "uống",
+                "xe mô tô"
+
         };
+        if (speak != null) {
+            speak.stop();  // Dừng đọc nếu đang nói
+            speak.shutdown();  // Giải phóng tài nguyên cũ
+        }
         speak = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
