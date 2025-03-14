@@ -164,6 +164,18 @@ public class MainActivity extends AppCompatActivity {
                 getCurrentLocation();
             }
         });
+        findViewById(R.id.btnHoctap).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), HocTapActivity.class));
+            }
+        });
+        findViewById(R.id.btnThiOnline).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), CauHoiActivity.class));
+            }
+        });
     }
 
     private FusedLocationProviderClient fusedLocationClient;

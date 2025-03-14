@@ -521,34 +521,24 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getEmotion(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
-    if (g_scrfd_deaf && g_yolo9 && g_emotion) {
-        scoreEmotions.clear();
-        objectsV9.clear();
-        faceObjects.clear();
-        g_scrfd_deaf->detect(image, faceObjects);
-        if (!faceObjects.empty()) {
-            g_yolo9->detect(image, objectsV9);
-            g_emotion->predict(image, faceObjects[0], scoreEmotions);
-        }
-    }
+
     if (!objectsV9.empty() && !scoreEmotions.empty()) {
         std::ostringstream oss;
-        oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " " << objectsV9[0].rect.y << " "
-            << objectsV9[0].rect.width << " " << objectsV9[0].rect.height << "#";
-
-        for (size_t i = 0; i < scoreEmotions.size(); ++i) {
-            if (i != 0) {
-                oss << ",";  // Add a separator between elements
-            }
-            oss << scoreEmotions[i];
-        }
-
+        oss << objectsV9[0].label << " " << objectsV9[0].rect.x << " "
+            << objectsV9[0].rect.y << " " << objectsV9[0].rect.width << " "
+            << objectsV9[0].rect.height;
 
         std::string embeddingStr = oss.str();
-        return env->NewStringUTF(embeddingStr.c_str());
+        jstring result = env->NewStringUTF(embeddingStr.c_str());
+        return result;
     }
+
+
     return env->NewStringUTF("");
 }
+
+
+
 extern "C"
 JNIEXPORT jobject JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getListMoneyResult(JNIEnv *env, jobject thiz) {

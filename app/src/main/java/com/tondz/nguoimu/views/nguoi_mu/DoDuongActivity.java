@@ -311,12 +311,12 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
     @SuppressLint("DefaultLocale")
     private void speakObject(String text) {
-        Log.e("TAGTOND", "speakObject: ");
+//        Log.e("TAGTOND", "speakObject: ");
+        Log.e("TAG", "speakObject: " + text);
         String[] arr = text.split(" ");
+        if (arr.length == 5) {
+//            double prob = Double.parseDouble(arr[5]);
 
-        double prob = Double.parseDouble(arr[5]);
-
-        if (prob > 0.5) {
             int label = Integer.parseInt(arr[0]);
             double x = Double.parseDouble(arr[1]);
             double y = Double.parseDouble(arr[2]);
@@ -384,12 +384,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
                     if (!textToSpeech.isSpeaking()) {
                         textToSpeech.speak(content, TextToSpeech.QUEUE_FLUSH, null);
                     }
-
-//                    try {
-//                        Thread.sleep(3000);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
                 }
 
             }
@@ -399,12 +393,6 @@ public class DoDuongActivity extends AppCompatActivity implements SurfaceHolder.
 
 
         }
-
-//        try {
-//            Thread.sleep(3000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
 
     }
 

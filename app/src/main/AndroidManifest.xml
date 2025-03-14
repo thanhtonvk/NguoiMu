@@ -37,9 +37,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
-        <activity
-            android:name=".views.nguoi_mu.MainActivity"
-            android:exported="false" />
+
         <activity
             android:name=".views.nguoi_mu.MauSacActivity"
             android:exported="false" />
@@ -69,6 +67,18 @@
             android:exported="false" />
         <activity
             android:name=".views.cam_diec.NguoiBinhThuongActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.nguoi_mu.CauHoiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.nguoi_mu.HocTapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.nguoi_mu.ReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.nguoi_mu.MainActivity"
             android:exported="false" />
         <activity
             android:name=".views.ManHinhChinh"

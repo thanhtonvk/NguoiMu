@@ -59,19 +59,17 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
                 if (!dataDeaf.isEmpty()) {
-                    if (dataDeaf.split("#").length != 2) continue;
-                    String deafScore = dataDeaf.split("#")[0];
-                    String emotion = getEmotion(dataDeaf.split("#")[1]);
+                    String deafScore = dataDeaf;
                     int deaf = getDeaf(deafScore);
-                    String cuChi = getSource(emotion, deaf);
+                    String cuChi = getSource("emotion", deaf);
                     if (canPlaySound && !cuChi.isEmpty()) {
                         speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
                         canPlaySound = false;
-                        handler.postDelayed(runnable, 100);
+                        handler.postDelayed(runnable, 2000);
                     }
                 }
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -80,36 +78,8 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private String getSource(String emotion, int deaf) {
-        String source = "";
-////        {
-////           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
-////                  7:  "thích",8: "xin chào",9: "xin lỗi", 10:"biết",11: "anh trai", 12:"chị gái", 13:"hiểu",14: "mẹ", 15:"nhà",
-////                  16:  "nhớ",17: "tò mò",18: "yêu"
-////        };
-        if (emotion.equalsIgnoreCase("sợ") && deaf == 5) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 4) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 6) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("tức giận") && deaf == 3) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 0) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 2) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 7) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 9) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 1) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 8) {
-            source = Common.classNames[deaf];
-        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 6) {
-            source = Common.classNames[deaf];
-        }
-        return source;
+        return Common.classNames[deaf];
+
     }
 
     private void onClick() {
