@@ -7,7 +7,7 @@ import android.view.Surface;
 import java.util.List;
 
 public class NguoiMuSDK {
-    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight, int camDiec, int money);
+    public native boolean loadModel(AssetManager assetManager, int yoloDetect, int faceDectector, int trafficLight, int camDiec, int money, int chuCai);
 
     public native boolean openCamera(int facing);
 
@@ -30,6 +30,7 @@ public class NguoiMuSDK {
     public native String getEmotion();
 
     public native String getDeaf();
+    public native String getChuCai();
 
     public native List<String> getListMoneyResult();
 

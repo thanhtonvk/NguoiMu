@@ -239,7 +239,7 @@ public class OcrActivity extends AppCompatActivity implements SurfaceHolder.Call
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0, 0);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0, 0,0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         }

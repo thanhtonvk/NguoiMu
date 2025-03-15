@@ -166,7 +166,7 @@ public class NhanDienTienActivity extends AppCompatActivity implements SurfaceHo
     }
 
     private void reload() {
-        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0, 1);
+        boolean ret_init = yolov8Ncnn.loadModel(getAssets(), 0, 0, 0, 0, 1,0);
         if (!ret_init) {
             Log.e("NhanDienTienActivity", "yolov8ncnn loadModel failed");
         }

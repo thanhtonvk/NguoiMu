@@ -23,6 +23,7 @@
 #include "cam_diec.h"
 #include "nhandientien.h"
 #include "indoor_detection.h"
+#include "chu_cai.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -46,6 +47,7 @@ static SCRFD_DEAF *g_scrfd_deaf = 0;
 static cam_diec *g_yolo9;
 static nhandientien *g_yolov11 = 0;
 static indoor_detection *indoorDetection = 0;
+static chu_cai *g_chu_cai;
 static ncnn::Mutex lock;
 
 
@@ -54,6 +56,7 @@ static std::vector<FaceObject> faceObjects;
 static std::vector<Object> moneyObjects;
 static std::vector<Object> objectsV9;
 static std::vector<Object> indoorObjects;
+static std::vector<Object> chuCaiObjects;
 
 
 static std::vector<float> embedding;
@@ -125,6 +128,11 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
                 g_yolo9->draw(rgb, objectsV9);
             }
         }
+        if (g_chu_cai) {
+            chuCaiObjects.clear();
+            g_chu_cai->detect(rgb, chuCaiObjects);
+            g_chu_cai->draw(rgb, chuCaiObjects);
+        }
     }
 }
 
@@ -164,6 +172,9 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 
         delete indoorDetection;
         indoorDetection = 0;
+
+        delete g_chu_cai;
+        g_chu_cai = 0;
     }
 
     delete g_camera;
@@ -174,7 +185,8 @@ JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
 extern "C" jboolean
 Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject assetManager,
                                             jint yoloDetect, jint faceDectector,
-                                            jint trafficLight, jint isCamDiec, jint money) {
+                                            jint trafficLight, jint isCamDiec, jint money,
+                                            jint chuCai) {
     AAssetManager *mgr = AAssetManager_fromJava(env, assetManager);
     ncnn::MutexLockGuard g(lock);
     const char *modeltype = "n";
@@ -214,6 +226,9 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
 
     delete indoorDetection;
     indoorDetection = 0;
+
+    delete g_chu_cai;
+    g_chu_cai = 0;
 
     if (isCamDiec == 0) {
         if (trafficLight == 1) {
@@ -256,6 +271,11 @@ Java_com_tondz_nguoimu_NguoiMuSDK_loadModel(JNIEnv *env, jobject thiz, jobject a
         if (!g_yolo9)
             g_yolo9 = new cam_diec;
         g_yolo9->load(mgr, 320, norm_vals[0]);
+    }
+    if (chuCai > 0) {
+        if (!g_chu_cai)
+            g_chu_cai = new chu_cai;
+        g_chu_cai->load(mgr, 320, norm_vals[0]);
     }
 
     return JNI_TRUE;
@@ -565,4 +585,21 @@ JNIEXPORT jobject JNICALL
 Java_com_tondz_nguoimu_NguoiMuSDK_getImage(JNIEnv *env, jobject thiz) {
     jobject bitmap = mat_to_bitmap(env, image, false);
     return bitmap;
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_tondz_nguoimu_NguoiMuSDK_getChuCai(JNIEnv *env, jobject thiz) {
+    if (!chuCaiObjects.empty()) {
+        std::ostringstream oss;
+        oss << chuCaiObjects[0].label << " " << chuCaiObjects[0].rect.x << " "
+            << chuCaiObjects[0].rect.y << " " << chuCaiObjects[0].rect.width << " "
+            << chuCaiObjects[0].rect.height;
+
+        std::string embeddingStr = oss.str();
+        jstring result = env->NewStringUTF(embeddingStr.c_str());
+        return result;
+    }
+
+
+    return env->NewStringUTF("");
 }

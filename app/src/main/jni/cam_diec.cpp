@@ -167,8 +167,8 @@ int cam_diec::load(AAssetManager *mgr, int _target_size, const float *_norm_vals
 
     char parampath[256];
     char modelpath[256];
-    sprintf(parampath, "cam_diec.param");
-    sprintf(modelpath, "cam_diec.bin");
+    sprintf(parampath, "cu_chi.param");
+    sprintf(modelpath, "cu_chi.bin");
 
     yolo.load_param(mgr, parampath);
     yolo.load_model(mgr, modelpath);
@@ -307,41 +307,8 @@ int cam_diec::draw(cv::Mat &rgb, const std::vector<Object> &objects) {
                                         "to mo",
                                         "xin chao",
                                         "xin loi",
-                                        "yeu",
-                                        "a",
-                                        "a",
-                                        "a",
-                                        "b",
-                                        "c",
-                                        "d",
-                                        "d",
-                                        "e",
-                                        "e",
-                                        "g",
-                                        "h",
-                                        "i",
-                                        "k",
-                                        "l",
-                                        "m",
-                                        "n",
-                                        "o",
-                                        "o",
-                                        "o",
-                                        "p",
-                                        "q",
-                                        "r",
-                                        "s",
-                                        "t",
-                                        "u",
-                                        "u",
-                                        "v",
-                                        "x",
-                                        "y",
-                                        "dau cham",
-                                        "dau hoi",
-                                        "dau huyen",
-                                        "dau nga",
-                                        "dau sac"};
+                                        "yeu"
+    };
     static const unsigned char colors[19][3] = {
             {54,  67,  244},
             {99,  30,  233},

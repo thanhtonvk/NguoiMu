@@ -1,6 +1,9 @@
 package com.tondz.nguoimu.views.cam_diec;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -86,10 +89,51 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
                 if (text.isEmpty()) {
                     Toast.makeText(NguoiBinhThuongActivity.this, "Vui lòng nhập từ khóa", Toast.LENGTH_SHORT).show();
                 } else {
-                    readContent(text);
+                    Toast.makeText(getApplicationContext(), text, LENGTH_LONG).show();
+                    videoQueue = extractKeywords(text);
+                    currentIndex = 0;
+                    playNextVideo();
                 }
             }
         });
+    }
+
+    private void playNextVideo() {
+        if (currentIndex < videoQueue.size()) {
+            int videoResId = videoQueue.get(currentIndex);
+            Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + videoResId);
+
+            // Thiết lập MediaController
+            MediaController mediaController = new MediaController(this);
+            mediaController.setAnchorView(videoView);
+
+            // Gắn MediaController và đường dẫn cho VideoView
+            videoView.setMediaController(mediaController);
+            videoView.setVideoURI(videoUri);
+
+            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    currentIndex++;
+                    playNextVideo();
+                }
+            });
+            videoView.start();
+        }
+    }
+
+    private List<Integer> videoQueue;
+    private int currentIndex = 0;
+
+    private List<Integer> extractKeywords(String text) {
+        List<Integer> queue = new ArrayList<>();
+        for (String keyword : keywordToVideoMap.keySet()) {
+            if (text.contains(keyword)) {
+                queue.add(keywordToVideoMap.get(keyword));
+                text = text.replace(keyword, ""); // Tránh lặp lại từ khóa
+            }
+        }
+        return queue;
     }
 
     @Override
@@ -100,8 +144,9 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
             ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (result != null && !result.isEmpty()) {
                 String text = result.get(0).toLowerCase();
-                int videoId = keywordToVideoMap.get(text);
-                playVideo(videoId);
+                videoQueue = extractKeywords(text);
+                currentIndex = 0;
+                playNextVideo();
             }
         }
     }
@@ -260,7 +305,6 @@ public class NguoiBinhThuongActivity extends AppCompatActivity {
         // Gắn MediaController và đường dẫn cho VideoView
         videoView.setMediaController(mediaController);
         videoView.setVideoURI(videoUri);
-
 
 
         // Bắt đầu phát video

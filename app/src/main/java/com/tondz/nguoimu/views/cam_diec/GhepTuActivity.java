@@ -84,7 +84,8 @@ public class GhepTuActivity extends AppCompatActivity implements SurfaceHolder.C
                         continue;
                     }
 
-                    String dataDeaf = nguoiMuSDK.getDeaf();
+                    String dataDeaf = nguoiMuSDK.getChuCai();
+
                     if (dataDeaf.isEmpty()) {
                         Thread.sleep(10);
                         continue;
@@ -134,12 +135,8 @@ public class GhepTuActivity extends AppCompatActivity implements SurfaceHolder.C
 
 
     private String getSource(String emotion, int deaf) {
-        String source = "";
-        if (deaf > 32) {
-            source = Common.classNames[deaf];
 
-        }
-        return source;
+        return  Common.classNames[deaf];
     }
 
     private void onClick() {
@@ -193,39 +190,6 @@ public class GhepTuActivity extends AppCompatActivity implements SurfaceHolder.C
         binding.cameraview.getHolder().addCallback(this);
 
         Common.classNames = new String[]{
-                "anh trai",
-                "biết",
-                "cảm ơn",
-                "chăm sóc",
-                "chị gái",
-                "con người",
-                "công cộng",
-                "công việc",
-                "giúp đỡ",
-                "giường",
-                "giống nhau",
-                "hẹn gặp lại",
-                "hiểu",
-                "hợp tác",
-                "khám bệnh",
-                "khát nước",
-                "khen",
-                "khỏe",
-                "không thích",
-                "lắng nghe",
-                "lễ phép",
-                "mẹ",
-                "năn nỉ",
-                "nhà",
-                "nhớ",
-                "rất vui được gặp bạn",
-                "sợ",
-                "tạm biệt",
-                "thích",
-                "tò mò",
-                "xin chào",
-                "xin lỗi",
-                "yêu",
                 "a",
                 "ă",
                 "â",
@@ -276,7 +240,7 @@ public class GhepTuActivity extends AppCompatActivity implements SurfaceHolder.C
     }
 
     private void reload() {
-        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1, 0);
+        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 0, 0, 1);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         } else {
