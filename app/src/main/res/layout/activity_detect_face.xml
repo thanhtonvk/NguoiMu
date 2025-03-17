@@ -13,12 +13,12 @@
         android:layout_height="fill_parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:background="@color/teal_700"
-        android:id="@+id/btnBt"
+        android:id="@+id/btnChangeCamera"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_margin="5dp"
         android:layout_weight="1"
+        android:background="@color/teal_700"
 
         android:text="Đổi camera"
         android:textColor="@color/white" />
