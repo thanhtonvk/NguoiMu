@@ -19,7 +19,7 @@ public class Common {
             "sandwich", "cam", "bông cải xanh", "cà rốt", "xúc xích", "pizza", "bánh rán", "bánh ngọt", "ghế", "đi văng",
             "chậu cây", "giường", "bàn ăn", "nhà vệ sinh", "ti vi", "máy tính xách tay", "chuột", "điều khiển từ xa", "bàn phím", "điện thoại di động",
             "lò vi sóng", "lò nướng", "máy nướng bánh mì", "bồn rửa", "tủ lạnh", "sách", "đồng hồ", "bình hoa", "kéo", "gấu bông",
-            "máy sấy tóc", "bàn chải đánh răng"
+            "máy sấy tóc", "bàn chải đánh răng", "cửa", "cầu thang", "cửa"
     };
     public static String[] moneys = {"100 nghìn",
             "10 nghìn",
