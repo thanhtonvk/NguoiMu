@@ -230,8 +230,11 @@ public class MainActivity extends AppCompatActivity {
         if (text.toLowerCase().contains("dinh vi")) {
             getCurrentLocation();
         }
-        if (text.toLowerCase().contains("mau")) {
-            startActivity(new Intent(getApplicationContext(), MauSacActivity.class));
+        if (text.toLowerCase().contains("hoc tap")) {
+            startActivity(new Intent(getApplicationContext(), HocTapActivity.class));
+        }
+        if (text.toLowerCase().contains("thi")) {
+            startActivity(new Intent(getApplicationContext(), CauHoiActivity.class));
         }
     }
 
