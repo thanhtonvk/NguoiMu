@@ -1,16 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.tondz.nguoimu"
-    compileSdk = 34
+    namespace = "com.com.phuyen.com.phuyen.nguoikhuyettat"
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.tondz.nguoimu"
+        applicationId = "com.com.phuyen.com.phuyen.nguoikhuyettat"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -28,7 +29,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            version = "3.31.1";
+            version = "3.31.5";
             path = file("src/main/jni/CMakeLists.txt");
         }
     }
@@ -38,6 +39,9 @@ android {
     }
     buildFeatures {
         viewBinding = true;
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 
@@ -50,6 +54,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.location)
+    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

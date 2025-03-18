@@ -11,6 +11,8 @@ googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
 firebaseAuth = "23.1.0"
 playServicesLocation = "21.3.0"
+kotlin = "1.9.24"
+coreKtx = "1.15.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -23,8 +25,10 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
