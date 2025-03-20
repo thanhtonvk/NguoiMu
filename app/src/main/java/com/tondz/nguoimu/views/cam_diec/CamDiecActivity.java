@@ -58,10 +58,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         new Thread(() -> {
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
+                String emotionScore = nguoiMuSDK.getEmotion();
                 if (!dataDeaf.isEmpty()) {
                     String deafScore = dataDeaf;
                     int deaf = getDeaf(deafScore);
-                    String cuChi = getSource("emotion", deaf);
+                    String deafValue = Common.classNames[deaf];
+                    String emotion = getEmotion(emotionScore);
+                    String cuChi = Common.getMatchingGesture(deafValue, emotion);
                     if (canPlaySound && !cuChi.isEmpty()) {
                         speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
                         canPlaySound = false;
@@ -101,73 +104,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             @Override
             public void onClick(View v) {
                 Common.classNames = new String[]{
-                        "anh trai",
-                        "biết",
-                        "cảm ơn",
-                        "chăm sóc",
-                        "chị gái",
-                        "con người",
-                        "công cộng",
-                        "công việc",
-                        "giúp đỡ",
-                        "giường",
-                        "giống nhau",
-                        "hẹn gặp lại",
-                        "hiểu",
-                        "hợp tác",
-                        "khám bệnh",
-                        "khát nước",
-                        "khen",
-                        "khỏe",
-                        "không thích",
-                        "lắng nghe",
-                        "lễ phép",
-                        "mẹ",
-                        "năn nỉ",
-                        "nhà",
-                        "nhớ",
-                        "rất vui được gặp bạn",
-                        "sợ",
-                        "tạm biệt",
-                        "thích",
-                        "tò mò",
-                        "xin chào",
-                        "xin lỗi",
-                        "yêu",
-                        "a",
-                        "ă",
-                        "â",
-                        "b",
-                        "c",
-                        "d",
-                        "đ",
-                        "e",
-                        "ê",
-                        "g",
-                        "h",
-                        "i",
-                        "k",
-                        "l",
-                        "m",
-                        "n",
-                        "o",
-                        "ô",
-                        "ơ",
-                        "p",
-                        "q",
-                        "r",
-                        "s",
-                        "t",
-                        "u",
-                        "ú",
-                        "v",
-                        "x",
-                        "y",
-                        "dấu chấm",
-                        "dấu hỏi",
-                        "dấu huyền",
-                        "dấu ngã",
-                        "dấu sắc"
+                        "cám ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt", "thích",
+                        "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà", "nhớ", "tò mò", "yêu",
+                        "chữ A", "chữ B", "chữ C", "chữ D", "chữ E", "chữ G", "chữ H", "chữ I", "chữ K", "chữ L", "chữ M",
+                        "chữ N", "chữ O", "chữ P", "chữ Q", "chữ R", "chữ S", "chữ T", "chữ U", "chữ V", "chữ X", "chữ Y",
+                        "dấu chấm", "dấu hỏi", "dấu huyền", "dấu sắc", "dấu ngã", "dấu mũ", "dấu mũ ngược", "chăm sóc",
+                        "con người", "công cộng", "công việc", "giống nhau", "giường", "giúp đỡ", "hợp tác", "khám bệnh",
+                        "khát nước", "khen", "lắng nghe", "lễ phép", "năn nỉ"
                 };
                 if (speak != null) {
                     speak.stop();  // Dừng đọc nếu đang nói
@@ -187,73 +130,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             @Override
             public void onClick(View v) {
                 Common.classNames = new String[]{
-                        "brother",
-                        "know",
-                        "thank you",
-                        "take care",
-                        "sister",
-                        "human",
-                        "public",
-                        "job",
-                        "help",
-                        "bed",
-                        "similar",
-                        "see you again",
-                        "understand",
-                        "cooperate",
-                        "medical checkup",
-                        "thirsty",
-                        "praise",
-                        "healthy",
-                        "dislike",
-                        "listen",
-                        "polite",
-                        "mother",
-                        "beg",
-                        "house",
-                        "miss",
-                        "nice to meet you",
-                        "afraid",
-                        "goodbye",
-                        "like",
-                        "curious",
-                        "hello",
-                        "sorry",
-                        "love",
-                        "a",
-                        "ă",
-                        "â",
-                        "b",
-                        "c",
-                        "d",
-                        "đ",
-                        "e",
-                        "ê",
-                        "g",
-                        "h",
-                        "i",
-                        "k",
-                        "l",
-                        "m",
-                        "n",
-                        "o",
-                        "ô",
-                        "ơ",
-                        "p",
-                        "q",
-                        "r",
-                        "s",
-                        "t",
-                        "u",
-                        "ú",
-                        "v",
-                        "x",
-                        "y",
-                        "period",
-                        "question mark",
-                        "grave accent",
-                        "tilde",
-                        "acute accent"
+                        "thank you", "see you again", "healthy", "don't like", "nice to meet you", "afraid", "goodbye", "like",
+                        "hello", "sorry", "know", "older brother", "older sister", "understand", "mother", "home", "miss", "curious", "love",
+                        "letter A", "letter B", "letter C", "letter D", "letter E", "letter G", "letter H", "letter I", "letter K", "letter L", "letter M",
+                        "letter N", "letter O", "letter P", "letter Q", "letter R", "letter S", "letter T", "letter U", "letter V", "letter X", "letter Y",
+                        "period", "question mark", "grave accent", "acute accent", "tilde", "circumflex", "inverted circumflex", "take care",
+                        "human", "public", "work", "similar", "bed", "help", "cooperate", "medical checkup",
+                        "thirsty", "praise", "listen", "polite", "plead"
                 };
                 if (speak != null) {
                     speak.stop();  // Dừng đọc nếu đang nói
@@ -273,73 +156,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             @Override
             public void onClick(View v) {
                 Common.classNames = new String[]{
-                        "哥哥",  // anh trai
-                        "知道",  // biết
-                        "谢谢",  // cảm ơn
-                        "照顾",  // chăm sóc
-                        "姐姐",  // chị gái
-                        "人类",  // con người
-                        "公共",  // công cộng
-                        "工作",  // công việc
-                        "帮助",  // giúp đỡ
-                        "床",  // giường
-                        "相似",  // giống nhau
-                        "再见",  // hẹn gặp lại
-                        "理解",  // hiểu
-                        "合作",  // hợp tác
-                        "看病",  // khám bệnh
-                        "口渴",  // khát nước
-                        "称赞",  // khen
-                        "健康",  // khỏe
-                        "不喜欢",  // không thích
-                        "倾听",  // lắng nghe
-                        "礼貌",  // lễ phép
-                        "妈妈",  // mẹ
-                        "恳求",  // năn nỉ
-                        "家",  // nhà
-                        "想念",  // nhớ
-                        "很高兴认识你",  // rất vui được gặp bạn
-                        "害怕",  // sợ
-                        "再见",  // tạm biệt
-                        "喜欢",  // thích
-                        "好奇",  // tò mò
-                        "你好",  // xin chào
-                        "对不起",  // xin lỗi
-                        "爱",  // yêu
-                        "a",
-                        "ă",
-                        "â",
-                        "b",
-                        "c",
-                        "d",
-                        "đ",
-                        "e",
-                        "ê",
-                        "g",
-                        "h",
-                        "i",
-                        "k",
-                        "l",
-                        "m",
-                        "n",
-                        "o",
-                        "ô",
-                        "ơ",
-                        "p",
-                        "q",
-                        "r",
-                        "s",
-                        "t",
-                        "u",
-                        "ú",
-                        "v",
-                        "x",
-                        "y",
-                        "句号",  // dấu chấm
-                        "问号",  // dấu hỏi
-                        "抑音符",  // dấu huyền
-                        "波浪号",  // dấu ngã
-                        "重音符"   // dấu sắc
+                        "谢谢", "再见", "健康", "不喜欢", "很高兴见到你", "害怕", "告别", "喜欢",
+                        "你好", "对不起", "知道", "哥哥", "姐姐", "理解", "妈妈", "家", "想念", "好奇", "爱",
+                        "字母A", "字母B", "字母C", "字母D", "字母E", "字母G", "字母H", "字母I", "字母K", "字母L", "字母M",
+                        "字母N", "字母O", "字母P", "字母Q", "字母R", "字母S", "字母T", "字母U", "字母V", "字母X", "字母Y",
+                        "句号", "问号", "沉音", "升调", "波浪音", "帽子音", "倒帽子音", "照顾",
+                        "人类", "公共", "工作", "相似", "床", "帮助", "合作", "体检",
+                        "口渴", "称赞", "倾听", "礼貌", "恳求"
                 };
                 if (speak != null) {
                     speak.stop();  // Dừng đọc nếu đang nói
@@ -382,73 +205,13 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         binding.cameraview.getHolder().setFormat(PixelFormat.RGBA_8888);
         binding.cameraview.getHolder().addCallback(this);
         Common.classNames = new String[]{
-                "anh trai",
-                "biết",
-                "cảm ơn",
-                "chăm sóc",
-                "chị gái",
-                "con người",
-                "công cộng",
-                "công việc",
-                "giúp đỡ",
-                "giường",
-                "giống nhau",
-                "hẹn gặp lại",
-                "hiểu",
-                "hợp tác",
-                "khám bệnh",
-                "khát nước",
-                "khen",
-                "khỏe",
-                "không thích",
-                "lắng nghe",
-                "lễ phép",
-                "mẹ",
-                "năn nỉ",
-                "nhà",
-                "nhớ",
-                "rất vui được gặp bạn",
-                "sợ",
-                "tạm biệt",
-                "thích",
-                "tò mò",
-                "xin chào",
-                "xin lỗi",
-                "yêu",
-                "a",
-                "ă",
-                "â",
-                "b",
-                "c",
-                "d",
-                "đ",
-                "e",
-                "ê",
-                "g",
-                "h",
-                "i",
-                "k",
-                "l",
-                "m",
-                "n",
-                "o",
-                "ô",
-                "ơ",
-                "p",
-                "q",
-                "r",
-                "s",
-                "t",
-                "u",
-                "ú",
-                "v",
-                "x",
-                "y",
-                "dấu chấm",
-                "dấu hỏi",
-                "dấu huyền",
-                "dấu ngã",
-                "dấu sắc"
+                "cám ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt", "thích",
+                "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà", "nhớ", "tò mò", "yêu",
+                "chữ A", "chữ B", "chữ C", "chữ D", "chữ E", "chữ G", "chữ H", "chữ I", "chữ K", "chữ L", "chữ M",
+                "chữ N", "chữ O", "chữ P", "chữ Q", "chữ R", "chữ S", "chữ T", "chữ U", "chữ V", "chữ X", "chữ Y",
+                "dấu chấm", "dấu hỏi", "dấu huyền", "dấu sắc", "dấu ngã", "dấu mũ", "dấu mũ ngược", "chăm sóc",
+                "con người", "công cộng", "công việc", "giống nhau", "giường", "giúp đỡ", "hợp tác", "khám bệnh",
+                "khát nước", "khen", "lắng nghe", "lễ phép", "năn nỉ"
         };
         if (speak != null) {
             speak.stop();  // Dừng đọc nếu đang nói
@@ -465,7 +228,7 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
     }
 
     private void reload() {
-        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1, 0,0);
+        boolean ret_init = nguoiMuSDK.loadModel(getAssets(), 0, 0, 0, 1, 0, 0);
         if (!ret_init) {
             Log.e("NhanDienNguoiThanActivity", "yolov8ncnn loadModel failed");
         } else {

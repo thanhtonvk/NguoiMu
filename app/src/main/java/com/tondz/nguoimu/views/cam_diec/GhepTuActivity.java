@@ -97,7 +97,8 @@ public class GhepTuActivity extends AppCompatActivity implements SurfaceHolder.C
                         Thread.sleep(10);
                         continue;
                     }
-                    mainHandler.post(() -> addToFinalString(cuChi));
+                    if(!finalString.contains(cuChi))
+                        mainHandler.post(() -> addToFinalString(cuChi));
                     // Xóa sau 10 giây nếu không có hành động mới
                     backgroundHandler.removeCallbacks(clearFinalStringRunnable);
                     backgroundHandler.postDelayed(clearFinalStringRunnable, 10000);
