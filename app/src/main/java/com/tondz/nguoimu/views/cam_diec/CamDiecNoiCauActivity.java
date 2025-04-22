@@ -172,73 +172,9 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
             @Override
             public void onClick(View v) {
                 Common.classNames = new String[]{
-                        "anh trai",
-                        "biết",
-                        "cảm ơn",
-                        "chăm sóc",
-                        "chị gái",
-                        "con người",
-                        "công cộng",
-                        "công việc",
-                        "giúp đỡ",
-                        "giường",
-                        "giống nhau",
-                        "hẹn gặp lại",
-                        "hiểu",
-                        "hợp tác",
-                        "khám bệnh",
-                        "khát nước",
-                        "khen",
-                        "khỏe",
-                        "không thích",
-                        "lắng nghe",
-                        "lễ phép",
-                        "mẹ",
-                        "năn nỉ",
-                        "nhà",
-                        "nhớ",
-                        "rất vui được gặp bạn",
-                        "sợ",
-                        "tạm biệt",
-                        "thích",
-                        "tò mò",
-                        "xin chào",
-                        "xin lỗi",
-                        "yêu",
-                        "a",
-                        "ă",
-                        "â",
-                        "b",
-                        "c",
-                        "d",
-                        "đ",
-                        "e",
-                        "ê",
-                        "g",
-                        "h",
-                        "i",
-                        "k",
-                        "l",
-                        "m",
-                        "n",
-                        "o",
-                        "ô",
-                        "ơ",
-                        "p",
-                        "q",
-                        "r",
-                        "s",
-                        "t",
-                        "u",
-                        "ú",
-                        "v",
-                        "x",
-                        "y",
-                        "dấu chấm",
-                        "dấu hỏi",
-                        "dấu huyền",
-                        "dấu ngã",
-                        "dấu sắc"
+                        "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
+                        "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
+                        "nhớ", "tò mò", "yêu"
                 };
                 if (speak != null) {
                     speak.stop();  // Dừng đọc nếu đang nói
@@ -257,75 +193,9 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.btnEn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{
-                        "brother",
-                        "know",
-                        "thank you",
-                        "take care",
-                        "sister",
-                        "human",
-                        "public",
-                        "job",
-                        "help",
-                        "bed",
-                        "similar",
-                        "see you again",
-                        "understand",
-                        "cooperate",
-                        "medical checkup",
-                        "thirsty",
-                        "praise",
-                        "healthy",
-                        "dislike",
-                        "listen",
-                        "polite",
-                        "mother",
-                        "beg",
-                        "house",
-                        "miss",
-                        "nice to meet you",
-                        "afraid",
-                        "goodbye",
-                        "like",
-                        "curious",
-                        "hello",
-                        "sorry",
-                        "love",
-                        "a",
-                        "ă",
-                        "â",
-                        "b",
-                        "c",
-                        "d",
-                        "đ",
-                        "e",
-                        "ê",
-                        "g",
-                        "h",
-                        "i",
-                        "k",
-                        "l",
-                        "m",
-                        "n",
-                        "o",
-                        "ô",
-                        "ơ",
-                        "p",
-                        "q",
-                        "r",
-                        "s",
-                        "t",
-                        "u",
-                        "ú",
-                        "v",
-                        "x",
-                        "y",
-                        "period",
-                        "question mark",
-                        "grave accent",
-                        "tilde",
-                        "acute accent"
-                };
+                Common.classNames = new String[]{"thank you", "see you later", "fine", "don't like", "nice to meet you", "scared", "goodbye",
+                        "like", "hello", "sorry", "know", "brother", "sister", "understand", "mother", "home",
+                        "miss", "curious", "love"};
                 if (speak != null) {
                     speak.stop();  // Dừng đọc nếu đang nói
                     speak.shutdown();  // Giải phóng tài nguyên cũ
@@ -343,75 +213,9 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.btnCn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Common.classNames = new String[]{
-                        "哥哥",  // anh trai
-                        "知道",  // biết
-                        "谢谢",  // cảm ơn
-                        "照顾",  // chăm sóc
-                        "姐姐",  // chị gái
-                        "人类",  // con người
-                        "公共",  // công cộng
-                        "工作",  // công việc
-                        "帮助",  // giúp đỡ
-                        "床",  // giường
-                        "相似",  // giống nhau
-                        "再见",  // hẹn gặp lại
-                        "理解",  // hiểu
-                        "合作",  // hợp tác
-                        "看病",  // khám bệnh
-                        "口渴",  // khát nước
-                        "称赞",  // khen
-                        "健康",  // khỏe
-                        "不喜欢",  // không thích
-                        "倾听",  // lắng nghe
-                        "礼貌",  // lễ phép
-                        "妈妈",  // mẹ
-                        "恳求",  // năn nỉ
-                        "家",  // nhà
-                        "想念",  // nhớ
-                        "很高兴认识你",  // rất vui được gặp bạn
-                        "害怕",  // sợ
-                        "再见",  // tạm biệt
-                        "喜欢",  // thích
-                        "好奇",  // tò mò
-                        "你好",  // xin chào
-                        "对不起",  // xin lỗi
-                        "爱",  // yêu
-                        "a",
-                        "ă",
-                        "â",
-                        "b",
-                        "c",
-                        "d",
-                        "đ",
-                        "e",
-                        "ê",
-                        "g",
-                        "h",
-                        "i",
-                        "k",
-                        "l",
-                        "m",
-                        "n",
-                        "o",
-                        "ô",
-                        "ơ",
-                        "p",
-                        "q",
-                        "r",
-                        "s",
-                        "t",
-                        "u",
-                        "ú",
-                        "v",
-                        "x",
-                        "y",
-                        "句号",  // dấu chấm
-                        "问号",  // dấu hỏi
-                        "抑音符",  // dấu huyền
-                        "波浪号",  // dấu ngã
-                        "重音符"   // dấu sắc
-                };
+                Common.classNames = new String[]{"谢谢", "待会儿见", "好吧", "不喜欢", "很高兴见到你", "害怕", "再见",
+                        "喜欢", "你好", "对不起", "知道", "哥哥", "姐姐", "理解", "妈妈", "家",
+                        "想念", "好奇", "爱"};
                 if (speak != null) {
                     speak.stop();  // Dừng đọc nếu đang nói
                     speak.shutdown();  // Giải phóng tài nguyên cũ
@@ -426,7 +230,6 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
                 });
             }
         });
-
     }
 
     private int getDeaf(String scoreDeaf) {
@@ -455,73 +258,9 @@ public class CamDiecNoiCauActivity extends AppCompatActivity implements SurfaceH
         binding.cameraview.getHolder().addCallback(this);
 
         Common.classNames = new String[]{
-                "anh trai",
-                "biết",
-                "cảm ơn",
-                "chăm sóc",
-                "chị gái",
-                "con người",
-                "công cộng",
-                "công việc",
-                "giúp đỡ",
-                "giường",
-                "giống nhau",
-                "hẹn gặp lại",
-                "hiểu",
-                "hợp tác",
-                "khám bệnh",
-                "khát nước",
-                "khen",
-                "khỏe",
-                "không thích",
-                "lắng nghe",
-                "lễ phép",
-                "mẹ",
-                "năn nỉ",
-                "nhà",
-                "nhớ",
-                "rất vui được gặp bạn",
-                "sợ",
-                "tạm biệt",
-                "thích",
-                "tò mò",
-                "xin chào",
-                "xin lỗi",
-                "yêu",
-                "a",
-                "ă",
-                "â",
-                "b",
-                "c",
-                "d",
-                "đ",
-                "e",
-                "ê",
-                "g",
-                "h",
-                "i",
-                "k",
-                "l",
-                "m",
-                "n",
-                "o",
-                "ô",
-                "ơ",
-                "p",
-                "q",
-                "r",
-                "s",
-                "t",
-                "u",
-                "ú",
-                "v",
-                "x",
-                "y",
-                "dấu chấm",
-                "dấu hỏi",
-                "dấu huyền",
-                "dấu ngã",
-                "dấu sắc"
+                "cảm ơn", "hẹn gặp lại", "khỏe", "không thích", "rất vui được gặp bạn", "sợ", "tạm biệt",
+                "thích", "xin chào", "xin lỗi", "biết", "anh trai", "chị gái", "hiểu", "mẹ", "nhà",
+                "nhớ", "tò mò", "yêu"
         };
         if (speak != null) {
             speak.stop();  // Dừng đọc nếu đang nói
