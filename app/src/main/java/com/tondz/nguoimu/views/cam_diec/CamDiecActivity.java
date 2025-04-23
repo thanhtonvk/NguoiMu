@@ -59,22 +59,19 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
             while (true) {
                 String dataDeaf = nguoiMuSDK.getDeaf();
                 if (!dataDeaf.isEmpty()) {
-                    String deafScore = dataDeaf;
+                    if(dataDeaf.split("#").length != 2) continue;
+                    String deafScore = dataDeaf.split("#")[0];
+                    String emotion = getEmotion(dataDeaf.split("#")[1]);
                     int deaf = getDeaf(deafScore);
-                    String[] arr = dataDeaf.split("#");
-                    if (arr.length == 2) {
-                        String emotion = getEmotion(arr[1]);
-                        String cuChi = getSource(emotion, deaf);
-                        if (canPlaySound && !cuChi.isEmpty()) {
-                            speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
-                            canPlaySound = false;
-                            handler.postDelayed(runnable, 2000);
-                        }
+                    String cuChi = getSource(emotion, deaf);
+                    if (canPlaySound && !cuChi.isEmpty()) {
+                        speak.speak(cuChi, TextToSpeech.QUEUE_FLUSH, null, null);
+                        canPlaySound = false;
+                        handler.postDelayed(runnable, 100);
                     }
-
                 }
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(30);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -82,7 +79,7 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         }).start();
     }
 
-    private String getSource(String emotion, int deaf) {
+    private String getSource(String emotion, int deaf){
         String source = "";
 ////        {
 ////           0: "cảm ơn",1: "hẹn gặp lại",2: "khỏe", 3: "không thích",4: "rất vui được gặp bạn",5: "sợ", 6:"tạm biệt",
@@ -110,6 +107,24 @@ public class CamDiecActivity extends AppCompatActivity implements SurfaceHolder.
         } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 8) {
             source = Common.classNames[deaf];
         } else if (emotion.equalsIgnoreCase("buồn") && deaf == 6) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("buồn") && deaf == 16) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 13) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("bất ngờ") && deaf == 17) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 12) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 11) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 14) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 15) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("vui vẻ") && deaf == 18) {
+            source = Common.classNames[deaf];
+        } else if (emotion.equalsIgnoreCase("tự nhiên") && deaf == 10) {
             source = Common.classNames[deaf];
         }
         return source;

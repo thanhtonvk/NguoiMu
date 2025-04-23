@@ -536,8 +536,6 @@ Java_com_tondz_nguoimu_NguoiMuSDK_getDeaf(JNIEnv *env, jobject thiz) {
             }
             oss << scoreEmotions[i];
         }
-
-
         std::string embeddingStr = oss.str();
         return env->NewStringUTF(embeddingStr.c_str());
     }
